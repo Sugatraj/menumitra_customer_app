@@ -158,19 +158,17 @@ function Search() {
               </div>
               <ul>
                 <li>
-         
-<HorizontalMenuCard
-  // image="assets/images/food/small/6.png"
-  title="Fresh Strawberry"
-  currentPrice={5.0}
-  originalPrice={8.9}
-  discount="10%"
-  // onAddToCart={() => handleAddToCart(productId)}
-  // onFavoriteClick={() => handleFavoriteClick(productId)}
-  isFavorite={false}
-  productUrl="/product-detail"
-/>
-                 
+                  <HorizontalMenuCard
+                    // image="assets/images/food/small/6.png"
+                    title="Fresh Strawberry"
+                    currentPrice={5.0}
+                    originalPrice={8.9}
+                    discount="10%"
+                    // onAddToCart={() => handleAddToCart(productId)}
+                    // onFavoriteClick={() => handleFavoriteClick(productId)}
+                    isFavorite={false}
+                    productUrl="/product-detail"
+                  />
                 </li>
               </ul>
             </div>

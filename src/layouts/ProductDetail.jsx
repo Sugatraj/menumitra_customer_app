@@ -1,0 +1,163 @@
+import React, { useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
+import { Link } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
+
+function ProductDetail() {
+  const [quantity, setQuantity] = useState(0);
+
+  const handleQuantityChange = (increment) => {
+    setQuantity(prev => Math.max(0, prev + increment));
+  };
+
+  // Sample product data - in a real app, this would come from props or API
+  const product = {
+    category: 'FRUITS',
+    name: 'Organic Lemons',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    rating: 4.6,
+    reviews: 89,
+    currentPrice: 5.8,
+    originalPrice: 8.0,
+    discount: '20%',
+    images: [
+      'https://men4u.xyz/media/menu_images/puranpoli3.jpg',
+      'https://men4u.xyz/media/menu_images/puranpoli3.jpg',
+      'https://men4u.xyz/media/menu_images/puranpoli3.jpg',
+      'https://men4u.xyz/media/menu_images/puranpoli3.jpg'
+    ]
+  };
+
+  return (
+    <div className="page-content">
+      <Header />
+      <div className="content-body bottom-content">
+        <div className="swiper-btn-center-lr my-0">
+          <Swiper
+            modules={[Pagination]}
+            pagination={{
+              clickable: true,
+              el: '.swiper-pagination',
+              bulletClass: 'swiper-pagination-bullet',
+              bulletActiveClass: 'swiper-pagination-bullet-active',
+              horizontalClass: 'swiper-pagination-horizontal',
+              clickableClass: 'swiper-pagination-clickable',
+            }}
+            className="demo-swiper swiper-initialized swiper-horizontal swiper-ios swiper-watch-progress swiper-backface-hidden"
+            watchProgress={true}
+            slidesPerView={1}
+          >
+            {product.images.map((image, index) => (
+              <SwiperSlide key={index}>
+                <div className="dz-banner-heading">
+                  <div className="overlay-black-light">
+                    <img src={image} className="bnr-img" alt="product" />
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+            <div className="swiper-btn">
+              <div className="swiper-pagination style-2 flex-1 swiper-pagination-clickable swiper-pagination-bullets swiper-pagination-horizontal" />
+            </div>
+          </Swiper>
+        </div>
+
+        <div className="account-box style-1">
+          <div className="container">
+            <div className="company-detail">
+              <div className="detail-content">
+                <div className="flex-1">
+                  <h6 className="text-secondary sub-title">{product.category}</h6>
+                  <h4>{product.name}</h4>
+                  <p>{product.description}</p>
+                </div>
+              </div>
+              <ul className="item-inner">
+                <li>
+                  <div className="reviews-info">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M21.3899 11.6C21.6646 11.3192 21.8559 10.9676 21.9424 10.5845C22.029 10.2013 22.0073 9.80162 21.8799 9.43003C21.7604 9.05734 21.5386 8.7257 21.2398 8.47289C20.941 8.22007 20.5773 8.05623 20.1899 8.00003L15.8999 7.34003C15.8799 7.33423 15.8615 7.32404 15.8459 7.3102C15.8303 7.29636 15.818 7.27922 15.8099 7.26003L13.9299 3.26003C13.7651 2.88547 13.4949 2.56693 13.1522 2.34321C12.8095 2.1195 12.4092 2.00026 11.9999 2.00003C11.5954 1.99835 11.1991 2.11354 10.8585 2.33174C10.5179 2.54994 10.2475 2.86187 10.0799 3.23003L8.19994 7.23003C8.18968 7.24953 8.1755 7.2667 8.15829 7.28047C8.14108 7.29423 8.12122 7.3043 8.09994 7.31003L3.81994 8.00003C3.43203 8.05782 3.06776 8.22207 2.76764 8.47453C2.46751 8.72699 2.2433 9.05775 2.11994 9.43003C1.99723 9.80291 1.97896 10.2023 2.0671 10.5848C2.15524 10.9673 2.34643 11.3184 2.61994 11.6L5.77994 14.85C5.78903 14.8705 5.79373 14.8926 5.79373 14.915C5.79373 14.9374 5.78903 14.9596 5.77994 14.98L5.03994 19.52C4.97114 19.9154 5.01599 20.3222 5.16926 20.6931C5.32253 21.064 5.57794 21.3838 5.90577 21.6152C6.23361 21.8467 6.62042 21.9804 7.02122 22.0007C7.42203 22.021 7.82037 21.9272 8.16994 21.73L11.8999 19.66C11.9185 19.6504 11.939 19.6453 11.9599 19.6453C11.9808 19.6453 12.0014 19.6504 12.0199 19.66L15.7499 21.73C16.1 21.9229 16.4972 22.0135 16.8963 21.9913C17.2953 21.9691 17.6801 21.8351 18.0065 21.6045C18.333 21.374 18.5881 21.0563 18.7425 20.6877C18.897 20.3191 18.9446 19.9144 18.8799 19.52L18.1899 15C18.1794 14.9818 18.1739 14.9611 18.1739 14.94C18.1739 14.919 18.1794 14.8983 18.1899 14.88L21.3899 11.6Z" fill="#FFA902"/>
+                    </svg>
+                    <h6 className="reviews">{product.rating} ({product.reviews} reviews)</h6>
+                  </div>
+                </li>
+                <li>
+                  <a className="d-flex delivery" href="javascript:void(0);">
+                    <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17.415 5H15.81V2.51C15.7935 1.39475 14.8853 0.5 13.77 0.5H2.79C1.67475 0.5 0.7665 1.39475 0.75 2.51V11.99C0.7665 13.1052 1.67475 14 2.79 14H5.415C5.83875 15.1678 7.1295 15.7715 8.298 15.347C8.92425 15.1198 9.41775 14.6263 9.645 14H16.335C16.7588 15.1678 18.0495 15.7715 19.218 15.347C19.8442 15.1198 20.3377 14.6263 20.565 14H21.525C22.4775 14 23.25 13.2275 23.25 12.275V10.865C23.2628 7.6385 20.6565 5.01275 17.43 5C17.4247 5 17.4202 5 17.415 5ZM7.5 14C7.086 14 6.75 13.664 6.75 13.25C6.75 12.836 7.086 12.5 7.5 12.5C7.914 12.5 8.25 12.836 8.25 13.25C8.25 13.664 7.914 14 7.5 14ZM18.45 14C18.036 14 17.7 13.664 17.7 13.25C17.7 12.836 18.036 12.5 18.45 12.5C18.864 12.5 19.2 12.836 19.2 13.25C19.2 13.664 18.864 14 18.45 14Z" fill="var(--primary)"/>
+                    </svg>
+                    <h6 className="mb-0 ms-2">FREE DELIVERY</h6>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="item-list-2">
+              <div className="price">
+                <span className="text-style text-soft">Price</span>
+                <h3 className="sub-title">
+                  ${product.currentPrice} <del>${product.originalPrice}</del>
+                </h3>
+              </div>
+              <div className="dz-stepper border-1 rounded-stepper">
+                <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                  <span className="input-group-btn input-group-prepend">
+                    <button 
+                      className="btn btn-primary bootstrap-touchspin-down" 
+                      type="button"
+                      onClick={() => handleQuantityChange(-1)}
+                    >
+                      -
+                    </button>
+                  </span>
+                  <input
+                    readOnly
+                    className="stepper form-control"
+                    type="text"
+                    value={quantity}
+                    name="demo3"
+                  />
+                  <span className="input-group-btn input-group-append">
+                    <button 
+                      className="btn btn-primary bootstrap-touchspin-up" 
+                      type="button"
+                      onClick={() => handleQuantityChange(1)}
+                    >
+                      +
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="d-flex align-items-center justify-content-between">
+              <div className="badge bg-accent badge-lg badge-warning font-w400 px-3">
+                {product.discount} OFF DISCOUNT
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="footer fixed p-b80">
+        <div className="container">
+          <Link to="/shopping-cart" className="btn btn-primary text-start w-100">
+            <svg className="cart me-4" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18.1776 17.8443C16.6362 17.8428 15.3854 19.0912 15.3839 20.6326C15.3824 22.1739 16.6308 23.4247 18.1722 23.4262C19.7136 23.4277 20.9643 22.1794 20.9658 20.638C20.9658 20.6371 20.9658 20.6362 20.9658 20.6353C20.9644 19.0955 19.7173 17.8473 18.1776 17.8443Z" fill="white"/>
+              <path d="M23.1278 4.47973C23.061 4.4668 22.9932 4.46023 22.9251 4.46012H5.93181L5.66267 2.65958C5.49499 1.46381 4.47216 0.574129 3.26466 0.573761H1.07655C0.481978 0.573761 0 1.05574 0 1.65031C0 2.24489 0.481978 2.72686 1.07655 2.72686H3.26734C3.40423 2.72586 3.52008 2.82779 3.53648 2.96373L5.19436 14.3267C5.42166 15.7706 6.66363 16.8358 8.12528 16.8405H19.3241C20.7313 16.8423 21.9454 15.8533 22.2281 14.4747L23.9802 5.74121C24.0931 5.15746 23.7115 4.59269 23.1278 4.47973Z" fill="white"/>
+              <path d="M11.3404 20.5158C11.2749 19.0196 10.0401 17.8418 8.54244 17.847C7.0023 17.9092 5.80422 19.2082 5.86645 20.7484C5.92617 22.2262 7.1283 23.4008 8.60704 23.4262H8.67432C10.2142 23.3587 11.4079 22.0557 11.3404 20.5158Z" fill="white"/>
+            </svg>
+            ADD TO CART
+          </Link>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
+export default ProductDetail;

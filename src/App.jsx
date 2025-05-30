@@ -9,6 +9,7 @@ import Profile from "./layouts/Profile";
 import EditProfile from "./layouts/EditProfile";
 import Categories from "./layouts/Categories";
 import Search from "./layouts/Search";
+import ProductDetail from "./layouts/ProductDetail";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/search" element={<Search />} />
+            <Route path="/product-detail" element={<ProductDetail />} />
           </Routes>
           <Sidebar />
         </SidebarProvider>
