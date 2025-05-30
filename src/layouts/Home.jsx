@@ -1,7 +1,89 @@
 import React from 'react'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
+import CategorySwiper from '../components/CategorySwiper/CategorySwiper'
+import { 
+  faAppleWhole, 
+  faFish, 
+  faDrumstickBite, 
+  faPizzaSlice,
+  faBreadSlice,
+  faMartiniGlass,
+  faCookie,
+  faCarrot
+} from '@fortawesome/free-solid-svg-icons';
 function Home() {
+const foodCategories = [
+    {
+      id: 1,
+      name: 'Fresh Fruits',
+      items: 86,
+      bgImage: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=300&auto=format&fit=crop',
+      icon: faAppleWhole,
+      backgroundColor: 'bg-primary'
+    },
+    {
+      id: 2,
+      name: 'Seafood',
+      items: 45,
+      bgImage: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&auto=format&fit=crop',
+      icon: faFish,
+      backgroundColor: 'bg-2'
+    },
+    {
+      id: 3,
+      name: 'Fresh Meat',
+      items: 52,
+      bgImage: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=300&auto=format&fit=crop',
+      icon: faDrumstickBite,
+      backgroundColor: 'bg-3'
+    },
+    {
+      id: 4,
+      name: 'Pizza & Fast Food',
+      items: 64,
+      bgImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop',
+      icon: faPizzaSlice,
+      backgroundColor: 'bg-4'
+    },
+    {
+      id: 5,
+      name: 'Fresh Bakery',
+      items: 73,
+      bgImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&auto=format&fit=crop',
+      icon: faBreadSlice,
+      backgroundColor: 'bg-5'
+    },
+    {
+      id: 6,
+      name: 'Beverages',
+      items: 48,
+      bgImage: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&auto=format&fit=crop',
+      icon: faMartiniGlass,
+      backgroundColor: 'bg-6'
+    },
+    {
+      id: 7,
+      name: 'Snacks',
+      items: 91,
+      bgImage: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=300&auto=format&fit=crop',
+      icon: faCookie,
+      backgroundColor: 'bg-7'
+    },
+    {
+      id: 8,
+      name: 'Vegetables',
+      items: 78,
+      bgImage: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop',
+      icon: faCarrot,
+      backgroundColor: 'bg-8'
+    }
+  ];
+
+  const handleCategoryClick = (category) => {
+    console.log('Selected category:', category.name);
+    // Add your navigation or other logic here
+  };
   return (
     <>
 
@@ -529,7 +611,50 @@ function Home() {
               </svg>
             </a>
           </div>
-          <div className="categories-box">
+          <CategorySwiper 
+        categories={foodCategories}
+        onCategoryClick={handleCategoryClick}
+        ui={{
+          card: {
+            width: '100%',
+            height: '160px',
+            borderRadius: '16px',
+            padding: '25px 15px',
+            margin: '8px',
+            shadow: '0 4px 12px rgba(0,0,0,0.15)',
+            overlay: 'rgba(0,0,0,0.6)',
+            transition: 'all 0.3s ease',
+            hoverTransform: 'translateY(-5px) scale(1.02)',
+            backgroundColor: '#ffffff'
+          },
+          container: {
+            width: '100%',
+            padding: '20px',
+            margin: '30px 0',
+            backgroundColor: '#f5f5f5'
+          },
+          icon: {
+            size: '3x',
+            color: '#ffffff',
+            marginBottom: '12px'
+          },
+          text: {
+            titleSize: '16px',
+            titleColor: '#ffffff',
+            titleWeight: '600',
+            countSize: '14px',
+            countColor: 'rgba(255,255,255,0.8)',
+            countWeight: '400'
+          }
+        }}
+        breakpoints={{
+          320: { slidesPerView: 1.5 },
+          480: { slidesPerView: 2.5 },
+          768: { slidesPerView: 3.5 },
+          1024: { slidesPerView: 4.5 }
+        }}
+      />
+          {/* <div className="categories-box">
             <div className="swiper-btn-center-lr">
               <div className="swiper categorie-swiper swiper-initialized swiper-horizontal swiper-ios swiper-watch-progress">
                 <div
@@ -1041,7 +1166,7 @@ function Home() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
           {/* Categorie End */}
           {/* Recomended Start */}
           <div className="title-bar">

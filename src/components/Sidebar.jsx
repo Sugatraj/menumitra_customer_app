@@ -199,7 +199,7 @@ function Sidebar() {
     </a>
     <div className="sidebar-bottom d-none">
       <h6 className="name">W3Grocery - Multipurpose App</h6>
-      <span className="ver-info">App Version 1.0</span>
+      <span className="ver-info">App Version 2.0</span>
     </div>
     <div className="author-box mt-auto mb-0">
       <div className="dz-media">
