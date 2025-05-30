@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import fallbackImage from '../assets/images/food/small/6.png';
 
 const HorizontalMenuCard = ({
   image,
@@ -15,7 +16,7 @@ const HorizontalMenuCard = ({
   return (
     <div className="item-content">
       <div className="item-media media media-95">
-        <img src={image || "https://placehold.co/300x200?text=No+Image+Found"} alt={title} />
+        <img src={image || fallbackImage} alt={title} />
         <a 
           href="javascript:void(0);" 
           className="item-bookmark icon-2"
