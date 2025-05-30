@@ -511,7 +511,7 @@ const AuthOffcanvas = () => {
         </div>
       )}
       <p className="text-muted mb-4">
-        Enter the verification code sent to +91 {phoneNumber}
+        Enter the verification code sent to <span className="fw-bold">+91 {phoneNumber}</span>
       </p>
       <form onSubmit={handleOTPSubmit}>
         <div className="mb-4">
@@ -523,7 +523,6 @@ const AuthOffcanvas = () => {
                 type="text"
                 id={`digit-${digit}`}
                 name={`digit-${digit}`}
-                placeholder="-"
                 data-next={digit < 4 ? `digit-${digit + 1}` : null}
                 data-previous={digit > 1 ? `digit-${digit - 1}` : null}
                 maxLength="1"
@@ -565,7 +564,7 @@ const AuthOffcanvas = () => {
                 Verifying...
               </span>
             ) : (
-              'NEXT'
+              'SUBMIT'
             )}
           </button>
         </div>
