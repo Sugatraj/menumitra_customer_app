@@ -1,8 +1,19 @@
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext';
+
 function Profile() {
+  const { handleLogout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const onLogoutClick = (e) => {
+    e.preventDefault();
+    handleLogout();
+    navigate('/');
+  };
+
   return (
     <>
       <Header />
@@ -14,12 +25,9 @@ function Profile() {
                 <img src="assets/images/avatar/5.jpg" alt="/" />
               </div>
               <div className="about-profile">
-                <h5 className="sub-title mb-0">James Hawkins</h5>
-                <h6 className="sub-title fade-text mb-1 font-w500">
-                  jameshawkins@mail.com
-                </h6>
+                <h5 className="sub-title mb-0">{user?.name || 'Guest User'}</h5>
                 <h6 className="sub-title fade-text mb-0 font-w500">
-                  8854760544
+                  {user?.mobile ? `+91 ${user.mobile}` : 'No phone number'}
                 </h6>
               </div>
               <Link to="/edit-profile" className="edit-profile">
@@ -83,7 +91,7 @@ function Profile() {
                 </a>
               </li>
               <li className="border-0">
-                <a href="welcome.html">
+                <a href="#" onClick={onLogoutClick}>
                   <i className="fa-solid fa-power-off" />
                   LogOut
                 </a>

@@ -1,6 +1,22 @@
+export const clearAuthData = () => {
+  // Clear all auth-related data
+  localStorage.removeItem('auth');
+  
+  // Clear any other auth-related items
+  // localStorage.removeItem('other_auth_related_item');
+  
+  // Clear any session storage if used
+  // sessionStorage.clear();
+};
+
 export const getAuthData = () => {
-  const authData = localStorage.getItem('auth');
-  return authData ? JSON.parse(authData) : null;
+  try {
+    const authData = localStorage.getItem('auth');
+    return authData ? JSON.parse(authData) : null;
+  } catch (error) {
+    console.error('Error parsing auth data:', error);
+    return null;
+  }
 };
 
 export const isAuthenticated = () => {
@@ -17,10 +33,6 @@ export const isAuthenticated = () => {
 export const getAccessToken = () => {
   const authData = getAuthData();
   return authData?.accessToken;
-};
-
-export const clearAuth = () => {
-  localStorage.removeItem('auth');
 };
 
 export const getUserRole = () => {

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { getAuthData, clearAuth } from '../utils/auth';
 
 const AuthContext = createContext(null);
 
@@ -10,23 +9,39 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check localStorage for existing auth data on mount
-    const authData = getAuthData();
+    const authData = localStorage.getItem('auth');
     if (authData) {
+      const parsedData = JSON.parse(authData);
       setUser({
-        id: authData.userId,
-        name: authData.name,
-        role: authData.role
+        id: parsedData.userId,
+        name: parsedData.name,
+        role: parsedData.role,
+        mobile: parsedData.mobile
       });
     }
   }, []);
 
   const handleLoginSuccess = (userData) => {
-    setUser(userData);
+    setUser({
+      id: userData.id,
+      name: userData.name,
+      role: userData.role,
+      mobile: userData.mobile
+    });
   };
 
   const handleLogout = () => {
-    clearAuth();
+    // Clear all auth-related data from localStorage
+    localStorage.removeItem('auth');
+    
+    // Clear any other app-specific data if needed
+    // localStorage.removeItem('other_data');
+    
+    // Clear user state
     setUser(null);
+    
+    // Close auth modal if it's open
+    setShowAuthOffcanvas(false);
   };
 
   return (

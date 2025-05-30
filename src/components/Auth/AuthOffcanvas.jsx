@@ -133,22 +133,33 @@ const AuthOffcanvas = () => {
     setIsLoading(true);
 
     try {
-      // API call to create new user
-      const response = await fetch('/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/user/account_signup`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
-          phoneNumber,
-          ...userDetails
+          mobile: phoneNumber,
+          name: userDetails.name
         })
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        setCurrentStep(STEPS.OTP);
+        // Show success message briefly
+        setError('Account created successfully!');
+        // Move to OTP step after a short delay
+        setTimeout(() => {
+          setCurrentStep(STEPS.OTP);
+          setError('');
+        }, 1500);
       } else {
-        throw new Error('Signup failed');
+        setError(data.detail || 'Failed to create account. Please try again.');
       }
     } catch (err) {
+      console.error('Signup error:', err);
       setError('Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
@@ -189,6 +200,7 @@ const AuthOffcanvas = () => {
           userId: data.user_id,
           name: data.name,
           role: data.role,
+          mobile: phoneNumber,
           accessToken: data.access_token,
           expiresAt: data.expires_at
         }));
@@ -197,7 +209,8 @@ const AuthOffcanvas = () => {
         handleLoginSuccess({
           id: data.user_id,
           name: data.name,
-          role: data.role
+          role: data.role,
+          mobile: phoneNumber
         });
 
         // Close the auth modal
@@ -339,11 +352,33 @@ const AuthOffcanvas = () => {
     </div>
   );
 
+  const buttonContainerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    marginTop: '1rem'
+  };
+
+  const backButtonStyle = {
+    width: '40px',
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease'
+  };
+
   const renderSignupStep = () => (
     <div className="px-1">
       <h6 className="title font-w600 mb-4">Create Account</h6>
       {error && (
-        <div className="alert alert-danger py-2 mb-3">{error}</div>
+        <div className={`alert ${error.includes('successfully') ? 'alert-success' : 'alert-danger'} py-2 mb-3`}>
+          {error}
+        </div>
       )}
       <form onSubmit={handleSignupSubmit}>
         <div className="mb-3">
@@ -354,9 +389,20 @@ const AuthOffcanvas = () => {
               type="tel"
               className="form-control"
               value={phoneNumber}
-              disabled
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 10) {
+                  setPhoneNumber(value);
+                }
+              }}
+              placeholder="Enter your phone number"
+              pattern="[0-9]{10}"
+              maxLength="10"
+              required
+              disabled={isLoading}
             />
           </div>
+          <small className="text-muted">Enter 10 digit mobile number</small>
         </div>
         <div className="mb-3">
           <label className="form-label">Full Name</label>
@@ -370,32 +416,38 @@ const AuthOffcanvas = () => {
             disabled={isLoading}
           />
         </div>
-        <div className="mb-3">
-          <label className="form-label">Email (Optional)</label>
-          <input
-            type="email"
-            className="form-control"
-            value={userDetails.email}
-            onChange={(e) => setUserDetails(prev => ({ ...prev, email: e.target.value }))}
-            placeholder="Enter your email"
+        <div style={buttonContainerStyle}>
+          <button 
+            type="button"
+            style={backButtonStyle}
+            onClick={() => setCurrentStep(STEPS.LOGIN)}
             disabled={isLoading}
-          />
+            className="back-btn"
+          >
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path 
+                fillRule="evenodd" 
+                clipRule="evenodd" 
+                d="M4.40366 8L9.91646 2.58333L7.83313 0.499999L0.333132 8L7.83313 15.5L9.91644 13.4167L4.40366 8Z" 
+                fill="#666666"
+              />
+            </svg>
+          </button>
+          <button 
+            type="submit" 
+            className="btn btn-primary flex-grow-1"
+            disabled={isLoading || !userDetails.name.trim() || phoneNumber.length !== 10}
+          >
+            {isLoading ? (
+              <span>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Creating Account...
+              </span>
+            ) : (
+              'NEXT'
+            )}
+          </button>
         </div>
-        <button 
-          type="submit" 
-          className="btn btn-primary w-100"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Creating Account...' : 'Create Account'}
-        </button>
-        <button 
-          type="button" 
-          className="btn btn-link w-100 mt-2"
-          onClick={() => setCurrentStep(STEPS.LOGIN)}
-          disabled={isLoading}
-        >
-          Back to Login
-        </button>
       </form>
     </div>
   );
@@ -471,36 +523,36 @@ const AuthOffcanvas = () => {
             />
           </div>
         </div>
-        <button 
-          type="submit" 
-          className="btn btn-primary w-100"
-          disabled={isLoading || otp.length !== 4}
-        >
-          {isLoading ? (
-            <span>
-              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-              Verifying...
-            </span>
-          ) : (
-            'Verify OTP'
-          )}
-        </button>
-        <div className="d-flex justify-content-between mt-3">
+        <div style={buttonContainerStyle}>
           <button 
-            type="button" 
-            className="btn btn-link"
+            type="button"
+            style={backButtonStyle}
             onClick={() => setCurrentStep(STEPS.LOGIN)}
             disabled={isLoading}
+            className="back-btn"
           >
-            Change Number
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path 
+                fillRule="evenodd" 
+                clipRule="evenodd" 
+                d="M4.40366 8L9.91646 2.58333L7.83313 0.499999L0.333132 8L7.83313 15.5L9.91644 13.4167L4.40366 8Z" 
+                fill="#666666"
+              />
+            </svg>
           </button>
           <button 
-            type="button" 
-            className="btn btn-link"
-            onClick={handleResendOTP}
-            disabled={isLoading}
+            type="submit" 
+            className="btn btn-primary flex-grow-1"
+            disabled={isLoading || otp.length !== 4}
           >
-            Resend OTP
+            {isLoading ? (
+              <span>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Verifying...
+              </span>
+            ) : (
+              'NEXT'
+            )}
           </button>
         </div>
       </form>
