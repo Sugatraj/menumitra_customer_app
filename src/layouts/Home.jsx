@@ -1,32 +1,34 @@
-import React, {useState, useEffect} from 'react'
-import { Link } from 'react-router-dom';
-import Footer from '../components/Footer'
-import Header from '../components/Header'
-import CategorySwiper from '../components/CategorySwiper/CategorySwiper'
-import { 
-  faAppleWhole, 
-  faFish, 
-  faDrumstickBite, 
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Footer from "../components/Footer";
+import Header from "../components/Header";
+import CategorySwiper from "../components/CategorySwiper/CategorySwiper";
+import {
+  faAppleWhole,
+  faFish,
+  faDrumstickBite,
   faPizzaSlice,
   faBreadSlice,
   faMartiniGlass,
   faCookie,
-  faCarrot
-} from '@fortawesome/free-solid-svg-icons';
-import BannerSwiper from '../components/BannerSwiper/BannerSwiper';
-import apiClient from '../services/apiService';
+  faCarrot,
+} from "@fortawesome/free-solid-svg-icons";
+import BannerSwiper from "../components/BannerSwiper/BannerSwiper";
+import apiClient from "../services/apiService";
+import VerticalMenuCard from "../components/VerticalMenuCard";
 
 function Home() {
-   const [categories, setCategories] = useState([]);
-
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await apiClient.post('get_category_list_with_image', { outlet_id: 1 });
+        const response = await apiClient.post("get_category_list_with_image", {
+          outlet_id: 1,
+        });
         setCategories(response.detail.menu_list);
       } catch (err) {
-        setError('Failed to fetch categories');
+        setError("Failed to fetch categories");
         console.error(err);
       }
     };
@@ -34,130 +36,136 @@ function Home() {
     fetchCategories();
   }, []);
 
-const foodCategories = [
+  const foodCategories = [
     {
       id: 1,
-      name: 'Fresh Fruits',
+      name: "Fresh Fruits",
       items: 86,
-      bgImage: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=300&auto=format&fit=crop",
       icon: faAppleWhole,
-      backgroundColor: 'bg-primary'
+      backgroundColor: "bg-primary",
     },
     {
       id: 2,
-      name: 'Seafood',
+      name: "Seafood",
       items: 45,
-      bgImage: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&auto=format&fit=crop",
       icon: faFish,
-      backgroundColor: 'bg-2'
+      backgroundColor: "bg-2",
     },
     {
       id: 3,
-      name: 'Fresh Meat',
+      name: "Fresh Meat",
       items: 52,
-      bgImage: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=300&auto=format&fit=crop",
       icon: faDrumstickBite,
-      backgroundColor: 'bg-3'
+      backgroundColor: "bg-3",
     },
     {
       id: 4,
-      name: 'Pizza & Fast Food',
+      name: "Pizza & Fast Food",
       items: 64,
-      bgImage: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop",
       icon: faPizzaSlice,
-      backgroundColor: 'bg-4'
+      backgroundColor: "bg-4",
     },
     {
       id: 5,
-      name: 'Fresh Bakery',
+      name: "Fresh Bakery",
       items: 73,
-      bgImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&auto=format&fit=crop",
       icon: faBreadSlice,
-      backgroundColor: 'bg-5'
+      backgroundColor: "bg-5",
     },
     {
       id: 6,
-      name: 'Beverages',
+      name: "Beverages",
       items: 48,
-      bgImage: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&auto=format&fit=crop",
       icon: faMartiniGlass,
-      backgroundColor: 'bg-6'
+      backgroundColor: "bg-6",
     },
     {
       id: 7,
-      name: 'Snacks',
+      name: "Snacks",
       items: 91,
-      bgImage: 'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=300&auto=format&fit=crop",
       icon: faCookie,
-      backgroundColor: 'bg-7'
+      backgroundColor: "bg-7",
     },
     {
       id: 8,
-      name: 'Vegetables',
+      name: "Vegetables",
       items: 78,
-      bgImage: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop',
+      bgImage:
+        "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop",
       icon: faCarrot,
-      backgroundColor: 'bg-8'
-    }
+      backgroundColor: "bg-8",
+    },
   ];
 
   // Optional: Custom banners data
   const customBanners = [
     {
       id: 1,
-      title: '30% OFF',
-      subtitle: 'Weekend Special',
-      description: '*on Selected Items',
-      bgImage: 'assets/images/background/bg2.png'
+      title: "30% OFF",
+      subtitle: "Weekend Special",
+      description: "*on Selected Items",
+      bgImage: "assets/images/background/bg2.png",
     },
     {
       id: 2,
-      title: 'FREE DELIVERY',
-      subtitle: 'First Order',
-      description: '*min order $30',
-      bgImage: 'assets/images/background/bg3.png'
+      title: "FREE DELIVERY",
+      subtitle: "First Order",
+      description: "*min order $30",
+      bgImage: "assets/images/background/bg3.png",
     },
     {
       id: 3,
-      title: '15% OFF',
-      subtitle: 'Happy Hours',
-      description: '*limited time offer',
-      bgImage: 'assets/images/background/bg4.png'
-    }
+      title: "15% OFF",
+      subtitle: "Happy Hours",
+      description: "*limited time offer",
+      bgImage: "assets/images/background/bg4.png",
+    },
   ];
 
   const handleBannerClick = (banner) => {
-    console.log('Banner clicked:', banner);
+    console.log("Banner clicked:", banner);
     // Add your navigation or action logic here
   };
 
   const handleCategoryClick = (category) => {
-    console.log('Selected category:', category.name);
+    console.log("Selected category:", category.name);
     // Add your navigation or other logic here
   };
   return (
     <>
-
-
-    <div className="page-wraper">
-  {/* Preloader */}
-  <div id="preloader" style={{ display: "none" }}>
-    <div className="loader">
-      <span />
-      <span />
-      <span />
-      <span />
-      <span />
-    </div>
-  </div>
-  {/* Preloader end*/}
-  {/* Header */}
-  {/* <header className="header"> */}
-    <Header/>
-  {/* </header> */}
-  {/* Header */}
-  {/* Sidebar */}
-  {/* <div className="dark-overlay" />
+      <div className="page-wraper">
+        {/* Preloader */}
+        <div id="preloader" style={{ display: "none" }}>
+          <div className="loader">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+        {/* Preloader end*/}
+        {/* Header */}
+        {/* <header className="header"> */}
+        <Header />
+        {/* </header> */}
+        {/* Header */}
+        {/* Sidebar */}
+        {/* <div className="dark-overlay" />
   <div className="sidebar style-2">
     <a href="index.html" className="side-menu-logo">
       <img src="assets/images/logo-sidebar.svg" alt="logo" />
@@ -362,71 +370,71 @@ const foodCategories = [
       </div>
     </div>
   </div> */}
-  {/* Sidebar End */}
-  {/* Banner */}
-  <div className="author-notification">
-    <div className="container inner-wrapper">
-      <div className="dz-info">
-        <span className="text-dark d-block">Good Morning</span>
-        <h2 className="name mb-0 title">Louis A. 👋</h2>
-      </div>
-      <a href="notification.html" className="notify-cart">
-        <span className="font-18 font-w600 text-dark">6</span>
-        <div className="badge">
-          <svg
-            width={24}
-            height={24}
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M21.8574 17.4858C20.0734 14.5109 19 13.212 19 9.99997C18.9982 8.31756 18.3909 6.692 17.2892 5.42046C16.1876 4.14893 14.665 3.31636 13 3.07497V2.99997C13 2.73475 12.8947 2.4804 12.7071 2.29286C12.5196 2.10533 12.2653 1.99997 12 1.99997C11.7348 1.99997 11.4805 2.10533 11.2929 2.29286C11.1054 2.4804 11 2.73475 11 2.99997V3.07917C9.32471 3.39641 7.81116 4.28459 6.71715 5.59244C5.62313 6.9003 5.01632 8.54695 5.00004 10.252C5.00004 13.212 3.73804 14.826 2.14264 17.4859C2.05169 17.6376 2.00263 17.8107 2.00044 17.9876C1.99826 18.1645 2.04303 18.3388 2.1302 18.4927C2.21737 18.6467 2.3438 18.7747 2.49661 18.8638C2.64943 18.9529 2.82314 18.9999 3.00004 19H21C21.1769 18.9999 21.3507 18.9529 21.5035 18.8638C21.6563 18.7747 21.7828 18.6466 21.8699 18.4927C21.9571 18.3388 22.0019 18.1644 21.9997 17.9875C21.9975 17.8106 21.9484 17.6375 21.8574 17.4858Z"
-              fill="white"
-            />
-            <path
-              d="M14 20H10C9.73478 20 9.48043 20.1054 9.29289 20.2929C9.10536 20.4804 9 20.7348 9 21C9 21.2652 9.10536 21.5196 9.29289 21.7071C9.48043 21.8947 9.73478 22 10 22H14C14.2652 22 14.5196 21.8947 14.7071 21.7071C14.8946 21.5196 15 21.2652 15 21C15 20.7348 14.8946 20.4804 14.7071 20.2929C14.5196 20.1054 14.2652 20 14 20Z"
-              fill="white"
-            />
-          </svg>
-        </div>
-      </a>
-    </div>
-  </div>
-  {/* Banner End */}
-  {/* Page Content */}
-  <div className="page-content">
-    <div className="content-inner pt-0">
-      <div className="container p-b30">
-        {/* Search */}
-        <div className="search-box mb-4">
-          <div className="mb-3 input-group input-radius">
-            <span className="input-group-text">
-              <svg
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M10.9395 1.9313C5.98074 1.9313 1.94141 5.97063 1.94141 10.9294C1.94141 15.8881 5.98074 19.9353 10.9395 19.9353C13.0575 19.9353 15.0054 19.193 16.5449 17.9606L20.293 21.7067C20.4821 21.888 20.7347 21.988 20.9967 21.9854C21.2587 21.9827 21.5093 21.8775 21.6947 21.6924C21.8801 21.5073 21.9856 21.2569 21.9886 20.9949C21.9917 20.7329 21.892 20.4802 21.7109 20.2908L17.9629 16.5427C19.1963 15.0008 19.9395 13.0498 19.9395 10.9294C19.9395 5.97063 15.8982 1.9313 10.9395 1.9313ZM10.9395 3.93134C14.8173 3.93134 17.9375 7.05153 17.9375 10.9294C17.9375 14.8072 14.8173 17.9352 10.9395 17.9352C7.06162 17.9352 3.94141 14.8072 3.94141 10.9294C3.94141 7.05153 7.06162 3.93134 10.9395 3.93134Z"
-                  fill="#7D8FAB"
-                />
-              </svg>
-            </span>
-            <input
-              type="text"
-              placeholder="Search beverages or foods"
-              className="form-control main-in ps-0 bs-0"
-            />
+        {/* Sidebar End */}
+        {/* Banner */}
+        <div className="author-notification">
+          <div className="container inner-wrapper">
+            <div className="dz-info">
+              <span className="text-dark d-block">Good Morning</span>
+              <h2 className="name mb-0 title">Louis A. 👋</h2>
+            </div>
+            <a href="notification.html" className="notify-cart">
+              <span className="font-18 font-w600 text-dark">6</span>
+              <div className="badge">
+                <svg
+                  width={24}
+                  height={24}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M21.8574 17.4858C20.0734 14.5109 19 13.212 19 9.99997C18.9982 8.31756 18.3909 6.692 17.2892 5.42046C16.1876 4.14893 14.665 3.31636 13 3.07497V2.99997C13 2.73475 12.8947 2.4804 12.7071 2.29286C12.5196 2.10533 12.2653 1.99997 12 1.99997C11.7348 1.99997 11.4805 2.10533 11.2929 2.29286C11.1054 2.4804 11 2.73475 11 2.99997V3.07917C9.32471 3.39641 7.81116 4.28459 6.71715 5.59244C5.62313 6.9003 5.01632 8.54695 5.00004 10.252C5.00004 13.212 3.73804 14.826 2.14264 17.4859C2.05169 17.6376 2.00263 17.8107 2.00044 17.9876C1.99826 18.1645 2.04303 18.3388 2.1302 18.4927C2.21737 18.6467 2.3438 18.7747 2.49661 18.8638C2.64943 18.9529 2.82314 18.9999 3.00004 19H21C21.1769 18.9999 21.3507 18.9529 21.5035 18.8638C21.6563 18.7747 21.7828 18.6466 21.8699 18.4927C21.9571 18.3388 22.0019 18.1644 21.9997 17.9875C21.9975 17.8106 21.9484 17.6375 21.8574 17.4858Z"
+                    fill="white"
+                  />
+                  <path
+                    d="M14 20H10C9.73478 20 9.48043 20.1054 9.29289 20.2929C9.10536 20.4804 9 20.7348 9 21C9 21.2652 9.10536 21.5196 9.29289 21.7071C9.48043 21.8947 9.73478 22 10 22H14C14.2652 22 14.5196 21.8947 14.7071 21.7071C14.8946 21.5196 15 21.2652 15 21C15 20.7348 14.8946 20.4804 14.7071 20.2929C14.5196 20.1054 14.2652 20 14 20Z"
+                    fill="white"
+                  />
+                </svg>
+              </div>
+            </a>
           </div>
         </div>
-        {/* Search */}
-        {/* Dashboard Area */}
-        <div className="dashboard-area">
-          {/* Recent */}
-          {/* <div className="m-b10">
+        {/* Banner End */}
+        {/* Page Content */}
+        <div className="page-content">
+          <div className="content-inner pt-0">
+            <div className="container p-b30">
+              {/* Search */}
+              <div className="search-box mb-4">
+                <div className="mb-3 input-group input-radius">
+                  <span className="input-group-text">
+                    <svg
+                      width={24}
+                      height={24}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M10.9395 1.9313C5.98074 1.9313 1.94141 5.97063 1.94141 10.9294C1.94141 15.8881 5.98074 19.9353 10.9395 19.9353C13.0575 19.9353 15.0054 19.193 16.5449 17.9606L20.293 21.7067C20.4821 21.888 20.7347 21.988 20.9967 21.9854C21.2587 21.9827 21.5093 21.8775 21.6947 21.6924C21.8801 21.5073 21.9856 21.2569 21.9886 20.9949C21.9917 20.7329 21.892 20.4802 21.7109 20.2908L17.9629 16.5427C19.1963 15.0008 19.9395 13.0498 19.9395 10.9294C19.9395 5.97063 15.8982 1.9313 10.9395 1.9313ZM10.9395 3.93134C14.8173 3.93134 17.9375 7.05153 17.9375 10.9294C17.9375 14.8072 14.8173 17.9352 10.9395 17.9352C7.06162 17.9352 3.94141 14.8072 3.94141 10.9294C3.94141 7.05153 7.06162 3.93134 10.9395 3.93134Z"
+                        fill="#7D8FAB"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search beverages or foods"
+                    className="form-control main-in ps-0 bs-0"
+                  />
+                </div>
+              </div>
+              {/* Search */}
+              {/* Dashboard Area */}
+              <div className="dashboard-area">
+                {/* Recent */}
+                {/* <div className="m-b10">
             <div className="swiper-btn-center-lr">
               <div className="swiper tag-group mt-4 recomand-swiper swiper-initialized swiper-horizontal swiper-ios swiper-watch-progress swiper-backface-hidden">
                 <div
@@ -643,76 +651,76 @@ const foodCategories = [
               </div>
             </div>
           </div> */}
-         {/* <BannerSwiper 
+                {/* <BannerSwiper 
         banners={customBanners}
         onBannerClick={handleBannerClick}
         autoplayDelay={3000} // 3 seconds
         pauseOnHover={false} // Don't pause on hover
         disableOnInteraction={true} // Stop autoplay after user interaction
       /> */}
-          {/* Recent */}
-          {/* Categorie */}
-          <div className="title-bar mt-0">
-            <span className="title mb-0 font-18">Categories</span>
-            <Link className="btn-link" to="/categories">
-              <svg
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8.25005 20.25C8.05823 20.25 7.86623 20.1767 7.7198 20.0303C7.42673 19.7372 7.42673 19.2626 7.7198 18.9698L14.6895 12L7.7198 5.03025C7.42673 4.73719 7.42673 4.26263 7.7198 3.96975C8.01286 3.67688 8.48742 3.67669 8.7803 3.96975L16.2803 11.4698C16.5734 11.7628 16.5734 12.2374 16.2803 12.5303L8.7803 20.0303C8.63386 20.1767 8.44186 20.25 8.25005 20.25Z"
-                  fill="#7D8FAB"
+                {/* Recent */}
+                {/* Categorie */}
+                <div className="title-bar mt-0">
+                  <span className="title mb-0 font-18">Categories</span>
+                  <Link className="btn-link" to="/categories">
+                    <svg
+                      width={24}
+                      height={24}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.25005 20.25C8.05823 20.25 7.86623 20.1767 7.7198 20.0303C7.42673 19.7372 7.42673 19.2626 7.7198 18.9698L14.6895 12L7.7198 5.03025C7.42673 4.73719 7.42673 4.26263 7.7198 3.96975C8.01286 3.67688 8.48742 3.67669 8.7803 3.96975L16.2803 11.4698C16.5734 11.7628 16.5734 12.2374 16.2803 12.5303L8.7803 20.0303C8.63386 20.1767 8.44186 20.25 8.25005 20.25Z"
+                        fill="#7D8FAB"
+                      />
+                    </svg>
+                  </Link>
+                </div>
+                <CategorySwiper
+                  categories={foodCategories}
+                  onCategoryClick={handleCategoryClick}
+                  ui={{
+                    card: {
+                      width: "100%",
+                      height: "160px",
+                      borderRadius: "16px",
+                      padding: "25px 15px",
+                      margin: "8px",
+                      shadow: "0 4px 12px rgba(0,0,0,0.15)",
+                      overlay: "rgba(0,0,0,0.6)",
+                      transition: "all 0.3s ease",
+                      hoverTransform: "translateY(-5px) scale(1.02)",
+                      backgroundColor: "#ffffff",
+                    },
+                    container: {
+                      width: "100%",
+                      padding: "20px",
+                      margin: "30px 0",
+                      backgroundColor: "#f5f5f5",
+                    },
+                    icon: {
+                      size: "3x",
+                      color: "#ffffff",
+                      marginBottom: "12px",
+                    },
+                    text: {
+                      titleSize: "16px",
+                      titleColor: "#ffffff",
+                      titleWeight: "600",
+                      countSize: "14px",
+                      countColor: "rgba(255,255,255,0.8)",
+                      countWeight: "400",
+                    },
+                  }}
+                  breakpoints={{
+                    320: { slidesPerView: 1.5 },
+                    480: { slidesPerView: 2.5 },
+                    768: { slidesPerView: 3.5 },
+                    1024: { slidesPerView: 4.5 },
+                  }}
                 />
-              </svg>
-            </Link>
-          </div>
-          <CategorySwiper 
-        categories={foodCategories}
-        onCategoryClick={handleCategoryClick}
-        ui={{
-          card: {
-            width: '100%',
-            height: '160px',
-            borderRadius: '16px',
-            padding: '25px 15px',
-            margin: '8px',
-            shadow: '0 4px 12px rgba(0,0,0,0.15)',
-            overlay: 'rgba(0,0,0,0.6)',
-            transition: 'all 0.3s ease',
-            hoverTransform: 'translateY(-5px) scale(1.02)',
-            backgroundColor: '#ffffff'
-          },
-          container: {
-            width: '100%',
-            padding: '20px',
-            margin: '30px 0',
-            backgroundColor: '#f5f5f5'
-          },
-          icon: {
-            size: '3x',
-            color: '#ffffff',
-            marginBottom: '12px'
-          },
-          text: {
-            titleSize: '16px',
-            titleColor: '#ffffff',
-            titleWeight: '600',
-            countSize: '14px',
-            countColor: 'rgba(255,255,255,0.8)',
-            countWeight: '400'
-          }
-        }}
-        breakpoints={{
-          320: { slidesPerView: 1.5 },
-          480: { slidesPerView: 2.5 },
-          768: { slidesPerView: 3.5 },
-          1024: { slidesPerView: 4.5 }
-        }}
-      />
-          {/* <div className="categories-box">
+                {/* <div className="categories-box">
             <div className="swiper-btn-center-lr">
               <div className="swiper categorie-swiper swiper-initialized swiper-horizontal swiper-ios swiper-watch-progress">
                 <div
@@ -1225,139 +1233,156 @@ const foodCategories = [
               </div>
             </div>
           </div> */}
-          {/* Categorie End */}
-          {/* Recomended Start */}
-          <div className="title-bar">
-            <span className="title mb-0 font-18">Popular Deals</span>
-          </div>
-          <div className="row g-3 mb-3">
-            <div className="col-6">
-              <div className="card-item style-1">
-                <div className="dz-media">
-                  <img src="assets/images/food/food8.png" alt="image" />
-                  <a href="javascript:void(0);" className="r-btn">
-                    <div className="like-button">
-                      <i className="fa-regular fa-heart" />
-                    </div>
-                  </a>
-                  <div className="label">5% OFF</div>
+                {/* Categorie End */}
+                {/* Recomended Start */}
+                <div className="title-bar">
+                  <span className="title mb-0 font-18">Popular Deals</span>
                 </div>
-                <div className="dz-content">
-                  <h6 className="title mb-3">
-                    <a href="product.html">Fresh Grapes</a>
-                  </h6>
-                  <div className="dz-meta">
-                    <ul>
-                      <li className="price text-accent">$ 10.9</li>
-                      <li className="review">
-                        <span className="text-soft font-10">(243)</span>
-                        <i className="fa fa-star" />
-                      </li>
-                    </ul>
+                <div className="row g-3 mb-3">
+                  <div className="col-6">
+                    <VerticalMenuCard
+                      // image="https://men4u.xyz/media/menu_images/puranpoli3.jpg"
+                      title="Fresh Grapes"
+                      currentPrice={10.9}
+                      reviewCount={243}
+                      // onAddToCart={() => handleAddToCart(productId)}
+                      // onFavoriteClick={() => handleFavoriteClick(productId)}
+                      isFavorite={false}
+                      discount="5%"
+                      productUrl="/product"
+                      // onQuantityChange={(newQuantity) =>
+                      //   handleQuantityChange(productId, newQuantity)
+                      // }
+                      quantity={1}
+                    />
                   </div>
-                  <div className="mt-2">
-                    <a
-                      className="btn btn-primary add-btn light"
-                      href="javascript:void(0);"
-                    >
-                      Add to cart
-                    </a>
-                    <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                      <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                        <span className="input-group-btn input-group-prepend">
-                          <button
-                            className="btn btn-primary bootstrap-touchspin-down"
-                            type="button"
+                  {/* <div className="col-6">
+                    <div className="card-item style-1">
+                      <div className="dz-media">
+                        <img src="assets/images/food/food8.png" alt="image" />
+                        <a href="javascript:void(0);" className="r-btn">
+                          <div className="like-button">
+                            <i className="fa-regular fa-heart" />
+                          </div>
+                        </a>
+                        <div className="label">5% OFF</div>
+                      </div>
+                      <div className="dz-content">
+                        <h6 className="title mb-3">
+                          <a href="product.html">Fresh Grapes</a>
+                        </h6>
+                        <div className="dz-meta">
+                          <ul>
+                            <li className="price text-accent">$ 10.9</li>
+                            <li className="review">
+                              <span className="text-soft font-10">(243)</span>
+                              <i className="fa fa-star" />
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="mt-2">
+                          <a
+                            className="btn btn-primary add-btn light"
+                            href="javascript:void(0);"
                           >
-                            -
-                          </button>
-                        </span>
-                        <input
-                          className="stepper form-control"
-                          type="text"
-                          name="demo3"
-                          readOnly=""
-                        />
-                        <span className="input-group-btn input-group-append">
-                          <button
-                            className="btn btn-primary bootstrap-touchspin-up"
-                            type="button"
-                          >
-                            +
-                          </button>
-                        </span>
+                            Add to cart
+                          </a>
+                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
+                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                              <span className="input-group-btn input-group-prepend">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-down"
+                                  type="button"
+                                >
+                                  -
+                                </button>
+                              </span>
+                              <input
+                                className="stepper form-control"
+                                type="text"
+                                name="demo3"
+                                readOnly=""
+                              />
+                              <span className="input-group-btn input-group-append">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-up"
+                                  type="button"
+                                >
+                                  +
+                                </button>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-6">
-              <div className="card-item style-1">
-                <div className="dz-media">
-                  <img src="assets/images/food/food3.png" alt="image" />
-                  <a href="javascript:void(0);" className="r-btn">
-                    <div className="like-button active">
-                      <i className="fa-regular fa-heart" />
-                    </div>
-                  </a>
-                  <div className="label">5% OFF</div>
-                </div>
-                <div className="dz-content">
-                  <h6 className="title mb-3">
-                    <a href="product.html">Chicken Village</a>
-                  </h6>
-                  <div className="dz-meta">
-                    <ul>
-                      <li className="price text-accent">$ 10.9</li>
-                      <li className="review">
-                        <span className="text-soft font-10">(243)</span>
-                        <i className="fa fa-star" />
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="mt-2">
-                    <a
-                      className="btn btn-primary add-btn light"
-                      href="javascript:void(0);"
-                    >
-                      Add to cart
-                    </a>
-                    <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                      <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                        <span className="input-group-btn input-group-prepend">
-                          <button
-                            className="btn btn-primary bootstrap-touchspin-down"
-                            type="button"
+                  <div className="col-6">
+                    <div className="card-item style-1">
+                      <div className="dz-media">
+                        <img src="assets/images/food/food3.png" alt="image" />
+                        <a href="javascript:void(0);" className="r-btn">
+                          <div className="like-button active">
+                            <i className="fa-regular fa-heart" />
+                          </div>
+                        </a>
+                        <div className="label">5% OFF</div>
+                      </div>
+                      <div className="dz-content">
+                        <h6 className="title mb-3">
+                          <a href="product.html">Chicken Village</a>
+                        </h6>
+                        <div className="dz-meta">
+                          <ul>
+                            <li className="price text-accent">$ 10.9</li>
+                            <li className="review">
+                              <span className="text-soft font-10">(243)</span>
+                              <i className="fa fa-star" />
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="mt-2">
+                          <a
+                            className="btn btn-primary add-btn light"
+                            href="javascript:void(0);"
                           >
-                            -
-                          </button>
-                        </span>
-                        <input
-                          className="stepper form-control"
-                          type="text"
-                          name="demo3"
-                          readOnly=""
-                        />
-                        <span className="input-group-btn input-group-append">
-                          <button
-                            className="btn btn-primary bootstrap-touchspin-up"
-                            type="button"
-                          >
-                            +
-                          </button>
-                        </span>
+                            Add to cart
+                          </a>
+                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
+                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                              <span className="input-group-btn input-group-prepend">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-down"
+                                  type="button"
+                                >
+                                  -
+                                </button>
+                              </span>
+                              <input
+                                className="stepper form-control"
+                                type="text"
+                                name="demo3"
+                                readOnly=""
+                              />
+                              <span className="input-group-btn input-group-append">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-up"
+                                  type="button"
+                                >
+                                  +
+                                </button>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
+                {/* Recomended Start */}
               </div>
-            </div>
-          </div>
-          {/* Recomended Start */}
-        </div>
-        {/* Other Package */}
-        {/* <h6 className="title-head mb-3">Other Login w3Grocery package</h6>
+              {/* Other Package */}
+              {/* <h6 className="title-head mb-3">Other Login w3Grocery package</h6>
         <div className="row g-3">
           <div className="col-6">
             <div className="package-box box-1">
@@ -1386,14 +1411,14 @@ const foodCategories = [
             </div>
           </div>
         </div> */}
-        {/* Other Package */}
-      </div>
-    </div>
-  </div>
-  {/* Page Content End*/}
-  {/* Menubar */}
-      <Footer/>
-  {/* <div className="menubar-area style-2 footer-fixed border-top rounded-0">
+              {/* Other Package */}
+            </div>
+          </div>
+        </div>
+        {/* Page Content End*/}
+        {/* Menubar */}
+        <Footer />
+        {/* <div className="menubar-area style-2 footer-fixed border-top rounded-0">
     <div className="toolbar-inner menubar-nav">
       <a href="index.html" className="nav-link active">
         <svg
@@ -1440,8 +1465,8 @@ const foodCategories = [
       </a>
     </div>
   </div> */}
-  {/* Menubar */}
-  {/* <div
+        {/* Menubar */}
+        {/* <div
     className="offcanvas offcanvas-bottom m-3 rounded"
     tabIndex={-1}
     id="offcanvasBottom"
@@ -1583,38 +1608,37 @@ const foodCategories = [
       </ul>
     </div>
   </div> */}
-  {/* Theme Color Settings End */}
-  {/* PWA Offcanvas */}
-  <div
-    className="offcanvas offcanvas-bottom pwa-offcanvas"
-    style={{ display: "none" }}
-  >
-    <div className="container">
-      <div className="offcanvas-body small">
-        <img className="logo" src="assets/images/icon.png" alt="" />
-        <h6 className="title font-w600">W3Grocery on Your Home Screen</h6>
-        <p>
-          Install W3Grocery Pre-Build Grocery Mobile App Template to your home
-          screen for easy access, just like any other app
-        </p>
-        <button type="button" className="btn btn-sm btn-primary pwa-btn">
-          Add to Home Screen
-        </button>
-        <button
-          type="button"
-          className="btn btn-sm pwa-close btn-secondary ms-2 text-white"
+        {/* Theme Color Settings End */}
+        {/* PWA Offcanvas */}
+        <div
+          className="offcanvas offcanvas-bottom pwa-offcanvas"
+          style={{ display: "none" }}
         >
-          Maybe later
-        </button>
+          <div className="container">
+            <div className="offcanvas-body small">
+              <img className="logo" src="assets/images/icon.png" alt="" />
+              <h6 className="title font-w600">W3Grocery on Your Home Screen</h6>
+              <p>
+                Install W3Grocery Pre-Build Grocery Mobile App Template to your
+                home screen for easy access, just like any other app
+              </p>
+              <button type="button" className="btn btn-sm btn-primary pwa-btn">
+                Add to Home Screen
+              </button>
+              <button
+                type="button"
+                className="btn btn-sm pwa-close btn-secondary ms-2 text-white"
+              >
+                Maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="offcanvas-backdrop pwa-backdrop fade" />
+        {/* PWA Offcanvas End */}
       </div>
-    </div>
-  </div>
-  <div className="offcanvas-backdrop pwa-backdrop fade" />
-  {/* PWA Offcanvas End */}
-</div>
-
     </>
-  )
+  );
 }
 
-export default Home
+export default Home;
