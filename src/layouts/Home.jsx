@@ -1357,7 +1357,7 @@ const foodCategories = [
           {/* Recomended Start */}
         </div>
         {/* Other Package */}
-        <h6 className="title-head mb-3">Other Login w3Grocery package</h6>
+        {/* <h6 className="title-head mb-3">Other Login w3Grocery package</h6>
         <div className="row g-3">
           <div className="col-6">
             <div className="package-box box-1">
@@ -1385,7 +1385,7 @@ const foodCategories = [
               </a>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* Other Package */}
       </div>
     </div>
