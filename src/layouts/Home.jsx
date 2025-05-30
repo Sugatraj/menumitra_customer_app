@@ -12,6 +12,7 @@ import {
   faCookie,
   faCarrot
 } from '@fortawesome/free-solid-svg-icons';
+import BannerSwiper from '../components/BannerSwiper/BannerSwiper';
 function Home() {
 const foodCategories = [
     {
@@ -79,6 +80,36 @@ const foodCategories = [
       backgroundColor: 'bg-8'
     }
   ];
+
+  // Optional: Custom banners data
+  const customBanners = [
+    {
+      id: 1,
+      title: '30% OFF',
+      subtitle: 'Weekend Special',
+      description: '*on Selected Items',
+      bgImage: 'assets/images/background/bg2.png'
+    },
+    {
+      id: 2,
+      title: 'FREE DELIVERY',
+      subtitle: 'First Order',
+      description: '*min order $30',
+      bgImage: 'assets/images/background/bg3.png'
+    },
+    {
+      id: 3,
+      title: '15% OFF',
+      subtitle: 'Happy Hours',
+      description: '*limited time offer',
+      bgImage: 'assets/images/background/bg4.png'
+    }
+  ];
+
+  const handleBannerClick = (banner) => {
+    console.log('Banner clicked:', banner);
+    // Add your navigation or action logic here
+  };
 
   const handleCategoryClick = (category) => {
     console.log('Selected category:', category.name);
@@ -375,7 +406,7 @@ const foodCategories = [
         {/* Dashboard Area */}
         <div className="dashboard-area">
           {/* Recent */}
-          <div className="m-b10">
+          {/* <div className="m-b10">
             <div className="swiper-btn-center-lr">
               <div className="swiper tag-group mt-4 recomand-swiper swiper-initialized swiper-horizontal swiper-ios swiper-watch-progress swiper-backface-hidden">
                 <div
@@ -591,7 +622,8 @@ const foodCategories = [
                 />
               </div>
             </div>
-          </div>
+          </div> */}
+          <BannerSwiper/>
           {/* Recent */}
           {/* Categorie */}
           <div className="title-bar mt-0">
