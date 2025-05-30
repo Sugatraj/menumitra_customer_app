@@ -16,9 +16,11 @@ import {
 import BannerSwiper from "../components/BannerSwiper/BannerSwiper";
 import apiClient from "../services/apiService";
 import VerticalMenuCard from "../components/VerticalMenuCard";
+import { useAuth } from '../contexts/AuthContext';
 
 function Home() {
   const [categories, setCategories] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -331,7 +333,9 @@ function Home() {
           <div className="container inner-wrapper">
             <div className="dz-info">
               <span className="text-dark d-block">Good Morning</span>
-              <h2 className="name mb-0 title">Louis A. 👋</h2>
+              <h2 className="name mb-0 title">
+                {user?.name ? `${user.name} 👋` : 'Guest 👋'}
+              </h2>
             </div>
             <a href="notification.html" className="notify-cart">
               <span className="font-18 font-w600 text-dark">6</span>
