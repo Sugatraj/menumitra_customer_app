@@ -3,7 +3,7 @@ import Footer from '../components/Footer'
 function Home() {
   return (
     <>
-    {/* <Footer/> */}
+
 
     <div className="page-wraper">
   {/* Preloader */}
@@ -1515,7 +1515,8 @@ function Home() {
   </div>
   {/* Page Content End*/}
   {/* Menubar */}
-  <div className="menubar-area style-2 footer-fixed border-top rounded-0">
+      <Footer/>
+  {/* <div className="menubar-area style-2 footer-fixed border-top rounded-0">
     <div className="toolbar-inner menubar-nav">
       <a href="index.html" className="nav-link active">
         <svg
@@ -1561,9 +1562,9 @@ function Home() {
         </div>
       </a>
     </div>
-  </div>
+  </div> */}
   {/* Menubar */}
-  <div
+  {/* <div
     className="offcanvas offcanvas-bottom m-3 rounded"
     tabIndex={-1}
     id="offcanvasBottom"
@@ -1704,7 +1705,7 @@ function Home() {
         </li>
       </ul>
     </div>
-  </div>
+  </div> */}
   {/* Theme Color Settings End */}
   {/* PWA Offcanvas */}
   <div
