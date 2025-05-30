@@ -31,13 +31,12 @@ function Header() {
 
 
   return (
-    <> {/* Sidebar rendered conditionally */}
-  {isOpen && (
-        <div className="dark-overlay active" onClick={closeSidebar}></div>
-      )}
-   <Sidebar/>
-    
-    <header className="header">
+    <>
+      {/* Overlay always rendered, class toggled by isOpen */}
+      <div className={`dark-overlay${isOpen ? ' active' : ''}`} onClick={closeSidebar}></div>
+      {/* <Sidebar /> */}
+      {/* Sidebar always rendered, class toggled by isOpen for smooth animation */}
+      <header className="header">
       <div className="main-bar" ref={mainBarRef}>
         <div className="container">
           <div className="header-content">

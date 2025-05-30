@@ -7,7 +7,7 @@ function Sidebar() {
 
     // Always render the sidebar, let CSS handle visibility/animation
     return (
-      <div className={`sidebar style-2${isOpen ? ' show' : ''}`} style={{zIndex: 1051}}>
+      <div className={`sidebar style-2${isOpen ? ' show' : ''}`} >
         <a href="index.html" className="side-menu-logo">
           <img src="assets/images/logo-sidebar.svg" alt="logo" />
         </a>
