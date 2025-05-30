@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBars } from '@fortawesome/free-solid-svg-icons'
 
 function Header() {
   const mainBarRef = useRef(null);
@@ -29,7 +31,6 @@ function Header() {
           <div className="header-content">
           <div className="left-content">
             <a href="javascript:void(0);" className="menu-toggler me-2">
-              {/* <i class="fa-solid fa-bars font-16"></i> */}
               <svg
                 className="text-dark"
                 xmlns="http://www.w3.org/2000/svg"
