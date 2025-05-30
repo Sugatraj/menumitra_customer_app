@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import { Link } from 'react-router-dom';
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import CategorySwiper from '../components/CategorySwiper/CategorySwiper'
@@ -653,7 +654,7 @@ const foodCategories = [
           {/* Categorie */}
           <div className="title-bar mt-0">
             <span className="title mb-0 font-18">Categories</span>
-            <a className="btn-link" href="product-categorie.html">
+            <Link className="btn-link" to="/categories">
               <svg
                 width={24}
                 height={24}
@@ -666,7 +667,7 @@ const foodCategories = [
                   fill="#7D8FAB"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
           <CategorySwiper 
         categories={foodCategories}
