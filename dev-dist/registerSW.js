@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/menumitra_customer_app/dev-sw.js?dev-sw', { scope: '/menumitra_customer_app/', type: 'classic' })
