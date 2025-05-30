@@ -623,7 +623,13 @@ const foodCategories = [
               </div>
             </div>
           </div> */}
-          <BannerSwiper/>
+         <BannerSwiper 
+        banners={customBanners}
+        onBannerClick={handleBannerClick}
+        autoplayDelay={3000} // 3 seconds
+        pauseOnHover={false} // Don't pause on hover
+        disableOnInteraction={true} // Stop autoplay after user interaction
+      />
           {/* Recent */}
           {/* Categorie */}
           <div className="title-bar mt-0">
