@@ -24,7 +24,7 @@ function Home() {
   {/* </header> */}
   {/* Header */}
   {/* Sidebar */}
-  <div className="dark-overlay" />
+  {/* <div className="dark-overlay" />
   <div className="sidebar style-2">
     <a href="index.html" className="side-menu-logo">
       <img src="assets/images/logo-sidebar.svg" alt="logo" />
@@ -210,7 +210,7 @@ function Home() {
     </ul>
     <a
       href="javascript:void(0);"
-      onclick="deleteAllCookie()"
+      onClick="deleteAllCookie()"
       className="btn btn-primary btn-sm cookie-btn"
     >
       Delete Cookie
@@ -228,7 +228,7 @@ function Home() {
         <span>jameshawkins@mail.com</span>
       </div>
     </div>
-  </div>
+  </div> */}
   {/* Sidebar End */}
   {/* Banner */}
   <div className="author-notification">

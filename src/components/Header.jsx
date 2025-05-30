@@ -1,9 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState  } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import Sidebar from './Sidebar';
+import { useSidebar } from '../contexts/SidebarContext';
 
 function Header() {
   const mainBarRef = useRef(null);
+  const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,26 +28,29 @@ function Header() {
     };
   }, []);
 
+
+
   return (
+    <> {/* Sidebar rendered conditionally */}
+  {isOpen && (
+        <div className="dark-overlay active" onClick={closeSidebar}></div>
+      )}
+   <Sidebar/>
+    
     <header className="header">
       <div className="main-bar" ref={mainBarRef}>
         <div className="container">
           <div className="header-content">
           <div className="left-content">
-            <a href="javascript:void(0);" className="menu-toggler me-2">
-              <svg
-                className="text-dark"
-                xmlns="http://www.w3.org/2000/svg"
-                height="30px"
-                viewBox="0 0 24 24"
-                width="30px"
-                fill="#000000"
-              >
-                <path d="M13 14v6c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1zm-9 7h6c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1zM3 4v6c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1zm12.95-1.6L11.7 6.64c-.39.39-.39 1.02 0 1.41l4.25 4.25c.39.39 1.02.39 1.41 0l4.25-4.25c.39-.39.39-1.02 0-1.41L17.37 2.4c-.39-.39-1.03-.39-1.42 0z" />
-              </svg>
-            </a>
-            <h5 className="title mb-0 text-nowrap">Grocery</h5>
-          </div>
+                <a
+                  href="#"
+                  className="menu-toggler me-2"
+                  
+                >
+                 <button onClick={toggleSidebar}>click me</button>
+                </a>
+                <h5 className="title mb-0 text-nowrap">Grocery</h5>
+              </div>
           <div className="mid-content" />
           <div className="right-content">
             <a
@@ -94,7 +101,7 @@ function Header() {
       </div>
     </div>
     </header>
-
+</>
   )
 }
 
