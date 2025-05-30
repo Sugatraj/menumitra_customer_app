@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-
+import { Link } from "react-router-dom";
 function Profile() {
   return (
     <>
@@ -22,9 +22,9 @@ function Profile() {
                   8854760544
                 </h6>
               </div>
-              <a href="edit-profile.html" className="edit-profile">
+              <Link to="/edit-profile" className="edit-profile">
                 <i className="fa-solid fa-pencil" />
-              </a>
+              </Link>
             </div>
             <div className="location-box">
               <i className="location fa-solid fa-location-dot" />

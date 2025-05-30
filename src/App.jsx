@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import Checkout from "./layouts/Checkout";
 import Orders from "./layouts/Orders";
 import Profile from "./layouts/Profile";
+import EditProfile from "./layouts/EditProfile";
 import Categories from "./layouts/Categories";
 
 
@@ -20,6 +21,7 @@ function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/categories" element={<Categories />} />
           </Routes>
           <Sidebar />
