@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./layouts/Home";
+import AuthOffcanvas from "./components/Auth/AuthOffcanvas";
 import Favourite from "./layouts/Favourite";
 import SidebarProvider from "./contexts/SidebarContext";
 import Sidebar from "./components/Sidebar";
@@ -10,10 +11,12 @@ import EditProfile from "./layouts/EditProfile";
 import Categories from "./layouts/Categories";
 import Search from "./layouts/Search";
 import ProductDetail from "./layouts/ProductDetail";
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   return (
-    <>
+    <AuthProvider>
+      <AuthOffcanvas />
       <Router basename={import.meta.env.BASE_URL}>
         <SidebarProvider>
           <Routes>
@@ -30,7 +33,7 @@ function App() {
           <Sidebar />
         </SidebarProvider>
       </Router>
-    </>
+    </AuthProvider>
   );
 }
 
