@@ -1,11 +1,18 @@
-import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faHeart, faCheckToSlot, faClockRotateLeft, faUser } from '@fortawesome/free-solid-svg-icons'
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faHeart,
+  faCheckToSlot,
+  faClockRotateLeft,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
+import { Link, NavLink } from "react-router-dom";
 
 function Footer() {
-    return (
-        <div>
-            {/* <div class="menubar-area style-4 mt-4 footer-fixed border-top">
+  return (
+    <div>
+      {/* <div class="menubar-area style-4 mt-4 footer-fixed border-top">
             <div class="toolbar-inner menubar-nav">
                 <a href="javascript:void(0);" class="nav-link active">
                     <FontAwesomeIcon icon={faHouse} />
@@ -25,31 +32,41 @@ function Footer() {
             </div>
         </div> */}
 
-        <div className="menubar-area style-2 footer-fixed border-top">
-  <div className="toolbar-inner menubar-nav">
-    <a href="javascript:void(0);" className="nav-link active">
-        <FontAwesomeIcon icon={faHouse} />
-    </a>
-    <a href="javascript:void(0);" className="nav-link">
-      <FontAwesomeIcon icon={faHeart} />
-    </a>
-    <a href="javascript:void(0);" className="nav-link">
-       <FontAwesomeIcon icon={faCheckToSlot} />
-    </a>
-    <a href="javascript:void(0);" className="nav-link">
-       <FontAwesomeIcon icon={faClockRotateLeft} />
-    </a>
-    <a href="javascript:void(0);" className="nav-link">
-       <FontAwesomeIcon icon={faUser} />
-    </a>
-    {/* <a href="javascript:void(0);" className="menu-toggler">
+      <div className="menubar-area style-2 footer-fixed border-top">
+        <div className="toolbar-inner menubar-nav">
+        <NavLink 
+            to="/" 
+            className={({ isActive }) => 
+              isActive ? "nav-link active" : "nav-link"
+            }
+            end
+          >
+            <FontAwesomeIcon icon={faHouse} />
+          </NavLink>
+          <NavLink 
+            to="/favourites" 
+            className={({ isActive }) => 
+              isActive ? "nav-link active" : "nav-link"
+            }
+          >
+            <FontAwesomeIcon icon={faHeart} />
+          </NavLink>
+          <a href="javascript:void(0);" className="nav-link">
+            <FontAwesomeIcon icon={faCheckToSlot} />
+          </a>
+          <a href="javascript:void(0);" className="nav-link">
+            <FontAwesomeIcon icon={faClockRotateLeft} />
+          </a>
+          <a href="javascript:void(0);" className="nav-link">
+            <FontAwesomeIcon icon={faUser} />
+          </a>
+          {/* <a href="javascript:void(0);" className="menu-toggler">
        <FontAwesomeIcon icon={faClockRotateLeft} />
     </a> */}
-  </div>
-</div>
-
         </div>
-    )
+      </div>
+    </div>
+  );
 }
 
-export default Footer
+export default Footer;
