@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import VerticalMenuCard from "../components/VerticalMenuCard";
 
 function Favourite() {
   return (
@@ -37,370 +38,147 @@ function Favourite() {
               <div className="title-bar">
                 <span className="title mb-0 font-18">Popular Deals</span>
               </div>
-              <div className="row g-3">
-                <div className="col-6">
-                  <div className="card-item style-1">
-                    <div className="dz-media">
-                      <img src="assets/images/food/food8.png" alt="image" />
-                      <a href="javascript:void(0);" className="r-btn">
-                        <div className="like-button">
-                          <i className="fa-regular fa-heart" />
-                        </div>
-                      </a>
-                      <div className="label">5% OFF</div>
-                    </div>
-                    <div className="dz-content">
-                      <h6 className="title mb-3">
-                        <a href="product.html">Fresh Grapes</a>
-                      </h6>
-                      <div className="dz-meta">
-                        <ul>
-                          <li className="price text-accent">$ 10.9</li>
-                          <li className="review">
-                            <span className="text-soft font-10">(243)</span>
-                            <i className="fa fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <a
-                          className="btn btn-primary add-btn light"
-                          href="javascript:void(0);"
-                        >
-                          Add to cart
+              <div className="row g-3 mb-3">
+                  <div className="col-6">
+                    <VerticalMenuCard
+                      // image="https://men4u.xyz/media/menu_images/puranpoli3.jpg"
+                      title="Fresh Grapes"
+                      currentPrice={10.9}
+                      reviewCount={243}
+                      // onAddToCart={() => handleAddToCart(productId)}
+                      // onFavoriteClick={() => handleFavoriteClick(productId)}
+                      isFavorite={false}
+                      discount="5%"
+                      productUrl="/product"
+                      // onQuantityChange={(newQuantity) =>
+                      //   handleQuantityChange(productId, newQuantity)
+                      // }
+                      quantity={1}
+                    />
+                  </div>
+                  {/* <div className="col-6">
+                    <div className="card-item style-1">
+                      <div className="dz-media">
+                        <img src="assets/images/food/food8.png" alt="image" />
+                        <a href="javascript:void(0);" className="r-btn">
+                          <div className="like-button">
+                            <i className="fa-regular fa-heart" />
+                          </div>
                         </a>
-                        <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                          <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                            <span className="input-group-btn input-group-prepend">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-down"
-                                type="button"
-                              >
-                                -
-                              </button>
-                            </span>
-                            <input
-                              className="stepper form-control"
-                              type="text"
-                              name="demo3"
-                              readOnly=""
-                            />
-                            <span className="input-group-btn input-group-append">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-up"
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </span>
+                        <div className="label">5% OFF</div>
+                      </div>
+                      <div className="dz-content">
+                        <h6 className="title mb-3">
+                          <a href="product.html">Fresh Grapes</a>
+                        </h6>
+                        <div className="dz-meta">
+                          <ul>
+                            <li className="price text-accent">$ 10.9</li>
+                            <li className="review">
+                              <span className="text-soft font-10">(243)</span>
+                              <i className="fa fa-star" />
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="mt-2">
+                          <a
+                            className="btn btn-primary add-btn light"
+                            href="javascript:void(0);"
+                          >
+                            Add to cart
+                          </a>
+                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
+                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                              <span className="input-group-btn input-group-prepend">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-down"
+                                  type="button"
+                                >
+                                  -
+                                </button>
+                              </span>
+                              <input
+                                className="stepper form-control"
+                                type="text"
+                                name="demo3"
+                                readOnly=""
+                              />
+                              <span className="input-group-btn input-group-append">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-up"
+                                  type="button"
+                                >
+                                  +
+                                </button>
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-6">
-                  <div className="card-item style-1">
-                    <div className="dz-media">
-                      <img src="assets/images/food/food4.png" alt="image" />
-                      <a href="javascript:void(0);" className="r-btn">
-                        <div className="like-button">
-                          <i className="fa-regular fa-heart" />
-                        </div>
-                      </a>
-                    </div>
-                    <div className="dz-content">
-                      <h6 className="title mb-3">
-                        <a href="product.html">Gurame Fish</a>
-                      </h6>
-                      <div className="dz-meta">
-                        <ul>
-                          <li className="price text-accent">$ 10.9</li>
-                          <li className="review">
-                            <span className="text-soft font-10">(243)</span>
-                            <i className="fa fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <a
-                          className="btn btn-primary add-btn light"
-                          href="javascript:void(0);"
-                        >
-                          Add to cart
+                  <div className="col-6">
+                    <div className="card-item style-1">
+                      <div className="dz-media">
+                        <img src="assets/images/food/food3.png" alt="image" />
+                        <a href="javascript:void(0);" className="r-btn">
+                          <div className="like-button active">
+                            <i className="fa-regular fa-heart" />
+                          </div>
                         </a>
-                        <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                          <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                            <span className="input-group-btn input-group-prepend">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-down"
-                                type="button"
-                              >
-                                -
-                              </button>
-                            </span>
-                            <input
-                              className="stepper form-control"
-                              type="text"
-                              name="demo3"
-                              readOnly=""
-                            />
-                            <span className="input-group-btn input-group-append">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-up"
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </span>
+                        <div className="label">5% OFF</div>
+                      </div>
+                      <div className="dz-content">
+                        <h6 className="title mb-3">
+                          <a href="product.html">Chicken Village</a>
+                        </h6>
+                        <div className="dz-meta">
+                          <ul>
+                            <li className="price text-accent">$ 10.9</li>
+                            <li className="review">
+                              <span className="text-soft font-10">(243)</span>
+                              <i className="fa fa-star" />
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="mt-2">
+                          <a
+                            className="btn btn-primary add-btn light"
+                            href="javascript:void(0);"
+                          >
+                            Add to cart
+                          </a>
+                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
+                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                              <span className="input-group-btn input-group-prepend">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-down"
+                                  type="button"
+                                >
+                                  -
+                                </button>
+                              </span>
+                              <input
+                                className="stepper form-control"
+                                type="text"
+                                name="demo3"
+                                readOnly=""
+                              />
+                              <span className="input-group-btn input-group-append">
+                                <button
+                                  className="btn btn-primary bootstrap-touchspin-up"
+                                  type="button"
+                                >
+                                  +
+                                </button>
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
-                <div className="col-6">
-                  <div className="card-item style-1">
-                    <div className="dz-media">
-                      <img src="assets/images/food/food5.png" alt="image" />
-                      <a href="javascript:void(0);" className="r-btn">
-                        <div className="like-button">
-                          <i className="fa-regular fa-heart" />
-                        </div>
-                      </a>
-                    </div>
-                    <div className="dz-content">
-                      <h6 className="title mb-3">
-                        <a href="product.html">Tomatoes</a>
-                      </h6>
-                      <div className="dz-meta">
-                        <ul>
-                          <li className="price text-accent">$ 10.9</li>
-                          <li className="review">
-                            <span className="text-soft font-10">(243)</span>
-                            <i className="fa fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <a
-                          className="btn btn-primary add-btn light"
-                          href="javascript:void(0);"
-                        >
-                          Add to cart
-                        </a>
-                        <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                          <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                            <span className="input-group-btn input-group-prepend">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-down"
-                                type="button"
-                              >
-                                -
-                              </button>
-                            </span>
-                            <input
-                              className="stepper form-control"
-                              type="text"
-                              name="demo3"
-                              readOnly=""
-                            />
-                            <span className="input-group-btn input-group-append">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-up"
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="card-item style-1">
-                    <div className="dz-media">
-                      <img src="assets/images/food/food3.png" alt="image" />
-                      <a href="javascript:void(0);" className="r-btn">
-                        <div className="like-button active">
-                          <i className="fa-regular fa-heart" />
-                        </div>
-                      </a>
-                      <div className="label">5% OFF</div>
-                    </div>
-                    <div className="dz-content">
-                      <h6 className="title mb-3">
-                        <a href="product.html">Chicken Village</a>
-                      </h6>
-                      <div className="dz-meta">
-                        <ul>
-                          <li className="price text-accent">$ 10.9</li>
-                          <li className="review">
-                            <span className="text-soft font-10">(243)</span>
-                            <i className="fa fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <a
-                          className="btn btn-primary add-btn light"
-                          href="javascript:void(0);"
-                        >
-                          Add to cart
-                        </a>
-                        <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                          <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                            <span className="input-group-btn input-group-prepend">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-down"
-                                type="button"
-                              >
-                                -
-                              </button>
-                            </span>
-                            <input
-                              className="stepper form-control"
-                              type="text"
-                              name="demo3"
-                              readOnly=""
-                            />
-                            <span className="input-group-btn input-group-append">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-up"
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="card-item style-1">
-                    <div className="dz-media">
-                      <img src="assets/images/food/food6.png" alt="image" />
-                      <a href="javascript:void(0);" className="r-btn">
-                        <div className="like-button">
-                          <i className="fa-regular fa-heart" />
-                        </div>
-                      </a>
-                    </div>
-                    <div className="dz-content">
-                      <h6 className="title mb-3">
-                        <a href="product.html">Fresh Milk</a>
-                      </h6>
-                      <div className="dz-meta">
-                        <ul>
-                          <li className="price text-accent">$ 10.9</li>
-                          <li className="review">
-                            <span className="text-soft font-10">(243)</span>
-                            <i className="fa fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <a
-                          className="btn btn-primary add-btn light"
-                          href="javascript:void(0);"
-                        >
-                          Add to cart
-                        </a>
-                        <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                          <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                            <span className="input-group-btn input-group-prepend">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-down"
-                                type="button"
-                              >
-                                -
-                              </button>
-                            </span>
-                            <input
-                              className="stepper form-control"
-                              type="text"
-                              name="demo3"
-                              readOnly=""
-                            />
-                            <span className="input-group-btn input-group-append">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-up"
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="card-item style-1">
-                    <div className="dz-media">
-                      <img src="assets/images/food/food7.png" alt="image" />
-                      <a href="javascript:void(0);" className="r-btn">
-                        <div className="like-button">
-                          <i className="fa-regular fa-heart" />
-                        </div>
-                      </a>
-                    </div>
-                    <div className="dz-content">
-                      <h6 className="title mb-3">
-                        <a href="product.html">Fresh Avocados</a>
-                      </h6>
-                      <div className="dz-meta">
-                        <ul>
-                          <li className="price text-accent">$ 10.9</li>
-                          <li className="review">
-                            <span className="text-soft font-10">(243)</span>
-                            <i className="fa fa-star" />
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="mt-2">
-                        <a
-                          className="btn btn-primary add-btn light"
-                          href="javascript:void(0);"
-                        >
-                          Add to cart
-                        </a>
-                        <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                          <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                            <span className="input-group-btn input-group-prepend">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-down"
-                                type="button"
-                              >
-                                -
-                              </button>
-                            </span>
-                            <input
-                              className="stepper form-control"
-                              type="text"
-                              name="demo3"
-                              readOnly=""
-                            />
-                            <span className="input-group-btn input-group-append">
-                              <button
-                                className="btn btn-primary bootstrap-touchspin-up"
-                                type="button"
-                              >
-                                +
-                              </button>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

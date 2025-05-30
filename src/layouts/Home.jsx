@@ -64,51 +64,6 @@ function Home() {
       icon: faDrumstickBite,
       backgroundColor: "bg-3",
     },
-    {
-      id: 4,
-      name: "Pizza & Fast Food",
-      items: 64,
-      bgImage:
-        "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop",
-      icon: faPizzaSlice,
-      backgroundColor: "bg-4",
-    },
-    {
-      id: 5,
-      name: "Fresh Bakery",
-      items: 73,
-      bgImage:
-        "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300&auto=format&fit=crop",
-      icon: faBreadSlice,
-      backgroundColor: "bg-5",
-    },
-    {
-      id: 6,
-      name: "Beverages",
-      items: 48,
-      bgImage:
-        "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=300&auto=format&fit=crop",
-      icon: faMartiniGlass,
-      backgroundColor: "bg-6",
-    },
-    {
-      id: 7,
-      name: "Snacks",
-      items: 91,
-      bgImage:
-        "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=300&auto=format&fit=crop",
-      icon: faCookie,
-      backgroundColor: "bg-7",
-    },
-    {
-      id: 8,
-      name: "Vegetables",
-      items: 78,
-      bgImage:
-        "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop",
-      icon: faCarrot,
-      backgroundColor: "bg-8",
-    },
   ];
 
   // Optional: Custom banners data
