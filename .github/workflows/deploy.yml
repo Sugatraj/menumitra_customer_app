@@ -4,6 +4,13 @@ on:
     push:
         branches:
             - master
+
+# Add this permissions block
+permissions:
+    contents: write
+    pages: write
+    id-token: write
+
 jobs:
     build:
         name: Build
