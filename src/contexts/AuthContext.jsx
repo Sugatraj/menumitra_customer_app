@@ -1,53 +1,43 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { getAuthData, clearAuth } from '../utils/auth';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [showAuthOffcanvas, setShowAuthOffcanvas] = useState(false);
-  const [authCallback, setAuthCallback] = useState(null);
 
-  const requireAuth = (callback) => {
-    if (isAuthenticated) {
-      // If user is already authenticated, execute callback immediately
-      callback();
-    } else {
-      // Store callback and show auth offcanvas
-      setAuthCallback(() => callback);
-      setShowAuthOffcanvas(true);
+  useEffect(() => {
+    // Check localStorage for existing auth data on mount
+    const authData = getAuthData();
+    if (authData) {
+      setUser({
+        id: authData.userId,
+        name: authData.name,
+        role: authData.role
+      });
     }
-  };
+  }, []);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    setIsAuthenticated(true);
-    setShowAuthOffcanvas(false);
-    
-    // Execute stored callback if exists
-    if (authCallback) {
-      authCallback();
-      setAuthCallback(null);
-    }
   };
 
-  const logout = () => {
+  const handleLogout = () => {
+    clearAuth();
     setUser(null);
-    setIsAuthenticated(false);
-    // Additional logout logic (clear tokens etc.)
   };
 
   return (
     <AuthContext.Provider 
       value={{
-        isAuthenticated,
         user,
+        isAuthenticated: !!user,
         showAuthOffcanvas,
         setShowAuthOffcanvas,
-        requireAuth,
         handleLoginSuccess,
-        logout
+        handleLogout
       }}
     >
       {children}

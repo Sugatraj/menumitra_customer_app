@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Offcanvas from '../shared/Offcanvas';
 import { useAuth } from '../../contexts/AuthContext';
@@ -22,6 +22,65 @@ const AuthOffcanvas = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (currentStep === STEPS.OTP) {
+      const otpInputs = document.querySelectorAll('#otp input');
+      
+      const handleOTPInput = (e) => {
+        const input = e.target;
+        const value = input.value.replace(/\D/g, '');
+        
+        if (value) {
+          input.value = value;
+          
+          const next = input.getAttribute('data-next');
+          if (next && value.length === 1) {
+            const nextInput = document.getElementById(next);
+            if (nextInput) {
+              nextInput.focus();
+            }
+          }
+        }
+      };
+
+      const handleKeyDown = (e) => {
+        const input = e.target;
+        
+        if (e.key === 'Backspace' && !input.value) {
+          const prev = input.getAttribute('data-previous');
+          if (prev) {
+            const prevInput = document.getElementById(prev);
+            if (prevInput) {
+              prevInput.focus();
+            }
+          }
+        }
+      };
+
+      const updateOTPState = () => {
+        const digits = [...otpInputs].map(input => input.value).join('');
+        setOtp(digits);
+      };
+
+      otpInputs.forEach(input => {
+        input.addEventListener('input', (e) => {
+          handleOTPInput(e);
+          updateOTPState();
+        });
+        input.addEventListener('keydown', handleKeyDown);
+      });
+
+      otpInputs[0]?.focus();
+
+      return () => {
+        otpInputs.forEach(input => {
+          input.removeEventListener('input', handleOTPInput);
+          input.removeEventListener('keydown', handleKeyDown);
+        });
+      };
+    }
+  }, [currentStep]);
 
   const handleClose = () => {
     setCurrentStep(STEPS.LOGIN);
@@ -101,30 +160,47 @@ const AuthOffcanvas = () => {
     setError('');
     setIsLoading(true);
 
+    // Hardcoded device info for now
+    const deviceInfo = {
+      fcm_token: "457896354789",
+      device_id: "8974561234",
+      device_model: "Laptop 122"
+    };
+
     try {
-      const response = await fetch(`${API_BASE_URL}/common/verify-otp`, {
+      const response = await fetch(`${API_BASE_URL}/common/verify_otp`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          phone: phoneNumber,
-          country_code: '+91',
-          otp: otp
+          mobile: phoneNumber,
+          otp: otp,
+          ...deviceInfo
         })
       });
 
       const data = await response.json();
       
-      if (response.ok && data.success) {
-        // Store auth token if provided
-        if (data.token) {
-          localStorage.setItem('authToken', data.token);
-        }
-        
+      if (response.ok) {
+        // Store user data in localStorage
+        localStorage.setItem('auth', JSON.stringify({
+          userId: data.user_id,
+          name: data.name,
+          role: data.role,
+          accessToken: data.access_token,
+          expiresAt: data.expires_at
+        }));
+
         // Pass user data to context
-        handleLoginSuccess(data.user);
+        handleLoginSuccess({
+          id: data.user_id,
+          name: data.name,
+          role: data.role
+        });
+
+        // Close the auth modal
         handleClose();
       } else {
         setError(data.message || 'Invalid OTP. Please try again.');
@@ -295,28 +371,68 @@ const AuthOffcanvas = () => {
       </p>
       <form onSubmit={handleOTPSubmit}>
         <div className="mb-4">
-          <input
-            type="text"
-            className="form-control form-control-lg text-center"
-            value={otp}
-            onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, '');
-              if (value.length <= 6) {
-                setOtp(value);
-              }
-            }}
-            placeholder="• • • • • •"
-            maxLength={6}
-            pattern="[0-9]{6}"
-            required
-            disabled={isLoading}
-            autoComplete="one-time-code"
-          />
+          <div id="otp" className="digit-group d-flex gap-2 justify-content-center">
+            <input
+              className="form-control text-center"
+              type="text"
+              id="digit-1"
+              name="digit-1"
+              placeholder="-"
+              data-next="digit-2"
+              maxLength="1"
+              pattern="[0-9]"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+              disabled={isLoading}
+            />
+            <input
+              className="form-control text-center"
+              type="text"
+              id="digit-2"
+              name="digit-2"
+              placeholder="-"
+              data-next="digit-3"
+              data-previous="digit-1"
+              maxLength="1"
+              pattern="[0-9]"
+              inputMode="numeric"
+              required
+              disabled={isLoading}
+            />
+            <input
+              className="form-control text-center"
+              type="text"
+              id="digit-3"
+              name="digit-3"
+              placeholder="-"
+              data-next="digit-4"
+              data-previous="digit-2"
+              maxLength="1"
+              pattern="[0-9]"
+              inputMode="numeric"
+              required
+              disabled={isLoading}
+            />
+            <input
+              className="form-control text-center"
+              type="text"
+              id="digit-4"
+              name="digit-4"
+              placeholder="-"
+              data-previous="digit-3"
+              maxLength="1"
+              pattern="[0-9]"
+              inputMode="numeric"
+              required
+              disabled={isLoading}
+            />
+          </div>
         </div>
         <button 
           type="submit" 
           className="btn btn-primary w-100"
-          disabled={isLoading || otp.length !== 6}
+          disabled={isLoading || otp.length !== 4}
         >
           {isLoading ? (
             <span>
