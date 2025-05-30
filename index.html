@@ -13,12 +13,21 @@
     
 
     <title>MenuMitra Customer</title>
-    <script type="module" crossorigin src="/menumitra_customer_app/assets/index-DS31Ej0g.js"></script>
-    <link rel="stylesheet" crossorigin href="/menumitra_customer_app/assets/index-fs3rRefQ.css">
+    <script type="module" crossorigin src="/menumitra_customer_app/assets/index-CGioOLIb.js"></script>
+    <link rel="stylesheet" crossorigin href="/menumitra_customer_app/assets/index-CsCh-_iI.css">
   </head>
   <body>
     <div id="root"></div>
     <!-- Bootstrap 5.3.0-alpha1 JS Bundle (includes Popper, minified) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      (function() {
+        const redirect = localStorage.getItem('path');
+        if (redirect) {
+          localStorage.removeItem('path');
+          window.history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </body>
 </html>
