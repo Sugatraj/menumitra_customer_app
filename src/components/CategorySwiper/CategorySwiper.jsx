@@ -76,7 +76,7 @@ const CategorySwiper = ({
         width: ui.container.width,
         padding: ui.container.padding,
         margin: ui.container.margin,
-        backgroundColor: ui.container.backgroundColor,
+        // backgroundColor: ui.container.backgroundColor,
         ...containerStyle
       }}
     >
