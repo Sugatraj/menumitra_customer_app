@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import CategorySwiper from '../components/CategorySwiper/CategorySwiper'
@@ -13,7 +13,26 @@ import {
   faCarrot
 } from '@fortawesome/free-solid-svg-icons';
 import BannerSwiper from '../components/BannerSwiper/BannerSwiper';
+import apiClient from '../services/apiService';
+
 function Home() {
+   const [categories, setCategories] = useState([]);
+
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await apiClient.post('get_category_list_with_image', { outlet_id: 1 });
+        setCategories(response.detail.menu_list);
+      } catch (err) {
+        setError('Failed to fetch categories');
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 const foodCategories = [
     {
       id: 1,
@@ -623,13 +642,13 @@ const foodCategories = [
               </div>
             </div>
           </div> */}
-         <BannerSwiper 
+         {/* <BannerSwiper 
         banners={customBanners}
         onBannerClick={handleBannerClick}
         autoplayDelay={3000} // 3 seconds
         pauseOnHover={false} // Don't pause on hover
         disableOnInteraction={true} // Stop autoplay after user interaction
-      />
+      /> */}
           {/* Recent */}
           {/* Categorie */}
           <div className="title-bar mt-0">
