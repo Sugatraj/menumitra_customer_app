@@ -48,7 +48,7 @@ function Header() {
                 >
                 <FontAwesomeIcon icon={faBars} />
                 </a>
-                <h5 className="title mb-0 text-nowrap">Grocery</h5>
+                <h5 className="title mb-0 text-nowrap">MenuMitra</h5>
               </div>
           <div className="mid-content" />
           <div className="right-content">
