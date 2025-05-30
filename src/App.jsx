@@ -14,7 +14,7 @@ import ProductDetail from "./layouts/ProductDetail";
 function App() {
   return (
     <>
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <Router basename={import.meta.env.BASE_URL}>
         <SidebarProvider>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -29,7 +29,7 @@ function App() {
           </Routes>
           <Sidebar />
         </SidebarProvider>
-      </BrowserRouter>
+      </Router>
     </>
   );
 }
