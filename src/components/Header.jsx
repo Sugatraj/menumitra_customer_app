@@ -44,9 +44,9 @@ function Header() {
                 <a
                   href="#"
                   className="menu-toggler me-2"
-                  
+                  onClick={toggleSidebar}
                 >
-                 <button onClick={toggleSidebar}>click me</button>
+                <FontAwesomeIcon icon={faBars} />
                 </a>
                 <h5 className="title mb-0 text-nowrap">Grocery</h5>
               </div>
