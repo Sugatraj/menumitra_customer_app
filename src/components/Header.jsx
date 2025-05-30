@@ -1,6 +1,4 @@
-import React, { useEffect, useRef, useState  } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars } from '@fortawesome/free-solid-svg-icons'
+import React, { useEffect, useRef,} from 'react';
 import Sidebar from './Sidebar';
 import { useSidebar } from '../contexts/SidebarContext';
 
@@ -46,7 +44,10 @@ function Header() {
                   className="menu-toggler me-2"
                   onClick={toggleSidebar}
                 >
-                <FontAwesomeIcon icon={faBars} />
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3.5 7C3.5 6.44772 3.94772 6 4.5 6H19.5C20.0523 6 20.5 6.44772 20.5 7C20.5 7.55228 20.0523 8 19.5 8H4.5C3.94772 8 3.5 7.55228 3.5 7ZM3.5 12C3.5 11.4477 3.94772 11 4.5 11H19.5C20.0523 11 20.5 11.4477 20.5 12C20.5 12.5523 20.0523 13 19.5 13H4.5C3.94772 13 3.5 12.5523 3.5 12ZM3.5 17C3.5 16.4477 3.94772 16 4.5 16H19.5C20.0523 16 20.5 16.4477 20.5 17C20.5 17.5523 20.0523 18 19.5 18H4.5C3.94772 18 3.5 17.5523 3.5 17Z" 
+          fill="currentColor"/>
+</svg>
                 </a>
                 <h5 className="title mb-0 text-nowrap">MenuMitra</h5>
               </div>
