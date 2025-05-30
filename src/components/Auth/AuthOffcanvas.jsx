@@ -294,6 +294,48 @@ const AuthOffcanvas = () => {
           )}
         </button>
       </form>
+      
+      {/* Add divider and register button */}
+      <div className="text-center mt-4">
+        <div className="d-flex align-items-center justify-content-center gap-2 mb-3">
+          <div className="border-bottom flex-grow-1"></div>
+          <button 
+            type="button"
+            className="btn btn-link p-0 text-decoration-none"
+            onClick={() => setCurrentStep(STEPS.SIGNUP)}
+            disabled={isLoading}
+            style={{
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'opacity 0.2s ease',
+              color: '#6c757d'
+            }}
+          >
+            New to MenuMitra? <span className="ms-2" style={{ color: '#027335' }}>Register 
+              <svg 
+                className="ms-1 mt-0" 
+                viewBox="0 0 10 10" 
+                xmlns="http://www.w3.org/2000/svg" 
+                aria-hidden="true" 
+                style={{
+                  width: '0.68em', 
+                  height: '0.68em',
+                  color: '#027335'
+                }}
+              >
+                <path 
+                  d="M1.004 9.166 9.337.833m0 0v8.333m0-8.333H1.004" 
+                  stroke="currentColor" 
+                  strokeWidth="1.25" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </button>
+          <div className="border-bottom flex-grow-1"></div>
+        </div>
+      </div>
     </div>
   );
 
