@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext';
 function Home() {
   const [categories, setCategories] = useState([]);
   const { user } = useAuth();
+  const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -102,6 +103,37 @@ function Home() {
     console.log("Selected category:", category.name);
     // Add your navigation or other logic here
   };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon';
+    } else if (hour >= 17 && hour < 21) {
+      return 'Good Evening';
+    } else {
+      return 'Good Night';
+    }
+  };
+
+  // Update greeting when component mounts and every minute
+  useEffect(() => {
+    const updateGreeting = () => {
+      setGreeting(getGreeting());
+    };
+
+    // Set initial greeting
+    updateGreeting();
+
+    // Update greeting every minute
+    const interval = setInterval(updateGreeting, 60000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <div className="page-wraper">
@@ -332,7 +364,7 @@ function Home() {
         <div className="author-notification">
           <div className="container inner-wrapper">
             <div className="dz-info">
-              <span className="text-dark d-block">Good Morning</span>
+              <span className="text-dark d-block">{greeting}</span>
               <h2 className="name mb-0 title">
                 {user?.name ? `${user.name} 👋` : 'Guest 👋'}
               </h2>
