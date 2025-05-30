@@ -22,6 +22,7 @@ const AuthOffcanvas = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
     if (currentStep === STEPS.OTP) {
@@ -81,6 +82,60 @@ const AuthOffcanvas = () => {
       };
     }
   }, [currentStep]);
+
+  useEffect(() => {
+    const handleVisualViewport = () => {
+      const viewportHeight = window.visualViewport?.height || window.innerHeight;
+      const windowHeight = window.innerHeight;
+      const offcanvas = document.querySelector('.auth-offcanvas');
+      
+      // Check if keyboard is open
+      const keyboardIsOpen = viewportHeight < windowHeight * 0.75;
+
+      if (offcanvas) {
+        if (keyboardIsOpen) {
+          // Lock background scroll
+          document.body.style.overflow = 'hidden';
+          document.body.style.position = 'fixed';
+          document.body.style.width = '100%';
+          
+          // Simple transform to move above keyboard
+          const keyboardHeight = windowHeight - viewportHeight;
+          offcanvas.style.transform = `translateY(-${keyboardHeight}px)`;
+          offcanvas.style.transition = 'transform 0.2s ease-out';
+        } else {
+          // Reset all styles
+          document.body.style.overflow = '';
+          document.body.style.position = '';
+          document.body.style.width = '';
+          
+          offcanvas.style.transform = 'translateY(0)';
+        }
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualViewport);
+      window.visualViewport.addEventListener('scroll', handleVisualViewport);
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleVisualViewport);
+        window.visualViewport.removeEventListener('scroll', handleVisualViewport);
+      }
+      // Cleanup styles
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, []);
+
+  const handleInputFocus = (e) => {
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
 
   const handleClose = () => {
     setCurrentStep(STEPS.LOGIN);
@@ -148,9 +203,7 @@ const AuthOffcanvas = () => {
       const data = await response.json();
       
       if (response.ok) {
-        // Show success message briefly
         setError('Account created successfully!');
-        // Move to OTP step after a short delay
         setTimeout(() => {
           setCurrentStep(STEPS.OTP);
           setError('');
@@ -171,7 +224,6 @@ const AuthOffcanvas = () => {
     setError('');
     setIsLoading(true);
 
-    // Hardcoded device info for now
     const deviceInfo = {
       fcm_token: "457896354789",
       device_id: "8974561234",
@@ -195,7 +247,6 @@ const AuthOffcanvas = () => {
       const data = await response.json();
       
       if (response.ok) {
-        // Store user data in localStorage
         localStorage.setItem('auth', JSON.stringify({
           userId: data.user_id,
           name: data.name,
@@ -205,7 +256,6 @@ const AuthOffcanvas = () => {
           expiresAt: data.expires_at
         }));
 
-        // Pass user data to context
         handleLoginSuccess({
           id: data.user_id,
           name: data.name,
@@ -213,7 +263,6 @@ const AuthOffcanvas = () => {
           mobile: phoneNumber
         });
 
-        // Close the auth modal
         handleClose();
       } else {
         setError(data.message || 'Invalid OTP. Please try again.');
@@ -246,9 +295,8 @@ const AuthOffcanvas = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Show success message
         setError('OTP resent successfully!');
-        setTimeout(() => setError(''), 3000); // Clear message after 3 seconds
+        setTimeout(() => setError(''), 3000);
       } else {
         throw new Error(data.message || 'Failed to resend OTP');
       }
@@ -283,6 +331,7 @@ const AuthOffcanvas = () => {
                   setPhoneNumber(value);
                 }
               }}
+              onFocus={handleInputFocus}
               placeholder="Enter your phone number"
               pattern="[0-9]{10}"
               maxLength="10"
@@ -308,7 +357,6 @@ const AuthOffcanvas = () => {
         </button>
       </form>
       
-      {/* Add divider and register button */}
       <div className="text-center mt-4">
         <div className="d-flex align-items-center justify-content-center gap-2 mb-3">
           <div className="border-bottom flex-grow-1"></div>
@@ -395,6 +443,7 @@ const AuthOffcanvas = () => {
                   setPhoneNumber(value);
                 }
               }}
+              onFocus={handleInputFocus}
               placeholder="Enter your phone number"
               pattern="[0-9]{10}"
               maxLength="10"
@@ -411,6 +460,7 @@ const AuthOffcanvas = () => {
             className="form-control"
             value={userDetails.name}
             onChange={(e) => setUserDetails(prev => ({ ...prev, name: e.target.value }))}
+            onFocus={handleInputFocus}
             placeholder="Enter your full name"
             required
             disabled={isLoading}
@@ -466,61 +516,25 @@ const AuthOffcanvas = () => {
       <form onSubmit={handleOTPSubmit}>
         <div className="mb-4">
           <div id="otp" className="digit-group d-flex gap-2 justify-content-center">
-            <input
-              className="form-control text-center"
-              type="text"
-              id="digit-1"
-              name="digit-1"
-              placeholder="-"
-              data-next="digit-2"
-              maxLength="1"
-              pattern="[0-9]"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              required
-              disabled={isLoading}
-            />
-            <input
-              className="form-control text-center"
-              type="text"
-              id="digit-2"
-              name="digit-2"
-              placeholder="-"
-              data-next="digit-3"
-              data-previous="digit-1"
-              maxLength="1"
-              pattern="[0-9]"
-              inputMode="numeric"
-              required
-              disabled={isLoading}
-            />
-            <input
-              className="form-control text-center"
-              type="text"
-              id="digit-3"
-              name="digit-3"
-              placeholder="-"
-              data-next="digit-4"
-              data-previous="digit-2"
-              maxLength="1"
-              pattern="[0-9]"
-              inputMode="numeric"
-              required
-              disabled={isLoading}
-            />
-            <input
-              className="form-control text-center"
-              type="text"
-              id="digit-4"
-              name="digit-4"
-              placeholder="-"
-              data-previous="digit-3"
-              maxLength="1"
-              pattern="[0-9]"
-              inputMode="numeric"
-              required
-              disabled={isLoading}
-            />
+            {[1, 2, 3, 4].map((digit) => (
+              <input
+                key={digit}
+                className="form-control text-center"
+                type="text"
+                id={`digit-${digit}`}
+                name={`digit-${digit}`}
+                placeholder="-"
+                data-next={digit < 4 ? `digit-${digit + 1}` : null}
+                data-previous={digit > 1 ? `digit-${digit - 1}` : null}
+                maxLength="1"
+                pattern="[0-9]"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                required
+                disabled={isLoading}
+                onFocus={handleInputFocus}
+              />
+            ))}
           </div>
         </div>
         <div style={buttonContainerStyle}>
@@ -565,6 +579,10 @@ const AuthOffcanvas = () => {
       onClose={handleClose} 
       position="bottom"
       className="auth-offcanvas m-3 rounded"
+      style={{
+        transition: 'transform 0.2s ease-out',
+        willChange: 'transform'
+      }}
     >
       {currentStep === STEPS.LOGIN && renderLoginStep()}
       {currentStep === STEPS.SIGNUP && renderSignupStep()}
