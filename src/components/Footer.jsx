@@ -51,9 +51,14 @@ function Footer() {
           >
             <FontAwesomeIcon icon={faHeart} />
           </NavLink>
-          <a href="javascript:void(0);" className="nav-link">
+          <NavLink 
+            to="/checkout" 
+            className={({ isActive }) => 
+              isActive ? "nav-link active" : "nav-link"
+            }
+          >
             <FontAwesomeIcon icon={faCheckToSlot} />
-          </a>
+          </NavLink>
           <a href="javascript:void(0);" className="nav-link">
             <FontAwesomeIcon icon={faClockRotateLeft} />
           </a>
