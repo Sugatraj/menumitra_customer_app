@@ -2,7 +2,7 @@ import React from "react";
 
 function OutletInfoBanner() {
   return (
-    <div className="container-fluid bg-white py-2 shadow-sm">
+    <div className="container py-2">
       <div className="d-flex align-items-center">
         {/* Left side - Store Icon and Name */}
         <div className="d-flex align-items-center flex-grow-1">
@@ -19,7 +19,7 @@ function OutletInfoBanner() {
           </div>
           <div>
             <h6 className="mb-0 text-dark fw-bold">DESHMUKH WADA</h6>
-            <small className="text-muted">Pimpinvihir - 1</small>
+            <small className="text-muted">Pune</small>
           </div>
         </div>
 

@@ -5,12 +5,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import TestEnvironmentBanner from './TestEnvironmentBanner';
 import OutletInfoBanner from "./OutletInfoBanner";
+import { useLocation } from "react-router-dom";
 
 function Header() {
   const mainBarRef = useRef(null);
   const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
   const { isAuthenticated, user, setShowAuthOffcanvas } = useAuth();
-
+  const location = useLocation();
   useEffect(() => {
     const handleScroll = () => {
       if (!mainBarRef.current) return;
@@ -155,7 +156,7 @@ function Header() {
           </div>
         </div>
       </header>
-      <OutletInfoBanner />
+      {!location.pathname.includes('/all-outlets') && <OutletInfoBanner />}
     </>
   );
 }

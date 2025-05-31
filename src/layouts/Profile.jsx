@@ -107,6 +107,12 @@ function Profile() {
                   Blog &amp; Blog Detail
                 </a>
               </li>
+              <Link to="/all-outlets">
+                <a href="blog.html">
+                  <i className="fa-brands fa-microblog me-2" />
+                  All Outlets
+                </a>
+              </Link>
               <li className="border-0">
                 <a href="#" onClick={onLogoutClick}>
                   <i className="fa-solid fa-power-off" />
