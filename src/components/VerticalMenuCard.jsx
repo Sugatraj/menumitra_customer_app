@@ -36,7 +36,7 @@ const VerticalMenuCard = ({
         </h6>
         <div className="dz-meta">
           <ul>
-            <li className="price text-accent">$ {currentPrice}</li>
+            <li className="price text-accent">₹{currentPrice}</li>
             {reviewCount && (
               <li className="review">
                 <span className="text-soft font-10">({reviewCount})</span>

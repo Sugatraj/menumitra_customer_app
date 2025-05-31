@@ -24,6 +24,8 @@ function Home() {
   const [categories, setCategories] = useState([]);
   const { user } = useAuth();
   const [greeting, setGreeting] = useState('');
+  const [menuCategories, setMenuCategories] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -65,37 +67,64 @@ function Home() {
     fetchCategories(); // Call the function
   }, []); // Empty dependency array means this runs once on mount
 
+  useEffect(() => {
+    const fetchMenusByCategory = async () => {
+      try {
+        const authData = localStorage.getItem('auth');
+        const userData = authData ? JSON.parse(authData) : null;
 
+        const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${userData?.accessToken}`
+          },
+          body: JSON.stringify({
+            outlet_id: 1
+          })
+        });
 
-  // Optional: Custom banners data
-  // const customBanners = [
-  //   {
-  //     id: 1,
-  //     title: "30% OFF",
-  //     subtitle: "Weekend Special",
-  //     description: "*on Selected Items",
-  //     bgImage: "assets/images/background/bg2.png",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "FREE DELIVERY",
-  //     subtitle: "First Order",
-  //     description: "*min order $30",
-  //     bgImage: "assets/images/background/bg3.png",
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "15% OFF",
-  //     subtitle: "Happy Hours",
-  //     description: "*limited time offer",
-  //     bgImage: "assets/images/background/bg4.png",
-  //   },
-  // ];
+        const data = await response.json();
 
-  // const handleBannerClick = (banner) => {
-  //   console.log("Banner clicked:", banner);
-  //   // Add your navigation or action logic here
-  // };
+        // Set categories from the response
+        if (data.detail && data.detail.category) {
+          setMenuCategories(data.detail.category.map(category => ({
+            menuCatId: category.menu_cat_id,
+            categoryName: category.category_name,
+            menuCount: category.menu_count
+          })));
+        }
+
+        // Set menu items from the response
+        if (data.detail && data.detail.menus) {
+          setMenuItems(data.detail.menus.map(menu => ({
+            menuId: menu.menu_id,
+            menuName: menu.menu_name,
+            menuFoodType: menu.menu_food_type,
+            outletId: menu.outlet_id,
+            menuCatId: menu.menu_cat_id,
+            categoryName: menu.category_name,
+            spicyIndex: menu.spicy_index,
+            portions: menu.portions,
+            rating: menu.rating,
+            offer: menu.offer,
+            isSpecial: menu.is_special,
+            isFavourite: menu.is_favourite,
+            isActive: menu.is_active,
+            image: menu.image
+          })));
+        }
+
+      } catch (error) {
+        console.error('Error fetching menus by category:', error);
+        setMenuCategories([]);
+        setMenuItems([]);
+      }
+    };
+
+    fetchMenusByCategory();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleCategoryClick = (category) => {
     console.log("Selected category:", category.name);
@@ -131,6 +160,22 @@ function Home() {
     // Cleanup interval on unmount
     return () => clearInterval(interval);
   }, []);
+
+  // Add these handler functions in Home.jsx
+  const handleAddToCart = (menuId) => {
+    console.log('Adding to cart:', menuId);
+    // Will implement cart functionality later
+  };
+
+  const handleFavoriteClick = (menuId) => {
+    console.log('Toggle favorite:', menuId);
+    // Will implement favorite functionality later
+  };
+
+  const handleQuantityChange = (menuId, newQuantity) => {
+    console.log('Quantity changed:', menuId, newQuantity);
+    // Will implement quantity change functionality later
+  };
 
   return (
     <>
@@ -1225,148 +1270,26 @@ function Home() {
                 {/* Categorie End */}
                 {/* Recomended Start */}
                 <div className="title-bar">
-                  <span className="title mb-0 font-18">Popular Deals</span>
+                  <span className="title mb-0 font-18">Popular Menus</span>
                 </div>
                 <div className="row g-3 mb-3">
-                  <div className="col-6">
-                    <VerticalMenuCard
-                      // image="https://men4u.xyz/media/menu_images/puranpoli3.jpg"
-                      title="Fresh Grapes"
-                      currentPrice={10.9}
-                      reviewCount={243}
-                      // onAddToCart={() => handleAddToCart(productId)}
-                      // onFavoriteClick={() => handleFavoriteClick(productId)}
-                      isFavorite={false}
-                      discount="5%"
-                      productUrl="/product"
-                      // onQuantityChange={(newQuantity) =>
-                      //   handleQuantityChange(productId, newQuantity)
-                      // }
-                      quantity={1}
-                    />
-                  </div>
-                  {/* <div className="col-6">
-                    <div className="card-item style-1">
-                      <div className="dz-media">
-                        <img src="assets/images/food/food8.png" alt="image" />
-                        <a href="javascript:void(0);" className="r-btn">
-                          <div className="like-button">
-                            <i className="fa-regular fa-heart" />
-                          </div>
-                        </a>
-                        <div className="label">5% OFF</div>
-                      </div>
-                      <div className="dz-content">
-                        <h6 className="title mb-3">
-                          <a href="product.html">Fresh Grapes</a>
-                        </h6>
-                        <div className="dz-meta">
-                          <ul>
-                            <li className="price text-accent">$ 10.9</li>
-                            <li className="review">
-                              <span className="text-soft font-10">(243)</span>
-                              <i className="fa fa-star" />
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="mt-2">
-                          <a
-                            className="btn btn-primary add-btn light"
-                            href="javascript:void(0);"
-                          >
-                            Add to cart
-                          </a>
-                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                              <span className="input-group-btn input-group-prepend">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-down"
-                                  type="button"
-                                >
-                                  -
-                                </button>
-                              </span>
-                              <input
-                                className="stepper form-control"
-                                type="text"
-                                name="demo3"
-                                readOnly=""
-                              />
-                              <span className="input-group-btn input-group-append">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-up"
-                                  type="button"
-                                >
-                                  +
-                                </button>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                  {menuItems.map((menu) => (
+                    <div className="col-6" key={menu.menuId}>
+                      <VerticalMenuCard
+                        image={menu.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
+                        title={menu.menuName}
+                        currentPrice={menu.portions && menu.portions[0] ? menu.portions[0].price : 0}
+                        reviewCount={menu.rating ? parseInt(menu.rating) : null}
+                        onAddToCart={() => handleAddToCart(menu.menuId)}
+                        onFavoriteClick={() => handleFavoriteClick(menu.menuId)}
+                        isFavorite={menu.isFavourite === 1}
+                        discount={menu.offer > 0 ? `${menu.offer}%` : null}
+                        productUrl={`/product/${menu.menuId}`}
+                        onQuantityChange={(newQuantity) => handleQuantityChange(menu.menuId, newQuantity)}
+                        quantity={1}
+                      />
                     </div>
-                  </div>
-                  <div className="col-6">
-                    <div className="card-item style-1">
-                      <div className="dz-media">
-                        <img src="assets/images/food/food3.png" alt="image" />
-                        <a href="javascript:void(0);" className="r-btn">
-                          <div className="like-button active">
-                            <i className="fa-regular fa-heart" />
-                          </div>
-                        </a>
-                        <div className="label">5% OFF</div>
-                      </div>
-                      <div className="dz-content">
-                        <h6 className="title mb-3">
-                          <a href="product.html">Chicken Village</a>
-                        </h6>
-                        <div className="dz-meta">
-                          <ul>
-                            <li className="price text-accent">$ 10.9</li>
-                            <li className="review">
-                              <span className="text-soft font-10">(243)</span>
-                              <i className="fa fa-star" />
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="mt-2">
-                          <a
-                            className="btn btn-primary add-btn light"
-                            href="javascript:void(0);"
-                          >
-                            Add to cart
-                          </a>
-                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                              <span className="input-group-btn input-group-prepend">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-down"
-                                  type="button"
-                                >
-                                  -
-                                </button>
-                              </span>
-                              <input
-                                className="stepper form-control"
-                                type="text"
-                                name="demo3"
-                                readOnly=""
-                              />
-                              <span className="input-group-btn input-group-append">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-up"
-                                  type="button"
-                                >
-                                  +
-                                </button>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
+                  ))}
                 </div>
                 {/* Recomended Start */}
               </div>

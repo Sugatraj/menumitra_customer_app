@@ -97,10 +97,10 @@ function Categories() {
             <ul className="categore-list">
               {categories.map((category) => (
                 <li key={category.menuCatId}>
-                  <a
-                    href="product.html"
-                    className="categore-box box-lg"
-                    style={{
+                <a
+                  href="product.html"
+                  className="categore-box box-lg"
+                  style={{
                       backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url(${getImageUrl(category)})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center center',
@@ -123,7 +123,7 @@ function Categories() {
                     
                     <h6 
                       className="text-white mb-0"
-                      style={{
+                  style={{
                         fontSize: '14px',
                         lineHeight: '1.2',
                         color: '#FFFFFF',
@@ -136,7 +136,7 @@ function Categories() {
                     </h6>
                     <span 
                       className="text-white"
-                      style={{
+                  style={{
                         fontSize: '12px',
                         lineHeight: '1.2',
                         color: 'rgba(255, 255, 255, 0.8)',
@@ -146,8 +146,8 @@ function Categories() {
                     >
                       {category.menuCount} Items
                     </span>
-                  </a>
-                </li>
+                </a>
+              </li>
               ))}
             </ul>
           </div>
