@@ -26,21 +26,28 @@ function OutletInfoBanner() {
         {/* Right side - Info Icon */}
         <div>
           <button
-            className="btn btn-link text-dark p-0"
+            className="btn btn-link p-0 d-flex align-items-center"
             onClick={() => {
               /* Handle table info click */
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              {/* Simple Location Marker */}
-              <path d="M12 2C8.1 2 5 5.1 5 9c0 4 7 13 7 13s7-9 7-13c0-3.9-3.1-7-7-7zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z"/>
-            </svg>
+            <div className="text-primary">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 15 24"
+                fill="currentColor"
+                className="me-2"
+              >
+                {/* Simple Location Marker */}
+                <path d="M12 2C8.1 2 5 5.1 5 9c0 4 7 13 7 13s7-9 7-13c0-3.9-3.1-7-7-7zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z" />
+              </svg>
+            </div>
+            <div className="d-flex flex-column align-items-start">
+              <span className="fw-bold text-dark">Garden</span>
+              <small className="text-muted">Table No. 8</small>
+            </div>
           </button>
         </div>
       </div>
