@@ -68,46 +68,7 @@ function Header() {
               </div>
               <div className="mid-content" />
               <div className="right-content">
-                {isAuthenticated ? (
-                  <Link to="/profile" className="d-flex align-items-center">
-                    <div className="media media-25 rounded-circle overflow-hidden">
-                      <img 
-                        src={user?.avatar || "assets/images/avatar/1.jpg"} 
-                        alt="profile" 
-                        className="w-100"
-                      />
-                    </div>
-                  </Link>
-                ) : (
-                  <button 
-                    onClick={() => setShowAuthOffcanvas(true)}
-                    className="btn btn-sm btn-primary rounded-pill px-3"
-                    style={{
-                      fontSize: '0.875rem',
-                      fontWeight: '500',
-                      height: '32px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <svg 
-                      width="16" 
-                      height="16" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2"
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                    >
-                      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                      <polyline points="10 17 15 12 10 7"/>
-                      <line x1="15" y1="12" x2="3" y2="12"/>
-                    </svg>
-                    Login
-                  </button>
-                )}
+                
                 <a
                   href="javascript:void(0);"
                   className="theme-color ms-2"

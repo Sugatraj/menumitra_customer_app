@@ -3,15 +3,22 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useModal } from '../contexts/ModalContext';
 
 function Profile() {
-  const { handleLogout, user } = useAuth();
+  const { handleLogout, user, isAuthenticated, setShowAuthOffcanvas } = useAuth();
   const navigate = useNavigate();
+  const { openModal } = useModal();
 
   const onLogoutClick = (e) => {
     e.preventDefault();
     handleLogout();
     navigate("/");
+  };
+
+  const handleLoginClick = (e) => {
+    e.preventDefault();
+    setShowAuthOffcanvas(true);
   };
 
   return (
@@ -147,10 +154,17 @@ function Profile() {
                 </a>
               </Link>
               <li className="border-0">
-                <a href="#" onClick={onLogoutClick}>
-                  <i className="fa-solid fa-power-off" />
-                  LogOut
-                </a>
+                {isAuthenticated ? (
+                  <a href="#" onClick={onLogoutClick}>
+                    <i className="fa-solid fa-power-off" />
+                    LogOut
+                  </a>
+                ) : (
+                  <a href="#" onClick={handleLoginClick}>
+                    <i className="fa-solid fa-sign-in-alt" />
+                    Login
+                  </a>
+                )}
               </li>
             </ul>
           </div>
