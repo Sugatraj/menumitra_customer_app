@@ -37,8 +37,11 @@ export const AddToCartModal = () => {
           {modalConfig.data?.portions?.length > 0 ? (
             modalConfig.data.portions.map(portion => (
               <div 
-                className={`${modalConfig.data.portions.length === 1 ? 'col-12' : 
-                             modalConfig.data.portions.length === 2 ? 'col-6' : 'col-4'}`}
+                className={
+                  modalConfig.data.portions.length === 1 ? 'col-12' : 
+                  modalConfig.data.portions.length === 2 ? 'col-6' : 
+                  'col-4'
+                }
                 key={portion.portion_id}
               >
                 <div 
@@ -49,7 +52,10 @@ export const AddToCartModal = () => {
                     padding: '12px 8px',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    backgroundColor: selectedPortion === portion.portion_id ? '#f8fff8' : 'white'
+                    backgroundColor: selectedPortion === portion.portion_id ? '#f8fff8' : 'white',
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center'
                   }}
                 >
                   <div className="d-flex flex-column align-items-center">
@@ -81,155 +87,257 @@ export const AddToCartModal = () => {
       </div>
 
       <div className="mb-4">
-        <label
-          className="mb-2"
-          style={{
-            fontSize: '14px',
-            color: '#19b5fe',
-            fontWeight: 400,
-            display: 'block'
-          }}
-        >
-          Quantity
+        <label className="text-secondary mb-2 d-flex justify-content-between align-items-center">
+          <span style={{ fontSize: '14px' }}>Special Instructions</span>
+          <small style={{ 
+            color: comment.length < 5 || comment.length > 30 ? '#dc3545' : '#6c757d',
+            fontSize: '12px' 
+          }}>
+            {comment.length}/30
+          </small>
         </label>
+
+        {/* Quick Suggestions with toggle functionality */}
+        <div className="d-flex flex-wrap gap-2 mb-3">
+          {[
+            { icon: '🌶️', text: 'Extra spicy' },
+            { icon: '🥬', text: 'No onions' },
+            { icon: '🧄', text: 'No garlic' },
+            { icon: '🥄', text: 'Extra sauce' },
+            { icon: '🔥', text: 'Well done' },
+            { icon: '🥗', text: 'Less spicy' },
+            { icon: '🥚', text: 'No egg' },
+            { icon: '🥜', text: 'No nuts' }
+          ].map((suggestion, index) => {
+            const isSelected = comment.includes(suggestion.text);
+            
+            const handleSuggestionClick = () => {
+              if (isSelected) {
+                // Remove the suggestion
+                const suggestions = comment.split(', ');
+                const filteredSuggestions = suggestions.filter(s => s !== suggestion.text);
+                const newComment = filteredSuggestions.join(', ');
+                if (newComment.length <= 30) {
+                  setComment(newComment);
+                }
+              } else {
+                // Add the suggestion if within limits
+                const newComment = comment ? `${comment}, ${suggestion.text}` : suggestion.text;
+                if (newComment.length <= 30) {
+                  setComment(newComment);
+                }
+              }
+            };
+
+            return (
+              <div
+                key={index}
+                onClick={handleSuggestionClick}
+                style={{
+                  backgroundColor: isSelected ? '#e8f5e9' : '#f8f9fa',
+                  border: `1px solid ${isSelected ? '#28a745' : '#e9ecef'}`,
+                  borderRadius: '20px',
+                  padding: '8px 12px',
+                  fontSize: '13px',
+                  color: isSelected ? '#28a745' : '#6c757d',
+                  cursor: comment.length > 30 && !isSelected ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  userSelect: 'none',
+                  opacity: comment.length > 30 && !isSelected ? 0.5 : 1
+                }}
+              >
+                <span>{suggestion.icon}</span>
+                <span>{suggestion.text}</span>
+                {isSelected && <span style={{ marginLeft: '4px', fontSize: '10px' }}>✓</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="position-relative">
+          <textarea
+            className="form-control"
+            value={comment}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= 30) {
+                setComment(newValue);
+              }
+            }}
+            placeholder="Add any specific instructions..."
+            style={{
+              border: `1.5px solid ${
+                comment.length < 5 && comment.length > 0 ? '#dc3545' : 
+                comment.length > 30 ? '#dc3545' : 
+                '#e9ecef'
+              }`,
+              borderRadius: '12px',
+              padding: '12px',
+              paddingRight: '60px',
+              fontSize: '14px',
+              minHeight: '60px',
+              maxHeight: '120px',
+              resize: 'vertical',
+              backgroundColor: '#f8f9fa',
+              transition: 'all 0.2s ease'
+            }}
+            onFocus={(e) => {
+              if (comment.length <= 30) {
+                e.target.style.border = '1.5px solid #28a745';
+              }
+            }}
+            onBlur={(e) => {
+              e.target.style.border = comment.length < 5 || comment.length > 30 
+                ? '1.5px solid #dc3545' 
+                : '1.5px solid #e9ecef';
+            }}
+          />
+          
+          {/* Clear button */}
+          {comment && (
+            <button
+              onClick={() => setComment('')}
+              className="d-flex align-items-center gap-1"
+              style={{
+                position: 'absolute',
+                right: '12px',
+                top: '12px',
+                background: '#f1f3f5',
+                border: '1px solid #e9ecef',
+                borderRadius: '16px',
+                padding: '4px 8px',
+                color: '#6c757d',
+                cursor: 'pointer',
+                fontSize: '12px',
+                zIndex: 2
+              }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* Validation message */}
+        {comment.length > 0 && (
+          <small style={{ 
+            color: '#dc3545', 
+            fontSize: '12px',
+            marginTop: '6px',
+            display: 'block' 
+          }}>
+            {comment.length < 5 ? 'Instructions must be at least 5 characters' :
+             comment.length > 30 ? 'Instructions cannot exceed 30 characters' : ''}
+          </small>
+        )}
+
+        {/* Helper text */}
+        <small style={{ 
+          color: '#6c757d', 
+          fontSize: '12px',
+          marginTop: comment.length > 0 ? '2px' : '6px',
+          display: 'block' 
+        }}>
+          Click to add/remove suggestions or type your custom instructions
+        </small>
+      </div>
+
+      <div className="d-flex align-items-center gap-3 mt-4">
         <div
           style={{
             display: 'flex',
-            justifyContent: 'center',
             alignItems: 'center',
-            marginTop: '8px'
+            border: '1px solid #28a745',
+            borderRadius: '999px',
+            padding: '5px 5px',
+            background: 'white',
+            flex: '1'
           }}
         >
-          <div
+          <button
+            type="button"
+            onClick={() => handleQuantityChange(quantity - 1)}
             style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#07813a',
+              color: 'white',
+              border: 'none',
+              fontSize: '20px',
+              fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
-              border: '1px solid #28a745',
-              borderRadius: '999px',
-              padding: '5px 5px',
-              background: 'white',
+              justifyContent: 'center',
+              marginRight: '20px',
+              transition: 'background 0.2s',
+              opacity: quantity <= 1 ? 0.5 : 1,
+            }}
+            disabled={quantity <= 1}
+          >
+            –
+          </button>
+          <span
+            style={{
+              fontSize: '20px',
+              fontWeight: 400,
+              color: '#23232b',
+              minWidth: '24px',
+              textAlign: 'center',
+              flex: '1'
             }}
           >
-            <button
-              type="button"
-              onClick={() => handleQuantityChange(quantity - 1)}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#07813a',
-                color: 'white',
-                border: 'none',
-                fontSize: '20px',
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: '20px',
-                transition: 'background 0.2s',
-                opacity: quantity <= 1 ? 0.5 : 1, // Visual feedback for min limit
-              }}
-              disabled={quantity <= 1}
-            >
-              –
-            </button>
-            <span
-              style={{
-                fontSize: '20px',
-                fontWeight: 400,
-                color: '#23232b',
-                minWidth: '24px',
-                textAlign: 'center'
-              }}
-            >
-              {quantity}
-            </span>
-            <button
-              type="button"
-              onClick={() => handleQuantityChange(quantity + 1)}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#07813a',
-                color: 'white',
-                border: 'none',
-                fontSize: '20px',
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: '20px',
-                transition: 'background 0.2s',
-                opacity: quantity >= MAX_QUANTITY ? 0.5 : 1, // Visual feedback for max limit
-              }}
-              disabled={quantity >= MAX_QUANTITY}
-            >
-              +
-            </button>
-          </div>
+            {quantity}
+          </span>
+          <button
+            type="button"
+            onClick={() => handleQuantityChange(quantity + 1)}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: '#07813a',
+              color: 'white',
+              border: 'none',
+              fontSize: '20px',
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: '20px',
+              transition: 'background 0.2s',
+              opacity: quantity >= MAX_QUANTITY ? 0.5 : 1,
+            }}
+            disabled={quantity >= MAX_QUANTITY}
+          >
+            +
+          </button>
         </div>
-        {quantity >= MAX_QUANTITY && (
-          <div className="text-center mt-2" style={{ color: '#dc3545', fontSize: '12px' }}>
-            Maximum quantity limit reached
-          </div>
-        )}
-      </div>
 
-      <div className="mb-4">
-        <label className="text-secondary mb-2" style={{ fontSize: '14px' }}>
-          Special Instructions
-        </label>
-        <textarea
-          className="form-control"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Any special instructions?"
-          style={{
-            border: '1.5px solid #e9ecef',
-            borderRadius: '8px',
-            padding: '12px',
-            fontSize: '15px',
-            minHeight: '80px',
-            resize: 'none'
-          }}
-          onFocus={(e) => e.target.style.border = '1.5px solid #28a745'}
-          onBlur={(e) => e.target.style.border = '1.5px solid #e9ecef'}
-        />
-      </div>
-
-      <div className="d-flex gap-2 mt-4">
         <button 
           type="button" 
-          className="btn flex-grow-1" 
-          onClick={closeModal}
-          style={{
-            backgroundColor: '#f8f9fa',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '12px',
-            fontSize: '15px',
-            fontWeight: '500'
-          }}
-        >
-          Cancel
-        </button>
-        <button 
-          type="button" 
-          className="btn btn-success flex-grow-1" 
+          className="btn btn-success" 
           onClick={handleAddToCart}
           style={{
             backgroundColor: '#28a745',
             border: 'none',
             borderRadius: '8px',
-            padding: '12px',
+            padding: '12px 24px',
             fontSize: '15px',
-            fontWeight: '500'
+            fontWeight: '500',
+            flex: '1'
           }}
         >
           Add to Cart
         </button>
       </div>
+      {quantity >= MAX_QUANTITY && (
+        <div className="text-center mt-2" style={{ color: '#dc3545', fontSize: '12px' }}>
+          Maximum quantity limit reached
+        </div>
+      )}
     </BaseModal>
   );
 };
