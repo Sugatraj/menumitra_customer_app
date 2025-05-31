@@ -17,6 +17,7 @@ const VerticalMenuCard = ({
 }) => {
   const { openModal } = useModal();
   const { cartItems, updateQuantity, removeFromCart } = useCart();
+  const MAX_QUANTITY = 20;
 
   // Check if item exists in cart
   const cartItem = cartItems.find(item => 
@@ -32,7 +33,7 @@ const VerticalMenuCard = ({
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity === 0) {
       removeFromCart(menuItem.menuId, cartItem.portionId);
-    } else {
+    } else if (newQuantity <= MAX_QUANTITY) {
       updateQuantity(menuItem.menuId, cartItem.portionId, newQuantity);
     }
   };
@@ -46,7 +47,7 @@ const VerticalMenuCard = ({
           className="r-btn"
           onClick={onFavoriteClick}
         >
-          <div className="like-button active">
+          <div className={`like-button ${isFavorite ? 'active' : ''}`}>
             <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i>
           </div>
         </a>
@@ -56,7 +57,7 @@ const VerticalMenuCard = ({
         <h6 className="title mb-3">
           <a href={productUrl}>{title}</a>
         </h6>
-        <div className="dz-meta">
+        <div className="dz-meta mb-3">
           <ul>
             <li className="price text-accent">₹{currentPrice}</li>
             {reviewCount && (
@@ -67,48 +68,48 @@ const VerticalMenuCard = ({
             )}
           </ul>
         </div>
-        <div className="mt-2">
+        <div className="mt-2" style={{ minHeight: '38px' }}>
           {!cartItem ? (
-            // Show Add to Cart button if item is not in cart
             <a 
-              className="btn btn-primary add-btn light"
+              className="btn btn-primary add-btn light w-100"
               href="javascript:void(0);"
               onClick={handleAddToCartClick}
             >
               Add to cart
             </a>
-          ) : (
-            // Show quantity stepper if item is in cart with active class
-            <div className="dz-stepper border-1 rounded-stepper stepper-fill active">
-              <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                <span className="input-group-btn input-group-prepend">
-                  <button 
-                    className="btn btn-primary bootstrap-touchspin-down" 
-                    type="button"
-                    onClick={() => handleQuantityChange(Math.max(0, cartItem.quantity - 1))}
-                  >
-                    -
-                  </button>
-                </span>
-                <input 
-                  className="stepper form-control" 
-                  type="text" 
-                  name="demo3"
-                  value={cartItem.quantity}
-                  readOnly
-                />
-                <span className="input-group-btn input-group-append">
-                  <button 
-                    className="btn btn-primary bootstrap-touchspin-up" 
-                    type="button"
-                    onClick={() => handleQuantityChange(cartItem.quantity + 1)}
-                  >
-                    +
-                  </button>
-                </span>
-              </div>
+          ) : null}
+          <div className={`dz-stepper border-1 rounded-stepper stepper-fill ${cartItem ? 'active' : ''}`}>
+            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+              <span className="input-group-btn input-group-prepend">
+                <button 
+                  className="btn btn-primary bootstrap-touchspin-down" 
+                  type="button"
+                  onClick={() => handleQuantityChange(Math.max(0, (cartItem?.quantity || 0) - 1))}
+                  disabled={!cartItem}
+                >
+                  -
+                </button>
+              </span>
+              <input 
+                className="stepper form-control" 
+                type="text" 
+                name="demo3"
+                value={cartItem?.quantity || 0}
+                readOnly
+              />
+              <span className="input-group-btn input-group-append">
+                <button 
+                  className="btn btn-primary bootstrap-touchspin-up" 
+                  type="button"
+                  onClick={() => handleQuantityChange((cartItem?.quantity || 0) + 1)}
+                  disabled={!cartItem || cartItem.quantity >= MAX_QUANTITY}
+                  style={{ opacity: cartItem?.quantity >= MAX_QUANTITY ? 0.5 : 1 }}
+                >
+                  +
+                </button>
+              </span>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

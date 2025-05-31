@@ -88,6 +88,7 @@ function Checkout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const MAX_QUANTITY = 20;
 
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -102,7 +103,7 @@ function Checkout() {
   const handleQuantityChange = (menuId, portionId, newQuantity) => {
     if (newQuantity === 0) {
       removeFromCart(menuId, portionId);
-    } else {
+    } else if (newQuantity <= MAX_QUANTITY) {
       updateQuantity(menuId, portionId, newQuantity);
     }
   };
@@ -369,11 +370,18 @@ function Checkout() {
                                         item.quantity + 1
                                       )
                                     }
+                                    disabled={item.quantity >= MAX_QUANTITY}
+                                    style={{ opacity: item.quantity >= MAX_QUANTITY ? 0.5 : 1 }}
                                   >
                                     +
                                   </button>
                                 </span>
                               </div>
+                              {item.quantity >= MAX_QUANTITY && (
+                                <small className="text-danger d-block text-center mt-1">
+                                  Max quantity reached
+                                </small>
+                              )}
                             </div>
                           </div>
                         </div>
