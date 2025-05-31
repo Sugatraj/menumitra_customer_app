@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import { useCart } from "../contexts/CartContext";
 import axios from "axios";
 import { API_CONFIG } from "../constants/config";
+import { useNavigate } from "react-router-dom";
 
 const FooterSummary = React.memo(function FooterSummary({ checkoutDetails }) {
   // Fallback to zeros if no data yet
@@ -85,6 +86,7 @@ function Checkout() {
   const [checkoutDetails, setCheckoutDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -208,9 +210,9 @@ function Checkout() {
                   </svg>
                   <span className="text-muted fs-5 mt-3 mb-2" style={{ color: "#b0b3b8" }}>Your cart is empty</span>
                   <button
-                    className="btn btn-success px-4 py-2"
+                    className="btn btn-outline-success px-4 py-3 mt-4"
                     style={{ borderRadius: 12, fontWeight: 500 }}
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => navigate('/')}
                   >
                     Go to Home
                   </button>

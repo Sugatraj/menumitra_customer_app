@@ -1,7 +1,11 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
 
 function Footer() {
+  const { getCartCount } = useCart();
+  const cartCount = getCartCount();
+
   return (
     <div>
       <div className="menubar-area style-2 footer-fixed border-top">
@@ -45,15 +49,40 @@ function Footer() {
           <NavLink
             to="/checkout"
             className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
+              isActive ? "nav-link active position-relative d-flex align-items-center justify-content-center" : "nav-link position-relative d-flex align-items-center justify-content-center"
             }
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 456.569 456.569"
-            >
-              <path d="M345.805 339.465c-29.323-.028-53.117 23.72-53.146 53.043s23.72 53.117 53.043 53.146 53.117-23.72 53.146-53.043v-.051c-.028-29.292-23.752-53.038-53.043-53.095zm94.171-254.244a20.44 20.44 0 0 0-3.855-.373H112.845l-5.12-34.253c-3.19-22.748-22.648-39.673-45.619-39.68H20.48C9.169 10.915 0 20.084 0 31.395s9.169 20.48 20.48 20.48h41.677a5.12 5.12 0 0 1 5.12 4.506l31.539 216.166c4.324 27.468 27.951 47.732 55.757 47.821h213.043c26.771.035 49.866-18.78 55.245-45.005l33.331-166.144c2.149-11.105-5.111-21.849-16.216-23.998zM215.737 390.286c-1.247-28.463-24.737-50.869-53.228-50.77h0c-29.299 1.184-52.091 25.896-50.907 55.195 1.136 28.113 24.005 50.458 52.136 50.943h1.28c29.295-1.284 52.002-26.073 50.719-55.368z"></path>
-            </svg>
+            <span style={{ position: "relative", display: "inline-block" }}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 456.569 456.569"
+                style={{ width: 32, height: 32 }}
+              >
+                <path d="M345.805 339.465c-29.323-.028-53.117 23.72-53.146 53.043s23.72 53.117 53.043 53.146 53.117-23.72 53.146-53.043v-.051c-.028-29.292-23.752-53.038-53.043-53.095zm94.171-254.244a20.44 20.44 0 0 0-3.855-.373H112.845l-5.12-34.253c-3.19-22.748-22.648-39.673-45.619-39.68H20.48C9.169 10.915 0 20.084 0 31.395s9.169 20.48 20.48 20.48h41.677a5.12 5.12 0 0 1 5.12 4.506l31.539 216.166c4.324 27.468 27.951 47.732 55.757 47.821h213.043c26.771.035 49.866-18.78 55.245-45.005l33.331-166.144c2.149-11.105-5.111-21.849-16.216-23.998zM215.737 390.286c-1.247-28.463-24.737-50.869-53.228-50.77h0c-29.299 1.184-52.091 25.896-50.907 55.195 1.136 28.113 24.005 50.458 52.136 50.943h1.28c29.295-1.284 52.002-26.073 50.719-55.368z"></path>
+              </svg>
+              {cartCount > 0 && (
+                <span
+                  className="position-absolute badge rounded-pill"
+                  style={{
+                    bottom: "18px",
+                    left: "21px",
+                    fontSize: "0.6rem",
+                    minWidth: 18,
+                    height: 18,
+                    backgroundColor: "#dc3545",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 4px",
+                    zIndex: 2,
+                    border: '1px solid white'
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </span>
           </NavLink>
 
           <NavLink
