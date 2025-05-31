@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
 import PropTypes from 'prop-types';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
+import 'swiper/css/autoplay';
 
 const categories = [/* ... same categories array ... */];
 
@@ -98,6 +100,12 @@ const CategorySwiper = ({
           slidesPerView={3.2}
           className="categorie-swiper"
           breakpoints={breakpoints}
+          loop={true}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true
+          }}
           watchSlidesProgress={true}
           watchSlidesVisibility={true}
           centeredSlidesBounds={true}
@@ -112,6 +120,7 @@ const CategorySwiper = ({
           touchStartPreventDefault={false}
           touchMoveStopPropagation={true}
           cssMode={true}
+          modules={[Autoplay]}
         >
           {customCategories.map((category) => (
             <SwiperSlide key={category.menuCatId}>
