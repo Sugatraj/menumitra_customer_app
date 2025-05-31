@@ -2,26 +2,39 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import fallbackImage from '../assets/images/food/food8.png';
 import { useModal } from '../contexts/ModalContext';
+import { useCart } from '../contexts/CartContext';
 
 const VerticalMenuCard = ({
   image,
   title,
   currentPrice,
   reviewCount,
-  onAddToCart,
   onFavoriteClick,
   isFavorite = false,
   discount,
   productUrl = '#',
-  onQuantityChange,
-  quantity = 1,
   menuItem
 }) => {
   const { openModal } = useModal();
+  const { cartItems, updateQuantity, removeFromCart } = useCart();
+
+  // Check if item exists in cart
+  const cartItem = cartItems.find(item => 
+    item.menuId === menuItem.menuId && 
+    item.portionId === menuItem.portions?.[0]?.portion_id
+  );
 
   const handleAddToCartClick = (e) => {
     e.preventDefault();
     openModal('ADD_TO_CART', menuItem);
+  };
+
+  const handleQuantityChange = (newQuantity) => {
+    if (newQuantity === 0) {
+      removeFromCart(menuItem.menuId, cartItem.portionId);
+    } else {
+      updateQuantity(menuItem.menuId, cartItem.portionId, newQuantity);
+    }
   };
 
   return (
@@ -55,41 +68,47 @@ const VerticalMenuCard = ({
           </ul>
         </div>
         <div className="mt-2">
-          <a 
-            className="btn btn-primary add-btn light" 
-            href="javascript:void(0);"
-            onClick={handleAddToCartClick}
-          >
-            Add to cart
-          </a>
-          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-              <span className="input-group-btn input-group-prepend">
-                <button 
-                  className="btn btn-primary bootstrap-touchspin-down" 
-                  type="button"
-                  onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-                >
-                  -
-                </button>
-              </span>
-              <input 
-                className="stepper form-control" 
-                type="text" 
-                value={quantity}
-                readOnly
-              />
-              <span className="input-group-btn input-group-append">
-                <button 
-                  className="btn btn-primary bootstrap-touchspin-up" 
-                  type="button"
-                  onClick={() => onQuantityChange(quantity + 1)}
-                >
-                  +
-                </button>
-              </span>
+          {!cartItem ? (
+            // Show Add to Cart button if item is not in cart
+            <a 
+              className="btn btn-primary add-btn light"
+              href="javascript:void(0);"
+              onClick={handleAddToCartClick}
+            >
+              Add to cart
+            </a>
+          ) : (
+            // Show quantity stepper if item is in cart with active class
+            <div className="dz-stepper border-1 rounded-stepper stepper-fill active">
+              <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                <span className="input-group-btn input-group-prepend">
+                  <button 
+                    className="btn btn-primary bootstrap-touchspin-down" 
+                    type="button"
+                    onClick={() => handleQuantityChange(Math.max(0, cartItem.quantity - 1))}
+                  >
+                    -
+                  </button>
+                </span>
+                <input 
+                  className="stepper form-control" 
+                  type="text" 
+                  name="demo3"
+                  value={cartItem.quantity}
+                  readOnly
+                />
+                <span className="input-group-btn input-group-append">
+                  <button 
+                    className="btn btn-primary bootstrap-touchspin-up" 
+                    type="button"
+                    onClick={() => handleQuantityChange(cartItem.quantity + 1)}
+                  >
+                    +
+                  </button>
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
@@ -101,13 +120,10 @@ VerticalMenuCard.propTypes = {
   title: PropTypes.string.isRequired,
   currentPrice: PropTypes.number.isRequired,
   reviewCount: PropTypes.number,
-  onAddToCart: PropTypes.func.isRequired,
   onFavoriteClick: PropTypes.func.isRequired,
   isFavorite: PropTypes.bool,
   discount: PropTypes.string,
   productUrl: PropTypes.string,
-  onQuantityChange: PropTypes.func.isRequired,
-  quantity: PropTypes.number,
   menuItem: PropTypes.object.isRequired
 };
 

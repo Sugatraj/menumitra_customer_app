@@ -17,6 +17,7 @@ import BannerSwiper from "../components/BannerSwiper/BannerSwiper";
 import apiClient from "../services/apiService";
 import VerticalMenuCard from "../components/VerticalMenuCard";
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
@@ -26,6 +27,7 @@ function Home() {
   const [greeting, setGreeting] = useState('');
   const [menuCategories, setMenuCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
+  const { cartItems, updateQuantity, addToCart } = useCart();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -175,6 +177,12 @@ function Home() {
   const handleQuantityChange = (menuId, newQuantity) => {
     console.log('Quantity changed:', menuId, newQuantity);
     // Will implement quantity change functionality later
+  };
+
+  // Helper function to check if item is in cart and get its quantity
+  const getCartItemQuantity = (menuId) => {
+    const cartItem = cartItems.find(item => item.menuId === menuId);
+    return cartItem ? cartItem.quantity : 0;
   };
 
   return (
