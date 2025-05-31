@@ -191,6 +191,8 @@ export const AddToCartModal = () => {
             minHeight: '80px',
             resize: 'none'
           }}
+          onFocus={(e) => e.target.style.border = '1.5px solid #28a745'}
+          onBlur={(e) => e.target.style.border = '1.5px solid #e9ecef'}
         />
       </div>
 
