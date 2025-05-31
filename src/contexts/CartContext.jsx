@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const CartContext = createContext();
 
@@ -126,9 +126,10 @@ export const CartProvider = ({ children }) => {
   };
 
   // Clear cart
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+    localStorage.removeItem('cart');
+  }, []);
 
   // Get cart total
   const getCartTotal = () => {

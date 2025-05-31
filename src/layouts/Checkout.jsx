@@ -82,6 +82,7 @@ function Checkout() {
     removeFromCart,
     getCartTotal,
     getCartCount,
+    clearCart,
   } = useCart();
   const [checkoutDetails, setCheckoutDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -206,15 +207,15 @@ function Checkout() {
       const orderItems = cartItems.map(item => ({
         menu_id: item.menuId,
         quantity: item.quantity,
-        portion_name: item.portionName.toLowerCase(), // Assuming portionName is available in cart item
-        comment: item.comment || "" // If comment exists in cart item
+        portion_name: item.portionName.toLowerCase(),
+        comment: item.comment || ""
       }));
 
       const payload = {
-        outlet_id: "1", // This seems to be fixed in your example
+        outlet_id: "1",
         user_id: String(userId),
-        section_id: "1", // This seems to be fixed in your example
-        order_type: "parcel", // This seems to be fixed in your example
+        section_id: "1",
+        order_type: "parcel",
         order_items: orderItems,
         action: "create_order"
       };
@@ -233,11 +234,14 @@ function Checkout() {
 
       // Handle successful order creation
       if (response.data?.order_id) {
-        // Clear the cart after successful order
-        // Assuming you have a clearCart function in your context
-        // clearCart(); 
+        // Clear both context and localStorage
+        clearCart();
+        localStorage.removeItem('cart');
 
-        // Navigate to success page or show success message
+        // Show success message (optional)
+        // toast.success('Order placed successfully!');
+
+        // Navigate to success page with order details
         navigate(`/`);
       }
 
