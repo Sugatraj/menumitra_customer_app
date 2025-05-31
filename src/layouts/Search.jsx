@@ -1,9 +1,91 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HorizontalMenuCard from "../components/HorizontalMenuCard";
+import { useAuth } from "../contexts/AuthContext"; // Assuming you have AuthContext
+import { debounce } from 'lodash'; // Make sure to install lodash
 
 function Search() {
+  const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Assuming you get these from context/props
+  const outletId = 1; // This should come from your app context/state
+  const { userId } = useAuth(); // Get user_id from auth context
+
+  // Search API function
+  const searchMenu = async (keyword) => {
+    try {
+      const response = await fetch('https://men4u.xyz/v2/user/search_menu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any auth headers if required
+        },
+        body: JSON.stringify({
+          outlet_id: outletId,
+          keyword: keyword,
+          user_id: userId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+
+      const data = await response.json();
+      return data.detail.menu_list;
+    } catch (err) {
+      throw new Error(err.message || 'Failed to search menu items');
+    }
+  };
+
+  // Debounced search handler
+  const debouncedSearch = useCallback(
+    debounce(async (searchTerm) => {
+      if (!searchTerm || searchTerm.trim().length === 0) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const results = await searchMenu(searchTerm);
+        setSearchResults(results);
+      } catch (err) {
+        setError(err.message);
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 500), // 500ms delay
+    [outletId, userId] // Dependencies
+  );
+
+  // Handle search input change
+  const handleSearchChange = (event) => {
+    const searchTerm = event.target.value;
+    debouncedSearch(searchTerm);
+  };
+
+  // Cleanup debounce on unmount
+  React.useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  const handleAddToCart = (menu) => {
+    // Implement add to cart logic
+  };
+
+  const handleFavoriteClick = (menuId) => {
+    // Implement favorite toggle logic
+  };
+
   return (
     <>
       <Header />
@@ -32,7 +114,8 @@ function Search() {
                   <input
                     type="search"
                     className="form-control main-in px-0 bs-0"
-                    placeholder="Strawberry"
+                    placeholder="Search menu items..."
+                    onChange={handleSearchChange}
                   />
                   <span className="input-group-text">
                     <a
@@ -157,19 +240,21 @@ function Search() {
                 </select>
               </div>
               <ul>
-                <li>
-                  <HorizontalMenuCard
-                    // image="assets/images/food/small/6.png"
-                    title="Fresh Strawberry"
-                    currentPrice={5.0}
-                    originalPrice={8.9}
-                    discount="10%"
-                    // onAddToCart={() => handleAddToCart(productId)}
-                    // onFavoriteClick={() => handleFavoriteClick(productId)}
-                    isFavorite={false}
-                    productUrl="/product-detail"
-                  />
-                </li>
+                {searchResults.map((menu) => (
+                  <li key={menu.menu_id}>
+                    <HorizontalMenuCard
+                      image={menu.image}
+                      title={menu.menu_name}
+                      currentPrice={menu.portions[0].price}
+                      originalPrice={menu.offer ? (menu.portions[0].price * 100) / (100 - menu.offer) : null}
+                      discount={menu.offer ? `${menu.offer}%` : null}
+                      onAddToCart={() => handleAddToCart(menu)}
+                      onFavoriteClick={() => handleFavoriteClick(menu.menu_id)}
+                      isFavorite={false}
+                      productUrl={`/product-detail/${menu.menu_id}`}
+                    />
+                  </li>
+                ))}
               </ul>
             </div>
             {/* Product List */}

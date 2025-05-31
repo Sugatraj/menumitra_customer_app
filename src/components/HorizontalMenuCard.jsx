@@ -41,10 +41,10 @@ const HorizontalMenuCard = ({
             <a href={productUrl}>{title}</a>
           </h5>
           <div className="d-flex align-items-center">
-            <h6 className="me-2 mb-0">$ {currentPrice}</h6>
+            <h6 className="me-2 mb-0">₹ {currentPrice}</h6>
             {originalPrice && (
               <del className="off-text">
-                <h6 className="mb-0">$ {originalPrice}</h6>
+                <h6 className="mb-0">₹ {originalPrice}</h6>
               </del>
             )}
           </div>    
