@@ -1273,20 +1273,21 @@ function Home() {
                   <span className="title mb-0 font-18">Popular Menus</span>
                 </div>
                 <div className="row g-3 mb-3">
-                  {menuItems.map((menu) => (
-                    <div className="col-6" key={menu.menuId}>
+                  {menuItems.map((menuItem) => (
+                    <div className="col-6" key={menuItem.menuId}>
                       <VerticalMenuCard
-                        image={menu.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
-                        title={menu.menuName}
-                        currentPrice={menu.portions && menu.portions[0] ? menu.portions[0].price : 0}
-                        reviewCount={menu.rating ? parseInt(menu.rating) : null}
-                        onAddToCart={() => handleAddToCart(menu.menuId)}
-                        onFavoriteClick={() => handleFavoriteClick(menu.menuId)}
-                        isFavorite={menu.isFavourite === 1}
-                        discount={menu.offer > 0 ? `${menu.offer}%` : null}
-                        productUrl={`/product/${menu.menuId}`}
-                        onQuantityChange={(newQuantity) => handleQuantityChange(menu.menuId, newQuantity)}
+                        image={menuItem.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
+                        title={menuItem.menuName}
+                        currentPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price : 0}
+                        reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
+                        onAddToCart={() => {}} // This can be empty since we're using modal now
+                        onFavoriteClick={() => handleFavoriteClick(menuItem.menuId)}
+                        isFavorite={menuItem.isFavourite === 1}
+                        discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
+                        productUrl={`/product/${menuItem.menuId}`}
+                        onQuantityChange={(newQuantity) => handleQuantityChange(menuItem.menuId, newQuantity)}
                         quantity={1}
+                        menuItem={menuItem} // Pass the entire menu item
                       />
                     </div>
                   ))}

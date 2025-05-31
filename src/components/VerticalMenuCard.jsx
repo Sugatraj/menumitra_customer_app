@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import fallbackImage from '../assets/images/food/food8.png';
+import { useModal } from '../contexts/ModalContext';
 
 const VerticalMenuCard = ({
   image,
@@ -13,8 +14,16 @@ const VerticalMenuCard = ({
   discount,
   productUrl = '#',
   onQuantityChange,
-  quantity = 1
+  quantity = 1,
+  menuItem
 }) => {
+  const { openModal } = useModal();
+
+  const handleAddToCartClick = (e) => {
+    e.preventDefault();
+    openModal('ADD_TO_CART', menuItem);
+  };
+
   return (
     <div className="card-item style-1">
       <div className="dz-media">
@@ -49,7 +58,7 @@ const VerticalMenuCard = ({
           <a 
             className="btn btn-primary add-btn light" 
             href="javascript:void(0);"
-            onClick={onAddToCart}
+            onClick={handleAddToCartClick}
           >
             Add to cart
           </a>
@@ -98,7 +107,8 @@ VerticalMenuCard.propTypes = {
   discount: PropTypes.string,
   productUrl: PropTypes.string,
   onQuantityChange: PropTypes.func.isRequired,
-  quantity: PropTypes.number
+  quantity: PropTypes.number,
+  menuItem: PropTypes.object.isRequired
 };
 
 export default VerticalMenuCard;
