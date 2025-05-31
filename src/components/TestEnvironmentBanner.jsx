@@ -20,7 +20,7 @@ const TestEnvironmentBanner = () => {
 
   return (
     <div
-      className="text-white d-flex justify-content-between align-items-center px-3 py-2"
+      className="text-white d-flex justify-content-between align-items-center px-2 py-2"
       style={{
         backgroundColor: "orange",
         boxShadow: "0 2px 4px rgba(0,0,0,0.1)",

@@ -65,65 +65,37 @@ function Home() {
     fetchCategories(); // Call the function
   }, []); // Empty dependency array means this runs once on mount
 
-  const foodCategories = [
-    {
-      id: 1,
-      name: "Fresh Fruits",
-      items: 86,
-      bgImage:
-        "https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=300&auto=format&fit=crop",
-      icon: faAppleWhole,
-      backgroundColor: "bg-primary",
-    },
-    {
-      id: 2,
-      name: "Seafood",
-      items: 45,
-      bgImage:
-        "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=300&auto=format&fit=crop",
-      icon: faFish,
-      backgroundColor: "bg-2",
-    },
-    {
-      id: 3,
-      name: "Fresh Meat",
-      items: 52,
-      bgImage:
-        "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=300&auto=format&fit=crop",
-      icon: faDrumstickBite,
-      backgroundColor: "bg-3",
-    },
-  ];
+
 
   // Optional: Custom banners data
-  const customBanners = [
-    {
-      id: 1,
-      title: "30% OFF",
-      subtitle: "Weekend Special",
-      description: "*on Selected Items",
-      bgImage: "assets/images/background/bg2.png",
-    },
-    {
-      id: 2,
-      title: "FREE DELIVERY",
-      subtitle: "First Order",
-      description: "*min order $30",
-      bgImage: "assets/images/background/bg3.png",
-    },
-    {
-      id: 3,
-      title: "15% OFF",
-      subtitle: "Happy Hours",
-      description: "*limited time offer",
-      bgImage: "assets/images/background/bg4.png",
-    },
-  ];
+  // const customBanners = [
+  //   {
+  //     id: 1,
+  //     title: "30% OFF",
+  //     subtitle: "Weekend Special",
+  //     description: "*on Selected Items",
+  //     bgImage: "assets/images/background/bg2.png",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "FREE DELIVERY",
+  //     subtitle: "First Order",
+  //     description: "*min order $30",
+  //     bgImage: "assets/images/background/bg3.png",
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "15% OFF",
+  //     subtitle: "Happy Hours",
+  //     description: "*limited time offer",
+  //     bgImage: "assets/images/background/bg4.png",
+  //   },
+  // ];
 
-  const handleBannerClick = (banner) => {
-    console.log("Banner clicked:", banner);
-    // Add your navigation or action logic here
-  };
+  // const handleBannerClick = (banner) => {
+  //   console.log("Banner clicked:", banner);
+  //   // Add your navigation or action logic here
+  // };
 
   const handleCategoryClick = (category) => {
     console.log("Selected category:", category.name);
