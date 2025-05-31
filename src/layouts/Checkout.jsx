@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useCart } from '../contexts/CartContext';
+import axios from 'axios';
+import { API_CONFIG } from '../constants/config';
 
 function Checkout() {
   const { 
@@ -11,6 +13,9 @@ function Checkout() {
     getCartTotal,
     getCartCount 
   } = useCart();
+  const [checkoutDetails, setCheckoutDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -29,6 +34,71 @@ function Checkout() {
       updateQuantity(menuId, portionId, newQuantity);
     }
   };
+
+  const fetchCheckoutDetails = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get token from localStorage.auth
+      const auth = JSON.parse(localStorage.getItem('auth'));
+      const accessToken = auth?.accessToken;
+
+      if (!accessToken) {
+        setError('Authentication required');
+        return;
+      }
+
+      // Transform cart items to required format
+      const orderItems = cartItems.map(item => ({
+        menu_id: item.menuId,
+        portion_id: item.portionId,
+        quantity: item.quantity
+      }));
+
+      // Debug logs
+      console.log('POST URL:', 'https://men4u.xyz/v2/user/get_checkout_detail');
+      console.log('orderItems:', orderItems);
+
+      const response = await axios.post(
+        'https://men4u.xyz/v2/user/get_checkout_detail',
+        {
+          outlet_id: "1",
+          order_items: orderItems
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      setCheckoutDetails(response.data.detail);
+    } catch (err) {
+      console.error('Checkout details error:', err);
+      if (err.response) {
+        console.error('API error response:', err.response);
+      }
+      if (err.response?.status === 401) {
+        setError('Session expired. Please login again.');
+      } else {
+        setError('Failed to fetch checkout details');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch checkout details when cart items change
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      fetchCheckoutDetails();
+    } else {
+      setCheckoutDetails(null);
+    }
+  }, [cartItems]);
 
   return (
     <>
@@ -105,33 +175,55 @@ function Checkout() {
         </div>
         <div className="footer fixed p-b80">
           <div className="container">
-            <div className="view-title mb-2">
-              <ul>
-                <li>
-                  <span className="text-soft">Subtotal</span>
-                  <span className="text-soft">₹{subtotal.toFixed(2)}</span>
-                </li>
-                <li>
-                  <span className="text-soft">TAX (2%)</span>
-                  <span className="text-soft">-₹{taxAmount.toFixed(2)}</span>
-                </li>
-                <li>
-                  <h5>Total</h5>
-                  <h5>₹{total.toFixed(2)}</h5>
-                </li>
-                <li>
-                  <a href="javascript:void(0);" className="promo-bx">
-                    Apply Promotion Code
-                    <span>2 Promos</span>
-                  </a>
-                </li>
-              </ul>
-            </div>
+            {loading ? (
+              <div className="text-center">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            ) : error ? (
+              <div className="alert alert-danger" role="alert">
+                {error}
+              </div>
+            ) : checkoutDetails && (
+              <div className="view-title mb-2">
+                <ul>
+                  <li>
+                    <span className="text-soft">Subtotal</span>
+                    <span className="text-soft">₹{checkoutDetails.total_bill_amount}</span>
+                  </li>
+                  {Number(checkoutDetails.discount_amount) > 0 && (
+                    <li>
+                      <span className="text-soft">Discount ({checkoutDetails.discount_percent}%)</span>
+                      <span className="text-soft text-success">-₹{checkoutDetails.discount_amount}</span>
+                    </li>
+                  )}
+                  <li>
+                    <span className="text-soft">Service Charge ({checkoutDetails.service_charges_percent}%)</span>
+                    <span className="text-soft">₹{checkoutDetails.service_charges_amount}</span>
+                  </li>
+                  <li>
+                    <span className="text-soft">GST ({checkoutDetails.gst_percent}%)</span>
+                    <span className="text-soft">₹{checkoutDetails.gst_amount}</span>
+                  </li>
+                  <li>
+                    <h5>Total</h5>
+                    <h5>₹{checkoutDetails.final_grand_total}</h5>
+                  </li>
+                  <li>
+                    <a href="javascript:void(0);" className="promo-bx">
+                      Apply Promotion Code
+                      <span>2 Promos</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            )}
             <div className="footer-btn d-flex align-items-center">
               <button 
                 className="btn btn-primary flex-1"
                 onClick={() => {/* Handle checkout */}}
-                disabled={cartItems.length === 0}
+                disabled={cartItems.length === 0 || loading || !!error}
               >
                 CHECKOUT ({getCartCount()} items)
               </button>
