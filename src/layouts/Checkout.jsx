@@ -293,17 +293,7 @@ function Checkout() {
               ) : (
                 cartItems.map((item) => (
                   <li key={`${item.menuId}-${item.portionId}`} className="position-relative">
-                    {/* Remove button at top right */}
-                    <button
-                      type="button"
-                      className="position-absolute top-0 end-0 m-2 p-0 border-0 bg-transparent shadow-none"
-                      aria-label="Remove"
-                      onClick={() => handleRemoveItem(item.menuId, item.portionId)}
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
-                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                      </svg>
-                    </button>
+                  
                     <div className="item-content">
                       <div className="item-media media media-100">
                         <img
@@ -315,18 +305,30 @@ function Checkout() {
                         />
                       </div>
                       <div className="item-inner">
-                        <div className="item-title-row">
-                          <h5 className="item-title sub-title">
-                            <a href={`/product/${item.menuId}`}>
-                              {item.menuName}
-                            </a>
-                          </h5>
-                          <div className="item-subtitle text-soft">
-                            {item.portionName}
-                            {item.comment && (
-                              <small className="d-block">{item.comment}</small>
-                            )}
+                        <div className="item-title-row d-flex justify-content-between align-items-start">
+                          <div>
+                            <h5 className="item-title sub-title">
+                              <a href={`/product/${item.menuId}`}>
+                                {item.menuName}
+                              </a>
+                            </h5>
+                            <div className="item-subtitle text-soft">
+                              {item.portionName}
+                              {item.comment && (
+                                <small className="d-block">{item.comment}</small>
+                              )}
+                            </div>
                           </div>
+                          <button
+                            type="button"
+                            className="btn p-0 border-0 bg-transparent shadow-none"
+                            aria-label="Remove"
+                            onClick={() => handleRemoveItem(item.menuId, item.portionId)}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
+                              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                          </button>
                         </div>
                         <div className="item-footer">
                           <div className="d-flex align-items-center">
