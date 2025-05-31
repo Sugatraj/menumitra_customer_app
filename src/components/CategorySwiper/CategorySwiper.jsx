@@ -50,9 +50,18 @@ const CategorySwiper = ({
     }
   },
   breakpoints = {
-    320: { slidesPerView: 2.5 },
-    576: { slidesPerView: 3.5 },
-    768: { slidesPerView: 4.5 }
+    320: { 
+      slidesPerView: 2.2,
+      slidesOffsetAfter: 0
+    },
+    576: { 
+      slidesPerView: 3.2,
+      slidesOffsetAfter: 0
+    },
+    768: { 
+      slidesPerView: 4.2,
+      slidesOffsetAfter: 0
+    }
   },
   showItemCount = true,
   categories: customCategories = categories
@@ -85,10 +94,24 @@ const CategorySwiper = ({
     >
       <div className="swiper-btn-center-lr">
         <Swiper
-          spaceBetween={15}
-          slidesPerView={3.5}
+          spaceBetween={12}
+          slidesPerView={3.2}
           className="categorie-swiper"
           breakpoints={breakpoints}
+          watchSlidesProgress={true}
+          watchSlidesVisibility={true}
+          centeredSlidesBounds={true}
+          resistanceRatio={0}
+          touchRatio={1}
+          touchAngle={45}
+          grabCursor={true}
+          momentumBounce={false}
+          momentumBounceRatio={1}
+          momentumRatio={1}
+          touchEventsTarget="wrapper"
+          touchStartPreventDefault={false}
+          touchMoveStopPropagation={true}
+          cssMode={true}
         >
           {customCategories.map((category) => (
             <SwiperSlide key={category.menuCatId}>
@@ -103,7 +126,7 @@ const CategorySwiper = ({
                     height: '160px',
                     borderRadius: '16px',
                     padding: '25px 15px',
-                    margin: '8px',
+                    margin: '4px',
                     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
                     backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url(${imageErrors[category.menuCatId] ? DEFAULT_IMAGE : category.image || DEFAULT_IMAGE})`,
                     backgroundSize: 'cover',
@@ -160,6 +183,16 @@ const styles = `
   .categore-box:after {
     content: none !important;
     background: none !important;
+  }
+  
+  .swiper-wrapper {
+    transform: translate3d(0, 0, 0) !important;
+    will-change: transform;
+  }
+  
+  .swiper-slide {
+    transform-origin: center center;
+    backface-visibility: hidden;
   }
 `;
 
