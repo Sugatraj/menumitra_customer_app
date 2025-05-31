@@ -100,6 +100,19 @@ function Checkout() {
     }
   }, [cartItems]);
 
+  // Remove item handler
+  const handleRemoveItem = (menuId, portionId) => {
+    // Remove from context
+    removeFromCart(menuId, portionId);
+
+    // Remove from localStorage if you store cart there
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const updatedCart = cart.filter(
+      (item) => !(item.menuId === menuId && item.portionId === portionId)
+    );
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
   return (
     <>
       <Header />
@@ -108,7 +121,18 @@ function Checkout() {
           <div className="item-list style-2">
             <ul>
               {cartItems.map((item) => (
-                <li key={`${item.menuId}-${item.portionId}`}>
+                <li key={`${item.menuId}-${item.portionId}`} className="position-relative">
+                  {/* Remove button at top right */}
+                  <button
+                    type="button"
+                    className="position-absolute top-0 end-0 m-2 p-0 border-0 bg-transparent shadow-none"
+                    aria-label="Remove"
+                    onClick={() => handleRemoveItem(item.menuId, item.portionId)}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
+                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                  </button>
                   <div className="item-content">
                     <div className="item-media media media-100">
                       <img
@@ -248,7 +272,7 @@ function Checkout() {
                         ₹{checkoutDetails.gst_amount}
                       </span>
                     </li>
-                    <li className="py-0">
+                    <li>
                       <h5>Grand Total</h5>
                       <h5>₹{checkoutDetails.final_grand_total}</h5>
                     </li>
