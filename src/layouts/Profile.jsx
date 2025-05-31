@@ -2,7 +2,7 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "../contexts/AuthContext";
 
 function Profile() {
   const { handleLogout, user } = useAuth();
@@ -11,7 +11,7 @@ function Profile() {
   const onLogoutClick = (e) => {
     e.preventDefault();
     handleLogout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -25,9 +25,9 @@ function Profile() {
                 <img src="assets/images/avatar/5.jpg" alt="/" />
               </div>
               <div className="about-profile">
-                <h5 className="sub-title mb-0">{user?.name || 'Guest User'}</h5>
+                <h5 className="sub-title mb-0">{user?.name || "Guest User"}</h5>
                 <h6 className="sub-title fade-text mb-0 font-w500">
-                  {user?.mobile ? `+91 ${user.mobile}` : 'No phone number'}
+                  {user?.mobile ? `+91 ${user.mobile}` : "No phone number"}
                 </h6>
               </div>
               <Link to="/edit-profile" className="edit-profile">
@@ -50,12 +50,11 @@ function Profile() {
               <li>
                 <Link to="/orders">
                   <svg
-                    width="20"
-                    height="20"
+                    width="24"
+                    height="24"
                     viewBox="0 0 24 24"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="me-2"
                     style={{
                       minWidth: '20px',
                       color: 'var(--primary)',
@@ -63,18 +62,52 @@ function Profile() {
                     }}
                   >
                     <path
-                      d="M18.9 3H5.1C4.4925 3 4 3.4925 4 4.1V21.9C4 22.5075 4.4925 23 5.1 23H18.9C19.5075 23 20 22.5075 20 21.9V4.1C20 3.4925 19.5075 3 18.9 3ZM8 17.5C7.725 17.5 7.5 17.275 7.5 17C7.5 16.725 7.725 16.5 8 16.5H16C16.275 16.5 16.5 16.725 16.5 17C16.5 17.275 16.275 17.5 16 17.5H8ZM8 13.5C7.725 13.5 7.5 13.275 7.5 13C7.5 12.725 7.725 12.5 8 12.5H16C16.275 12.5 16.5 12.725 16.5 13C16.5 13.275 16.275 13.5 16 13.5H8ZM8 9.5C7.725 9.5 7.5 9.275 7.5 9C7.5 8.725 7.725 8.5 8 8.5H16C16.275 8.5 16.5 8.725 16.5 9C16.5 9.275 16.275 9.5 16 9.5H8ZM11.5 6.5C11.5 6.225 11.725 6 12 6C12.275 6 12.5 6.225 12.5 6.5C12.5 6.775 12.275 7 12 7C11.725 7 11.5 6.775 11.5 6.5Z"
+                      d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z"
                       fill="currentColor"
+                    />
+                    <path
+                      d="M7 8H17M7 12H17M7 16H13"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
                   </svg>
                   My Orders
                 </Link>
               </li>
               <li>
-                <a href="payment.html">
-                  <i className="fa-solid fa-credit-card" />
-                  Payments &amp; Wallet
-                </a>
+                <Link to="/search">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="me-2"
+                    style={{
+                      minWidth: "20px",
+                      color: "var(--primary)",
+                      opacity: "0.7",
+                    }}
+                  >
+                    {/* Main circle of magnifier */}
+                    <path
+                      d="M10.9395 3.9313C7.08074 3.9313 3.94141 7.07063 3.94141 10.9294C3.94141 14.7881 7.08074 17.9353 10.9395 17.9353C14.7982 17.9353 17.9395 14.7881 17.9395 10.9294C17.9395 7.07063 14.7982 3.9313 10.9395 3.9313Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    {/* Handle of magnifier */}
+                    <path
+                      d="M16.5449 16.9606L20.293 20.7067C20.4821 20.888 20.7347 20.988 20.9967 20.9854C21.2587 20.9827 21.5093 20.8775 21.6947 20.6924C21.8801 20.5073 21.9856 20.2569 21.9886 19.9949C21.9917 19.7329 21.892 19.4802 21.7109 19.2908L17.9629 15.5427"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                  </svg>
+                  Search Menu
+                </Link>
               </li>
               <li>
                 <a href="review.html">
