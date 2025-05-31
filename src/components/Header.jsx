@@ -4,6 +4,7 @@ import { useSidebar } from "../contexts/SidebarContext";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import TestEnvironmentBanner from './TestEnvironmentBanner';
+import OutletInfoBanner from "./OutletInfoBanner";
 
 function Header() {
   const mainBarRef = useRef(null);
@@ -154,6 +155,7 @@ function Header() {
           </div>
         </div>
       </header>
+      <OutletInfoBanner />
     </>
   );
 }
