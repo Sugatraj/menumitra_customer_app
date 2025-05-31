@@ -27,63 +27,48 @@ export const AddToCartModal = () => {
           Select Portion
         </label>
         <div className="row g-2">
-          {modalConfig.data?.portions?.map(portion => (
-            <div className="col-6" key={portion.portion_id}>
+          {modalConfig.data?.portions?.length > 0 ? (
+            modalConfig.data.portions.map(portion => (
               <div 
-                onClick={() => setSelectedPortion(portion.portion_id)}
-                style={{
-                  border: `1.5px solid ${selectedPortion === portion.portion_id ? '#28a745' : '#e9ecef'}`,
-                  borderRadius: '12px',
-                  padding: '12px 16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  backgroundColor: selectedPortion === portion.portion_id ? '#f8fff8' : 'white'
-                }}
+                className="col-4" 
+                key={portion.portion_id}
               >
-                <div className="d-flex align-items-center justify-content-between">
-                  <div className="d-flex align-items-center gap-2">
-                    <div 
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '50%',
-                        border: `2px solid ${selectedPortion === portion.portion_id ? '#28a745' : '#dee2e6'}`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      {selectedPortion === portion.portion_id && (
-                        <div 
-                          style={{
-                            width: '10px',
-                            height: '10px',
-                            borderRadius: '50%',
-                            backgroundColor: '#28a745'
-                          }}
-                        />
-                      )}
-                    </div>
+                <div 
+                  onClick={() => setSelectedPortion(portion.portion_id)}
+                  style={{
+                    border: `1.5px solid ${selectedPortion === portion.portion_id ? '#28a745' : '#e9ecef'}`,
+                    borderRadius: '12px',
+                    padding: '12px 8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: selectedPortion === portion.portion_id ? '#f8fff8' : 'white'
+                  }}
+                >
+                  <div className="d-flex flex-column align-items-center">
                     <span style={{ 
-                      fontSize: '15px',
-                      fontWeight: selectedPortion === portion.portion_id ? '500' : '400',
-                      color: '#212529'
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#212529',
+                      marginBottom: '4px'
                     }}>
-                      {portion.portion_name}
+                      ₹{portion.price}
+                    </span>
+                    <span style={{ 
+                      fontSize: '13px',
+                      color: '#6c757d',
+                      textTransform: 'capitalize'
+                    }}>
+                      {portion.portion_name.toLowerCase()}
                     </span>
                   </div>
-                  <span style={{ 
-                    fontSize: '15px',
-                    fontWeight: '500',
-                    color: '#212529'
-                  }}>
-                    ₹{portion.price}
-                  </span>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="col-12 text-center text-muted">
+              No portion sizes available
             </div>
-          ))}
+          )}
         </div>
       </div>
 
