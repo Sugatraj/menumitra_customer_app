@@ -187,6 +187,75 @@ function Checkout() {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
+  const handleCheckout = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Get auth data from localStorage
+      const auth = JSON.parse(localStorage.getItem("auth"));
+      const accessToken = auth?.accessToken;
+      const userId = auth?.userId;
+
+      if (!accessToken || !userId) {
+        setError("Authentication required");
+        return;
+      }
+
+      // Transform cart items to required format
+      const orderItems = cartItems.map(item => ({
+        menu_id: item.menuId,
+        quantity: item.quantity,
+        portion_name: item.portionName.toLowerCase(), // Assuming portionName is available in cart item
+        comment: item.comment || "" // If comment exists in cart item
+      }));
+
+      const payload = {
+        outlet_id: "1", // This seems to be fixed in your example
+        user_id: String(userId),
+        section_id: "1", // This seems to be fixed in your example
+        order_type: "parcel", // This seems to be fixed in your example
+        order_items: orderItems,
+        action: "create_order"
+      };
+
+      const response = await axios.post(
+        `https://men4u.xyz/v2/common/create_order`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      // Handle successful order creation
+      if (response.data?.order_id) {
+        // Clear the cart after successful order
+        // Assuming you have a clearCart function in your context
+        // clearCart(); 
+
+        // Navigate to success page or show success message
+        navigate(`/`);
+      }
+
+    } catch (err) {
+      console.error("Checkout error:", err);
+      if (err.response) {
+        console.error("API error response:", err.response);
+      }
+      if (err.response?.status === 401) {
+        setError("Session expired. Please login again.");
+      } else {
+        setError("Failed to create order. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -322,11 +391,12 @@ function Checkout() {
               <div className="footer-btn d-flex align-items-center">
                 <button
                   className="btn btn-primary flex-1"
-                  onClick={() => {
-                    /* Handle checkout */
-                  }}
-                  disabled={cartItems.length === 0 || !!error}
+                  onClick={handleCheckout}
+                  disabled={cartItems.length === 0 || loading || !!error}
                 >
+                  {loading ? (
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  ) : null}
                   CHECKOUT ({getCartCount()} items)
                 </button>
               </div>
