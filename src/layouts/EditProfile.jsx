@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
+const API_BASE_URL = 'https://men4u.xyz/v2';
+
 function EditProfile() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     phoneNumber: ''
@@ -51,28 +55,56 @@ function EditProfile() {
       return;
     }
 
-    // TODO: Add your API call here to update the profile
     try {
-      // Simulating API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update localStorage with new values
       const authData = localStorage.getItem('auth');
-      if (authData) {
-        const userData = JSON.parse(authData);
-        const updatedAuthData = {
-          ...userData,
-          name: formData.name,
-          mobile: formData.phoneNumber
-        };
-        localStorage.setItem('auth', JSON.stringify(updatedAuthData));
+      if (!authData) {
+        setError('Authentication data not found');
+        setIsLoading(false);
+        return;
       }
 
-      setIsLoading(false);
-      // You can add success message or redirect here
+      const userData = JSON.parse(authData);
+      
+      const response = await fetch(`${API_BASE_URL}/user/account_profile_update`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${userData.accessToken}`
+        },
+        body: JSON.stringify({
+          mobile: formData.phoneNumber,
+          name: formData.name,
+          user_id: userData.userId
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update localStorage with new values
+        const updatedAuthData = {
+          ...userData,
+          name: data.customer_details.name,
+          mobile: data.customer_details.mobile
+        };
+        localStorage.setItem('auth', JSON.stringify(updatedAuthData));
+
+        // Show success message
+        setError('Profile updated successfully');
+        document.querySelector('.alert')?.classList.replace('alert-danger', 'alert-success');
+        
+        // Navigate with replace after showing success message briefly
+        setTimeout(() => {
+          navigate('/profile', { replace: true });
+        }, 1000);
+      } else {
+        throw new Error(data.detail || 'Failed to update profile');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
-      setError('Failed to update profile. Please try again.');
+      setError(error.message || 'Failed to update profile. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };
