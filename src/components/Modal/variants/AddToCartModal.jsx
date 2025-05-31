@@ -12,6 +12,13 @@ export const AddToCartModal = () => {
   const [quantity, setQuantity] = useState(1);
   const [comment, setComment] = useState('');
 
+  const MAX_QUANTITY = 20;
+
+  const handleQuantityChange = (newQuantity) => {
+    // Ensure quantity stays between 1 and MAX_QUANTITY
+    setQuantity(Math.min(Math.max(1, newQuantity), MAX_QUANTITY));
+  };
+
   const handleAddToCart = () => {
     addToCart(modalConfig.data, selectedPortion, quantity, comment);
     closeModal();
@@ -30,7 +37,8 @@ export const AddToCartModal = () => {
           {modalConfig.data?.portions?.length > 0 ? (
             modalConfig.data.portions.map(portion => (
               <div 
-                className="col-4" 
+                className={`${modalConfig.data.portions.length === 1 ? 'col-12' : 
+                             modalConfig.data.portions.length === 2 ? 'col-6' : 'col-4'}`}
                 key={portion.portion_id}
               >
                 <div 
@@ -76,7 +84,7 @@ export const AddToCartModal = () => {
         <label
           className="mb-2"
           style={{
-            fontSize: '14px', // keep same font size as original
+            fontSize: '14px',
             color: '#19b5fe',
             fontWeight: 400,
             display: 'block'
@@ -104,7 +112,7 @@ export const AddToCartModal = () => {
           >
             <button
               type="button"
-              onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+              onClick={() => handleQuantityChange(quantity - 1)}
               style={{
                 width: '40px',
                 height: '40px',
@@ -112,20 +120,22 @@ export const AddToCartModal = () => {
                 backgroundColor: '#07813a',
                 color: 'white',
                 border: 'none',
-                fontSize: '20px', // match input font size
+                fontSize: '20px',
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginRight: '20px',
-                transition: 'background 0.2s'
+                transition: 'background 0.2s',
+                opacity: quantity <= 1 ? 0.5 : 1, // Visual feedback for min limit
               }}
+              disabled={quantity <= 1}
             >
               –
             </button>
             <span
               style={{
-                fontSize: '20px', // match original input font size
+                fontSize: '20px',
                 fontWeight: 400,
                 color: '#23232b',
                 minWidth: '24px',
@@ -136,7 +146,7 @@ export const AddToCartModal = () => {
             </span>
             <button
               type="button"
-              onClick={() => setQuantity(prev => prev + 1)}
+              onClick={() => handleQuantityChange(quantity + 1)}
               style={{
                 width: '40px',
                 height: '40px',
@@ -144,19 +154,26 @@ export const AddToCartModal = () => {
                 backgroundColor: '#07813a',
                 color: 'white',
                 border: 'none',
-                fontSize: '20px', // match input font size
+                fontSize: '20px',
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginLeft: '20px',
-                transition: 'background 0.2s'
+                transition: 'background 0.2s',
+                opacity: quantity >= MAX_QUANTITY ? 0.5 : 1, // Visual feedback for max limit
               }}
+              disabled={quantity >= MAX_QUANTITY}
             >
               +
             </button>
           </div>
         </div>
+        {quantity >= MAX_QUANTITY && (
+          <div className="text-center mt-2" style={{ color: '#dc3545', fontSize: '12px' }}>
+            Maximum quantity limit reached
+          </div>
+        )}
       </div>
 
       <div className="mb-4">
