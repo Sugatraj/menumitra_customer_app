@@ -192,118 +192,145 @@ function Checkout() {
         <div className="container bottom-content shop-cart-wrapper">
           <div className="item-list style-2">
             <ul>
-              {cartItems.map((item) => (
-                <li key={`${item.menuId}-${item.portionId}`} className="position-relative">
-                  {/* Remove button at top right */}
+              {cartItems.length === 0 ? (
+                <div
+                  className="d-flex flex-column justify-content-center align-items-center"
+                  style={{
+                    minHeight: '60vh', // Adjust as needed for your header/footer
+                    width: '100%',
+                    // background: '#fcfbfc'
+                  }}
+                >
+                  {/* Cart SVG Icon */}
+                  <svg width="64" height="64" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="12" fill="#f8f9fa"/>
+                    <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM7.16 15l.94-2h7.45a2 2 0 0 0 1.92-1.45l2.13-7.11A1 1 0 0 0 18.64 3H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 5 17h12v-2H7.42a.25.25 0 0 1-.26-.19z" fill="#adb5bd"/>
+                  </svg>
+                  <span className="text-muted fs-5 mt-3 mb-2" style={{ color: "#b0b3b8" }}>Your cart is empty</span>
                   <button
-                    type="button"
-                    className="position-absolute top-0 end-0 m-2 p-0 border-0 bg-transparent shadow-none"
-                    aria-label="Remove"
-                    onClick={() => handleRemoveItem(item.menuId, item.portionId)}
+                    className="btn btn-success px-4 py-2"
+                    style={{ borderRadius: 12, fontWeight: 500 }}
+                    onClick={() => window.location.href = '/'}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
-                      <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                    </svg>
+                    Go to Home
                   </button>
-                  <div className="item-content">
-                    <div className="item-media media media-100">
-                      <img
-                        src={
-                          item.image ||
-                          "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"
-                        }
-                        alt={item.menuName}
-                      />
-                    </div>
-                    <div className="item-inner">
-                      <div className="item-title-row">
-                        <h5 className="item-title sub-title">
-                          <a href={`/product/${item.menuId}`}>
-                            {item.menuName}
-                          </a>
-                        </h5>
-                        <div className="item-subtitle text-soft">
-                          {item.portionName}
-                          {item.comment && (
-                            <small className="d-block">{item.comment}</small>
-                          )}
-                        </div>
+                </div>
+              ) : (
+                cartItems.map((item) => (
+                  <li key={`${item.menuId}-${item.portionId}`} className="position-relative">
+                    {/* Remove button at top right */}
+                    <button
+                      type="button"
+                      className="position-absolute top-0 end-0 m-2 p-0 border-0 bg-transparent shadow-none"
+                      aria-label="Remove"
+                      onClick={() => handleRemoveItem(item.menuId, item.portionId)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-x" viewBox="0 0 16 16">
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                      </svg>
+                    </button>
+                    <div className="item-content">
+                      <div className="item-media media media-100">
+                        <img
+                          src={
+                            item.image ||
+                            "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"
+                          }
+                          alt={item.menuName}
+                        />
                       </div>
-                      <div className="item-footer">
-                        <div className="d-flex align-items-center">
-                          <h6 className="me-2">₹ {item.price}</h6>
+                      <div className="item-inner">
+                        <div className="item-title-row">
+                          <h5 className="item-title sub-title">
+                            <a href={`/product/${item.menuId}`}>
+                              {item.menuName}
+                            </a>
+                          </h5>
+                          <div className="item-subtitle text-soft">
+                            {item.portionName}
+                            {item.comment && (
+                              <small className="d-block">{item.comment}</small>
+                            )}
+                          </div>
                         </div>
-                        <div className="d-flex align-items-center">
-                          <div className="dz-stepper stepper-fill small-stepper border-2">
-                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                              <span className="input-group-btn input-group-prepend">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-down"
-                                  type="button"
-                                  onClick={() =>
-                                    handleQuantityChange(
-                                      item.menuId,
-                                      item.portionId,
-                                      item.quantity - 1
-                                    )
-                                  }
-                                >
-                                  -
-                                </button>
-                              </span>
-                              <input
-                                className="stepper form-control"
-                                type="text"
-                                value={item.quantity}
-                                readOnly
-                              />
-                              <span className="input-group-btn input-group-append">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-up"
-                                  type="button"
-                                  onClick={() =>
-                                    handleQuantityChange(
-                                      item.menuId,
-                                      item.portionId,
-                                      item.quantity + 1
-                                    )
-                                  }
-                                >
-                                  +
-                                </button>
-                              </span>
+                        <div className="item-footer">
+                          <div className="d-flex align-items-center">
+                            <h6 className="me-2">₹ {item.price}</h6>
+                          </div>
+                          <div className="d-flex align-items-center">
+                            <div className="dz-stepper stepper-fill small-stepper border-2">
+                              <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                                <span className="input-group-btn input-group-prepend">
+                                  <button
+                                    className="btn btn-primary bootstrap-touchspin-down"
+                                    type="button"
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        item.menuId,
+                                        item.portionId,
+                                        item.quantity - 1
+                                      )
+                                    }
+                                  >
+                                    -
+                                  </button>
+                                </span>
+                                <input
+                                  className="stepper form-control"
+                                  type="text"
+                                  value={item.quantity}
+                                  readOnly
+                                />
+                                <span className="input-group-btn input-group-append">
+                                  <button
+                                    className="btn btn-primary bootstrap-touchspin-up"
+                                    type="button"
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        item.menuId,
+                                        item.portionId,
+                                        item.quantity + 1
+                                      )
+                                    }
+                                  >
+                                    +
+                                  </button>
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                ))
+              )}
             </ul>
           </div>
         </div>
-        <div className="footer fixed p-b60">
-          <div className="container">
-            {error && (
-              <div className="alert alert-danger" role="alert">
-                {error}
+        {cartItems.length > 0 && (
+          <div className="footer fixed p-b60">
+            <div className="container">
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
+              <FooterSummary checkoutDetails={checkoutDetails} />
+              <div className="footer-btn d-flex align-items-center">
+                <button
+                  className="btn btn-primary flex-1"
+                  onClick={() => {
+                    /* Handle checkout */
+                  }}
+                  disabled={cartItems.length === 0 || !!error}
+                >
+                  CHECKOUT ({getCartCount()} items)
+                </button>
               </div>
-            )}
-            <FooterSummary checkoutDetails={checkoutDetails} />
-            <div className="footer-btn d-flex align-items-center">
-              <button
-                className="btn btn-primary flex-1"
-                onClick={() => {
-                  /* Handle checkout */
-                }}
-                disabled={cartItems.length === 0 || !!error}
-              >
-                CHECKOUT ({getCartCount()} items)
-              </button>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <Footer />
     </>
