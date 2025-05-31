@@ -136,9 +136,9 @@ export const CartProvider = ({ children }) => {
     return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
-  // Get cart items count
+  // Get cart items count (unique items, not quantities)
   const getCartCount = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
+    return cartItems.length; // This will return the number of unique items in cart
   };
 
   // Update comment for an item

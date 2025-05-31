@@ -396,11 +396,8 @@ function Checkout() {
                 <button
                   className="btn btn-primary flex-1"
                   onClick={handleCheckout}
-                  disabled={cartItems.length === 0 || loading || !!error}
+                  disabled={cartItems.length === 0 || !!error}
                 >
-                  {loading ? (
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  ) : null}
                   CHECKOUT ({getCartCount()} items)
                 </button>
               </div>
