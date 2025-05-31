@@ -5,6 +5,75 @@ import { useCart } from "../contexts/CartContext";
 import axios from "axios";
 import { API_CONFIG } from "../constants/config";
 
+const FooterSummary = React.memo(function FooterSummary({ checkoutDetails }) {
+  // Fallback to zeros if no data yet
+  const details = checkoutDetails || {
+    grand_total: "0.00",
+    discount_percent: "0",
+    discount_amount: "0.00",
+    total_bill_amount: "0.00",
+    service_charges_percent: "0",
+    service_charges_amount: "0.00",
+    gst_percent: "0",
+    gst_amount: "0.00",
+    final_grand_total: "0.00"
+  };
+  return (
+    <div className="view-title mb-2">
+      <ul>
+        <li className="py-0">
+          <h5>Total</h5>
+          <h5>₹{details.grand_total}</h5>
+        </li>
+        <li>
+          <span className="text-soft">
+            Discount ({details.discount_percent}%)
+          </span>
+          <span className="text-soft">
+            ₹{details.discount_amount}
+          </span>
+        </li>
+        <li>
+          <span className="text-soft">Subtotal</span>
+          <span className="text-soft">
+            ₹{details.total_bill_amount}
+          </span>
+        </li>
+        {Number(details.discount_amount) > 0 && (
+          <li>
+            <span className="text-soft">
+              Discount ({details.discount_percent}%)
+            </span>
+            <span className="text-soft text-success">
+              -₹{details.discount_amount}
+            </span>
+          </li>
+        )}
+        <li>
+          <span className="text-soft">
+            Service Charge ({details.service_charges_percent}%)
+          </span>
+          <span className="text-soft">
+            ₹{details.service_charges_amount}
+          </span>
+        </li>
+        <li>
+          <span className="text-soft">
+            GST ({details.gst_percent}%)
+          </span>
+          <span className="text-soft">
+            ₹{details.gst_amount}
+          </span>
+        </li>
+        <li>
+          <h5>Grand Total</h5>
+          <h5>₹{details.final_grand_total}</h5>
+        </li>
+      </ul>
+    </div>
+  );
+});
+
 function Checkout() {
   const {
     cartItems,
@@ -75,7 +144,10 @@ function Checkout() {
         }
       );
 
-      setCheckoutDetails(response.data.detail);
+      setCheckoutDetails(prev => ({
+        ...prev,
+        ...response.data.detail
+      }));
     } catch (err) {
       console.error("Checkout details error:", err);
       if (err.response) {
@@ -213,86 +285,19 @@ function Checkout() {
         </div>
         <div className="footer fixed p-b60">
           <div className="container">
-            {loading ? (
-              <div className="text-center">
-                <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </div>
-            ) : error ? (
+            {error && (
               <div className="alert alert-danger" role="alert">
                 {error}
               </div>
-            ) : (
-              checkoutDetails && (
-                <div className="view-title mb-2">
-                  <ul>
-                    <li className="py-0">
-                      <h5>Total</h5>
-                      <h5>₹{checkoutDetails.grand_total}</h5>
-                    </li>
-                    <li>
-                      <span className="text-soft">
-                        Discount ({checkoutDetails.discount_percent}%)
-                      </span>
-                      <span className="text-soft">
-                        ₹{checkoutDetails.discount_amount}
-                      </span>
-                    </li>
-                    <li>
-                      <span className="text-soft">Subtotal</span>
-                      <span className="text-soft">
-                        ₹{checkoutDetails.total_bill_amount}
-                      </span>
-                    </li>
-                    {Number(checkoutDetails.discount_amount) > 0 && (
-                      <li>
-                        <span className="text-soft">
-                          Discount ({checkoutDetails.discount_percent}%)
-                        </span>
-                        <span className="text-soft text-success">
-                          -₹{checkoutDetails.discount_amount}
-                        </span>
-                      </li>
-                    )}
-                    <li>
-                      <span className="text-soft">
-                        Service Charge (
-                        {checkoutDetails.service_charges_percent}%)
-                      </span>
-                      <span className="text-soft">
-                        ₹{checkoutDetails.service_charges_amount}
-                      </span>
-                    </li>
-                    <li>
-                      <span className="text-soft">
-                        GST ({checkoutDetails.gst_percent}%)
-                      </span>
-                      <span className="text-soft">
-                        ₹{checkoutDetails.gst_amount}
-                      </span>
-                    </li>
-                    <li>
-                      <h5>Grand Total</h5>
-                      <h5>₹{checkoutDetails.final_grand_total}</h5>
-                    </li>
-                    {/* <li>
-                      <a href="javascript:void(0);" className="promo-bx">
-                        Apply Promotion Code
-                        <span>2 Promos</span>
-                      </a>
-                    </li> */}
-                  </ul>
-                </div>
-              )
             )}
+            <FooterSummary checkoutDetails={checkoutDetails} />
             <div className="footer-btn d-flex align-items-center">
               <button
                 className="btn btn-primary flex-1"
                 onClick={() => {
                   /* Handle checkout */
                 }}
-                disabled={cartItems.length === 0 || loading || !!error}
+                disabled={cartItems.length === 0 || !!error}
               >
                 CHECKOUT ({getCartCount()} items)
               </button>
