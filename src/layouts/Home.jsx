@@ -18,6 +18,8 @@ import apiClient from "../services/apiService";
 import VerticalMenuCard from "../components/VerticalMenuCard";
 import { useAuth } from '../contexts/AuthContext';
 
+const API_BASE_URL = 'https://men4u.xyz/v2';
+
 function Home() {
   const [categories, setCategories] = useState([]);
   const { user } = useAuth();
@@ -26,18 +28,42 @@ function Home() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await apiClient.post("get_category_list_with_image", {
-          outlet_id: 1,
+        const authData = localStorage.getItem('auth');
+        const userData = authData ? JSON.parse(authData) : null;
+
+        const response = await fetch(`${API_BASE_URL}/user/get_category_list_with_image`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${userData?.accessToken}`
+          },
+          body: JSON.stringify({
+            outlet_id: 1
+          })
         });
-        setCategories(response.detail.menu_list);
-      } catch (err) {
-        setError("Failed to fetch categories");
-        console.error(err);
+
+        const data = await response.json();
+
+        // Map and set categories directly
+        const mappedCategories = data.detail.menu_list.map(category => ({
+          menuCatId: category.menu_cat_id,
+          categoryName: category.category_name,
+          image: category.image,
+          outletId: category.outlet_id,
+          outletVegNonveg: category.outlet_veg_nonveg,
+          menuCount: category.menu_count
+        }));
+
+        setCategories(mappedCategories); // Set categories in state
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]); // Set empty array in case of error
       }
     };
 
-    fetchCategories();
-  }, []);
+    fetchCategories(); // Call the function
+  }, []); // Empty dependency array means this runs once on mount
 
   const foodCategories = [
     {
@@ -669,7 +695,7 @@ function Home() {
                   </Link>
                 </div>
                 <CategorySwiper
-                  categories={foodCategories}
+                  categories={categories}
                   onCategoryClick={handleCategoryClick}
                   ui={{
                     card: {
@@ -1009,7 +1035,7 @@ function Home() {
                     </a>
                   </div>
                   <div
-                    className="swiper-slide swiper-slide-visible swiper-slide-duplicate-prev"
+                    className="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev"
                     data-swiper-slide-index={3}
                     role="group"
                     aria-label="4 / 4"

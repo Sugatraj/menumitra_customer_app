@@ -1,12 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faAppleWhole, 
-  faFish, 
-  faDrumstickBite, 
-  faPizzaSlice 
-} from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
 
 // Import Swiper styles
@@ -14,6 +7,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 const categories = [/* ... same categories array ... */];
+
+const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_WzIoR2LV2Cgy33oxy6eEKQYSkaWr8AFU.jpg';
 
 const CategorySwiper = ({ 
   onCategoryClick,
@@ -30,7 +25,6 @@ const CategorySwiper = ({
       padding: '20px',
       margin: '5px',
       shadow: '0 2px 8px rgba(0,0,0,0.1)',
-      overlay: 'rgba(0,0,0,0.5)',
       transition: 'transform 0.3s ease',
       hoverTransform: 'translateY(-3px)',
       backgroundColor: 'transparent'
@@ -63,10 +57,19 @@ const CategorySwiper = ({
   showItemCount = true,
   categories: customCategories = categories
 }) => {
+  const [imageErrors, setImageErrors] = useState({});
+
   const handleClick = (category) => {
     if (onCategoryClick) {
       onCategoryClick(category);
     }
+  };
+
+  const handleImageError = (categoryId) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [categoryId]: true
+    }));
   };
 
   return (
@@ -88,62 +91,58 @@ const CategorySwiper = ({
           breakpoints={breakpoints}
         >
           {customCategories.map((category) => (
-            <SwiperSlide key={category.id}>
+            <SwiperSlide key={category.menuCatId}>
               <div 
                 onClick={() => handleClick(category)}
                 className="cursor-pointer"
               >
                 <div
-                  className={`categore-box ${category.backgroundColor} ${cardClassName || ''}`}
+                  className="categore-box"
                   style={{ 
-                    width: ui.card.width,
-                    height: ui.card.height,
-                    borderRadius: ui.card.borderRadius,
-                    padding: ui.card.padding,
-                    margin: ui.card.margin,
-                    boxShadow: ui.card.shadow,
-                    backgroundColor: ui.card.backgroundColor,
-                    backgroundImage: `linear-gradient(${ui.card.overlay}, ${ui.card.overlay}), url(${category.bgImage})`,
+                    width: '100%',
+                    height: '160px',
+                    borderRadius: '16px',
+                    padding: '25px 15px',
+                    margin: '8px',
+                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
+                    backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url(${imageErrors[category.menuCatId] ? DEFAULT_IMAGE : category.image || DEFAULT_IMAGE})`,
                     backgroundSize: 'cover',
-                    backgroundPosition: 'center',
+                    backgroundPosition: 'center center',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: ui.card.transition,
-                    '&:hover': {
-                      transform: ui.card.hoverTransform
-                    },
-                    ...cardStyle
+                    transition: '0.3s',
+                    position: 'relative'
                   }}
                 >
-                  <FontAwesomeIcon 
-                    icon={category.icon} 
-                    style={{
-                      color: ui.icon.color,
-                      marginBottom: ui.icon.marginBottom
-                    }}
-                    size={ui.icon.size}
+                  <img 
+                    src={category.image}
+                    alt=""
+                    style={{ display: 'none' }}
+                    onError={() => handleImageError(category.menuCatId)}
                   />
                   <h6 
                     style={{
-                      fontSize: ui.text.titleSize,
-                      color: ui.text.titleColor,
-                      fontWeight: ui.text.titleWeight,
-                      margin: 0
+                      fontSize: '16px',
+                      color: '#FFFFFF',
+                      fontWeight: '600',
+                      margin: '0px',
+                      textShadow: '0px 1px 2px rgba(0, 0, 0, 0.3)'
                     }}
                   >
-                    {category.name}
+                    {category.categoryName}
                   </h6>
                   {showItemCount && (
                     <span
                       style={{
-                        fontSize: ui.text.countSize,
-                        color: ui.text.countColor,
-                        fontWeight: ui.text.countWeight
+                        fontSize: '14px',
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        fontWeight: '400',
+                        textShadow: '0px 1px 2px rgba(0, 0, 0, 0.3)'
                       }}
                     >
-                      {category.items} Items
+                      {category.menuCount} Items
                     </span>
                   )}
                 </div>
@@ -155,6 +154,19 @@ const CategorySwiper = ({
     </div>
   );
 };
+
+// Add CSS to remove the :after pseudo-element
+const styles = `
+  .categore-box:after {
+    content: none !important;
+    background: none !important;
+  }
+`;
+
+// Add the styles to the document
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 CategorySwiper.propTypes = {
   onCategoryClick: PropTypes.func,
@@ -170,7 +182,6 @@ CategorySwiper.propTypes = {
       padding: PropTypes.string,
       margin: PropTypes.string,
       shadow: PropTypes.string,
-      overlay: PropTypes.string,
       transition: PropTypes.string,
       hoverTransform: PropTypes.string,
       backgroundColor: PropTypes.string
