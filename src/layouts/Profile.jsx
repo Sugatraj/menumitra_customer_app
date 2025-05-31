@@ -48,7 +48,7 @@ function Profile() {
           <div className="profile-content border-0">
             <ul>
               <li>
-                <a href="order.html">
+                <Link to="/orders">
                   <svg
                     width="20"
                     height="20"
@@ -68,7 +68,7 @@ function Profile() {
                     />
                   </svg>
                   My Orders
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="payment.html">
