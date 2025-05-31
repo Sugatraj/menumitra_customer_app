@@ -187,7 +187,7 @@ function Checkout() {
             </ul>
           </div>
         </div>
-        <div className="footer fixed p-b80">
+        <div className="footer fixed p-b60">
           <div className="container">
             {loading ? (
               <div className="text-center">
@@ -252,12 +252,12 @@ function Checkout() {
                       <h5>Grand Total</h5>
                       <h5>₹{checkoutDetails.final_grand_total}</h5>
                     </li>
-                    <li>
+                    {/* <li>
                       <a href="javascript:void(0);" className="promo-bx">
                         Apply Promotion Code
                         <span>2 Promos</span>
                       </a>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               )
