@@ -40,33 +40,40 @@ export const CartProvider = ({ children }) => {
   }, [orderSettings]);
 
   // Add item to cart with comment
-  const addToCart = (item, portionId, quantity = 1, comment = "") => {
+  const addToCart = (menuItem, portionId, quantity, comment, immediate = false) => {
     setCartItems(prevItems => {
       const existingItemIndex = prevItems.findIndex(
-        cartItem => cartItem.menuId === item.menuId && cartItem.portionId === portionId
+        item => item.menuId === menuItem.menuId && item.portionId === portionId
       );
 
-      if (existingItemIndex > -1) {
-        // Update quantity if item exists
-        const newItems = [...prevItems];
-        newItems[existingItemIndex].quantity += quantity;
-        if (comment) newItems[existingItemIndex].comment = comment;
-        return newItems;
+      if (existingItemIndex !== -1) {
+        // Update existing item
+        const updatedItems = [...prevItems];
+        if (quantity === 0) {
+          // Remove item if quantity is 0
+          updatedItems.splice(existingItemIndex, 1);
+        } else {
+          // Update quantity
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity: quantity,
+            comment: comment
+          };
+        }
+        return updatedItems;
+      } else if (quantity > 0) {
+        // Add new item
+        return [...prevItems, {
+          menuId: menuItem.menuId,
+          menuName: menuItem.menuName,
+          portionId: portionId,
+          portionName: menuItem.portions.find(p => p.portion_id === portionId)?.portion_name,
+          price: menuItem.portions.find(p => p.portion_id === portionId)?.price,
+          quantity: quantity,
+          comment: comment
+        }];
       }
-
-      // Add new item
-      const selectedPortion = item.portions.find(p => p.portion_id === portionId);
-      return [...prevItems, {
-        menuId: item.menuId,
-        menuName: item.menuName,
-        portionId: portionId,
-        portionName: selectedPortion.portion_name,
-        price: selectedPortion.price,
-        quantity: quantity,
-        image: item.image,
-        menuFoodType: item.menuFoodType,
-        comment: comment
-      }];
+      return prevItems;
     });
   };
 

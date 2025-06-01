@@ -5,12 +5,34 @@ import { useModal } from '../../../contexts/ModalContext';
 
 export const AddToCartModal = () => {
   const { closeModal, modalConfig } = useModal();
-  const { addToCart, cartItems } = useCart();
-  const [selectedPortion, setSelectedPortion] = useState(
-    modalConfig.data?.portions?.[0]?.portion_id
+  const { addToCart, cartItems, updateQuantity, removeFromCart } = useCart();
+  
+  console.log('Modal Config Data:', modalConfig.data);
+  console.log('Current Cart Items:', cartItems);
+
+  // Find existing cart item for this menu and portion
+  const existingCartItem = cartItems.find(item => 
+    item.menuId === modalConfig.data?.menuId && 
+    item.portionId === modalConfig.data?.portions?.[0]?.portion_id
   );
-  const [quantity, setQuantity] = useState(1);
-  const [comment, setComment] = useState('');
+  
+  console.log('Existing Cart Item:', existingCartItem);
+
+  const [selectedPortion, setSelectedPortion] = useState(
+    existingCartItem?.portionId || modalConfig.data?.portions?.[0]?.portion_id
+  );
+  
+  // Initialize quantity from cart if exists, otherwise default to 1
+  const [quantity, setQuantity] = useState(
+    existingCartItem?.quantity || 1
+  );
+
+  console.log('Initial Selected Portion:', selectedPortion);
+  console.log('Initial Quantity:', quantity);
+  
+  const [comment, setComment] = useState(
+    existingCartItem?.comment || ''
+  );
 
   const MAX_QUANTITY = 20;
 
@@ -19,15 +41,63 @@ export const AddToCartModal = () => {
     item.menuId === modalConfig.data?.menuId
   );
 
+  // Find existing cart item for current portion
+  const getCurrentCartItem = (portionId) => {
+    return cartItems.find(item => 
+      item.menuId === modalConfig.data?.menuId && 
+      item.portionId === portionId
+    );
+  };
+
+  // Update quantity when portion changes
+  const handlePortionChange = (portionId) => {
+    console.log('Portion Change:', {
+      from: selectedPortion,
+      to: portionId
+    });
+    
+    setSelectedPortion(portionId);
+    const portionCartItem = getCurrentCartItem(portionId);
+    setQuantity(portionCartItem?.quantity || 1);
+  };
+
   // Set modal title based on cart status and include menu name
   const modalTitle = `${isInCart ? "Update" : "Add"} - ${modalConfig.data?.menuName || modalConfig.data?.menu_name || ''}`;
 
   const handleQuantityChange = (newQuantity) => {
-    // Ensure quantity stays between 1 and MAX_QUANTITY
-    setQuantity(Math.min(Math.max(1, newQuantity), MAX_QUANTITY));
+    console.log('Quantity Change:', {
+      currentQuantity: quantity,
+      newQuantity: newQuantity,
+      selectedPortion: selectedPortion,
+      maxQuantity: MAX_QUANTITY
+    });
+
+    const finalQuantity = Math.min(Math.max(1, newQuantity), MAX_QUANTITY);
+    
+    // Update local state
+    setQuantity(finalQuantity);
+
+    // Immediately update cart context
+    if (modalConfig.data) {
+      addToCart(
+        modalConfig.data, 
+        selectedPortion, 
+        finalQuantity, 
+        comment,
+        true // Add an immediate flag to indicate instant update
+      );
+    }
   };
 
   const handleAddToCart = () => {
+    console.log('Final Cart Update:', {
+      menuData: modalConfig.data,
+      selectedPortion: selectedPortion,
+      quantity: quantity,
+      comment: comment
+    });
+    
+    // Final update to cart
     addToCart(modalConfig.data, selectedPortion, quantity, comment);
     closeModal();
   };
@@ -53,7 +123,7 @@ export const AddToCartModal = () => {
                 key={portion.portion_id}
               >
                 <div 
-                  onClick={() => setSelectedPortion(portion.portion_id)}
+                  onClick={() => handlePortionChange(portion.portion_id)}
                   style={{
                     border: `1.5px solid ${selectedPortion === portion.portion_id ? '#28a745' : '#e9ecef'}`,
                     borderRadius: '12px',
@@ -266,7 +336,13 @@ export const AddToCartModal = () => {
         >
           <button
             type="button"
-            onClick={() => handleQuantityChange(quantity - 1)}
+            onClick={() => {
+              console.log('Decrease Button Clicked', {
+                currentQuantity: quantity,
+                newQuantity: quantity - 1
+              });
+              handleQuantityChange(quantity - 1);
+            }}
             style={{
               width: '40px',
               height: '40px',
@@ -301,7 +377,13 @@ export const AddToCartModal = () => {
           </span>
           <button
             type="button"
-            onClick={() => handleQuantityChange(quantity + 1)}
+            onClick={() => {
+              console.log('Increase Button Clicked', {
+                currentQuantity: quantity,
+                newQuantity: quantity + 1
+              });
+              handleQuantityChange(quantity + 1);
+            }}
             style={{
               width: '40px',
               height: '40px',
@@ -338,7 +420,7 @@ export const AddToCartModal = () => {
             flex: '1'
           }}
         >
-          Add to Cart
+          {isInCart ? 'Update Cart' : 'Add to Cart'}
         </button>
       </div>
       {quantity >= MAX_QUANTITY && (
