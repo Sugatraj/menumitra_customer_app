@@ -39,24 +39,8 @@ const VerticalMenuCard = ({
 
   // Handle quantity changes
   const handleQuantityChange = (increment) => {
-    const totalQuantity = getTotalQuantity();
-    
-    if (increment) {
-      // When increasing, open modal to let user select portion
-      if (totalQuantity < MAX_QUANTITY) {
-        openModal('ADD_TO_CART', menuItem);
-      }
-    } else {
-      // When decreasing, reduce from the last added portion
-      if (cartItemsForMenu.length > 0) {
-        const lastItem = cartItemsForMenu[cartItemsForMenu.length - 1];
-        if (lastItem.quantity === 1) {
-          removeFromCart(menuItem.menuId, lastItem.portionId);
-        } else {
-          updateQuantity(menuItem.menuId, lastItem.portionId, lastItem.quantity - 1);
-        }
-      }
-    }
+    // Always open modal regardless of + or - click
+    openModal('ADD_TO_CART', menuItem);
   };
 
   return (
@@ -126,7 +110,7 @@ const VerticalMenuCard = ({
                           }`}
                         >
                           <div className="fw-bold">{item.quantity}</div>
-                          <div className="text-muted small">{portion?.portion_name.toUpperCase()}</div>
+                          <div className="text-muted small">{portion?.portion_name.charAt(0).toUpperCase()}</div>
                         </div>
                       );
                     })}

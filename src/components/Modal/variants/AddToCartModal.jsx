@@ -5,7 +5,7 @@ import { useModal } from '../../../contexts/ModalContext';
 
 export const AddToCartModal = () => {
   const { closeModal, modalConfig } = useModal();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const [selectedPortion, setSelectedPortion] = useState(
     modalConfig.data?.portions?.[0]?.portion_id
   );
@@ -13,6 +13,14 @@ export const AddToCartModal = () => {
   const [comment, setComment] = useState('');
 
   const MAX_QUANTITY = 20;
+
+  // Check if item exists in cart
+  const isInCart = cartItems.some(item => 
+    item.menuId === modalConfig.data?.menuId
+  );
+
+  // Set modal title based on cart status and include menu name
+  const modalTitle = `${isInCart ? "Update" : "Add"} - ${modalConfig.data?.menuName || modalConfig.data?.menu_name || ''}`;
 
   const handleQuantityChange = (newQuantity) => {
     // Ensure quantity stays between 1 and MAX_QUANTITY
@@ -26,7 +34,7 @@ export const AddToCartModal = () => {
 
   return (
     <BaseModal 
-      title="Add to Cart" 
+      title={modalTitle} 
       onClose={closeModal}
     >
       <div className="mb-4">
