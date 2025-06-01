@@ -499,7 +499,7 @@ function Search() {
                           foodType={menu.menu_food_type}
                           categoryName={menu.category_name}
                           portions={menu.portions}
-                          cartItem={cartItem} // Pass cart item to show quantity if in cart
+                          cartItem={cartItem}
                           onQuantityChange={(newQuantity) => 
                             handleQuantityChange(
                               menu.menu_id, 
@@ -508,6 +508,10 @@ function Search() {
                             )
                           }
                           maxQuantity={MAX_QUANTITY}
+                          isInCart={cartItem !== undefined}
+                          quantity={cartItem ? cartItem.quantity : 0}
+                          onIncrement={() => handleQuantityChange(menu.menu_id, menu.portions[0].portion_id, cartItem.quantity + 1)}
+                          onDecrement={() => handleQuantityChange(menu.menu_id, menu.portions[0].portion_id, cartItem.quantity - 1)}
                         />
                       </li>
                     );
