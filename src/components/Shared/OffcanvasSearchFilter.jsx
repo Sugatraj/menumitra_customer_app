@@ -1,23 +1,48 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
+  const [foodTypes, setFoodTypes] = useState({});
   const [filters, setFilters] = useState({
     priceRange: {
       min: '',
       max: ''
     },
     starRating: 4,
-    foodType: {
-      veg: false,
-      nonveg: false
-    },
+    foodType: {},  // This will now be dynamically populated
     others: {
-      discount: true,
+      discount: false,
       voucher: false,
       freeShipping: false,
-      sameDayDelivery: true
+      sameDayDelivery: false
     }
   });
+
+  useEffect(() => {
+    // Fetch food types when component mounts
+    fetchFoodTypes();
+  }, []);
+
+  const fetchFoodTypes = async () => {
+    try {
+      const response = await fetch('https://men4u.xyz/v2/user/get_food_type_list');
+      const data = await response.json();
+      const foodTypeList = data.detail.food_type_list;
+      
+      // Initialize foodType filters with all types set to false
+      const initialFoodTypes = Object.keys(foodTypeList).reduce((acc, type) => {
+        acc[type] = false;
+        return acc;
+      }, {});
+
+      setFoodTypes(foodTypeList);
+      setFilters(prev => ({
+        ...prev,
+        foodType: initialFoodTypes
+      }));
+    } catch (error) {
+      console.error('Error fetching food types:', error);
+    }
+  };
 
   const handlePriceChange = (type, value) => {
     setFilters(prev => ({
@@ -54,6 +79,30 @@ function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
     onClose();
   };
 
+  // Add reset handler
+  const handleReset = () => {
+    const initialState = {
+      priceRange: {
+        min: '',
+        max: ''
+      },
+      starRating: 4,
+      foodType: Object.keys(foodTypes).reduce((acc, type) => {
+        acc[type] = false;
+        return acc;
+      }, {}),
+      others: {
+        discount: false,
+        voucher: false,
+        freeShipping: false,
+        sameDayDelivery: false
+      }
+    };
+    
+    setFilters(initialState);
+    onApplyFilter(initialState); // This will reset the filters and show all results
+  };
+
   return (
     <div className="offcanvas-body container">
       <div className="filter-area">
@@ -70,7 +119,13 @@ function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
             </svg>
           </button>
           <h2 className="mb-0 flex-1">Search Filters</h2>
-          <h6 className="sub-title mb-0 text-accent">Reset</h6>
+          <h6 
+            className="sub-title mb-0 text-accent" 
+            style={{ cursor: 'pointer' }}
+            onClick={handleReset}
+          >
+            Reset
+          </h6>
         </div>
         <div className="filter-content">
           <div className="title-bar">
@@ -78,38 +133,26 @@ function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
           </div>
           <div className="border-bottom d-flex justify-content-between align-items-center pb-3">
             <ul className="d-flex align-items-center flex-wrap w-100">
-              <li className="w-50 pb-2 pe-2">
-                <div className="form-check">
-                  <input 
-                    className="form-check-input" 
-                    type="checkbox" 
-                    checked={filters.foodType.veg}
-                    onChange={() => handleFoodTypeChange('veg')}
-                    id="vegFilter" 
-                  />
-                  <label className="form-check-label" htmlFor="vegFilter">
-                    Vegetarian
-                  </label>
-                </div>
-              </li>
-              <li className="w-50 pb-2 pe-2">
-                <div className="form-check">
-                  <input 
-                    className="form-check-input" 
-                    type="checkbox" 
-                    checked={filters.foodType.nonveg}
-                    onChange={() => handleFoodTypeChange('nonveg')}
-                    id="nonvegFilter" 
-                  />
-                  <label className="form-check-label" htmlFor="nonvegFilter">
-                    Non-Vegetarian
-                  </label>
-                </div>
-              </li>
+              {Object.entries(foodTypes).map(([type, label]) => (
+                <li key={type} className="w-50 pb-2 pe-2">
+                  <div className="form-check">
+                    <input 
+                      className="form-check-input" 
+                      type="checkbox" 
+                      checked={filters.foodType[type] || false}
+                      onChange={() => handleFoodTypeChange(type)}
+                      id={`${type}Filter`} 
+                    />
+                    <label className="form-check-label" htmlFor={`${type}Filter`}>
+                      {label.charAt(0).toUpperCase() + label.slice(1)} {/* Capitalize first letter */}
+                    </label>
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
           <div className="title-bar">
-            <h5 className="sub-title mb-0">Price Range</h5>
+            <h5 className="sub-title">Price Range</h5>
           </div>
           <div className="border-bottom d-flex justify-content-between align-items-center">
             <div className="mb-3 me-3 input-group input-group-icon">
@@ -257,16 +300,6 @@ function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
               <li className="d-flex align-items-center pb-3">
                 <svg className="me-3" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M24 10.0761C24 8.11541 22.7548 6.2785 20.8546 5.80517C20.0473 5.60412 19.2108 5.62976 18.4477 5.87274C17.5468 4.8858 16.2508 4.26562 14.8125 4.26562C13.7955 4.26562 12.8126 4.57965 11.9892 5.15716C11.182 4.59576 10.1995 4.26562 9.14058 4.26562C7.7519 4.26562 6.4275 4.85944 5.50025 5.87585C4.90076 5.68378 4.24982 5.62115 3.58661 5.7182C1.47724 6.02655 -0.031006 7.8977 0.000488173 10.1678C0.0147704 11.1815 0.404786 12.0742 1.04859 12.7637C0.37677 13.5621 -0.0158083 14.6243 0.000488173 15.7928C0.0323485 18.0383 1.96631 19.7344 4.15772 19.7344H19.7915C20.8742 19.7344 21.9093 19.3334 22.706 18.6052C23.5316 17.8504 23.9912 16.8402 23.9998 15.7612L24 15.7011C24 14.7484 23.7017 13.8017 23.1602 13.0356C23.0905 12.9369 23.0169 12.8417 22.9398 12.7504C23.6132 12.0324 23.9919 11.1134 23.9998 10.1362L24 10.0761ZM3.79004 7.10962C5.27943 6.8919 6.67835 7.86602 6.97498 9.32739L8.35304 9.0476C8.14521 8.02349 7.57777 7.15905 6.80488 6.56122C7.443 5.9956 8.27449 5.67187 9.14058 5.67187C11.1049 5.67187 12.7031 7.24896 12.7031 9.1875H14.1093C14.1093 8.04144 13.7118 6.98565 13.0462 6.14831C13.5789 5.8385 14.1866 5.67187 14.8125 5.67187C16.751 5.67187 18.3281 7.24896 18.3281 9.1875H19.7343C19.7343 8.44903 19.5705 7.7481 19.2779 7.11877C19.682 7.05304 20.1079 7.06842 20.5146 7.16986C21.7194 7.46997 22.5937 8.6922 22.5937 10.0761L22.5935 10.1243C22.5884 10.7651 22.3266 11.3707 21.8622 11.8412C21.5465 11.6576 21.208 11.5182 20.8546 11.4304C20.0473 11.2291 19.2108 11.2549 18.4477 11.4977C17.5468 10.5108 16.2508 9.89062 14.8125 9.89062C13.7955 9.89062 12.8126 10.2046 11.9892 10.7822C11.182 10.2208 10.1995 9.89062 9.14058 9.89062C7.7519 9.89062 6.42731 10.4844 5.50025 11.501C4.90076 11.3088 4.24982 11.2461 3.58661 11.3432C3.05634 11.4206 2.56433 11.597 2.12506 11.8535C1.68543 11.4051 1.41608 10.8224 1.40656 10.1481C1.38495 8.5924 2.38745 7.31469 3.79004 7.10962ZM22.5935 15.7493C22.5824 17.1471 21.2992 18.3281 19.7915 18.3281H4.15772C2.7013 18.3281 1.42706 17.2297 1.40656 15.7731C1.38513 14.2176 2.38745 12.9397 3.79004 12.7346C5.27943 12.5171 6.67835 13.491 6.97498 14.9524L8.35304 14.6726C8.14521 13.6487 7.57758 12.7842 6.80488 12.1864C7.443 11.6206 8.2743 11.2969 9.14058 11.2969C11.1049 11.2969 12.7031 12.874 12.7031 14.8125H14.1093C14.1093 13.6664 13.7118 12.6106 13.0462 11.7733C13.5789 11.4635 14.1866 11.2969 14.8125 11.2969C16.751 11.2969 18.3281 12.874 18.3281 14.8125H19.7343C19.7343 14.074 19.5705 13.3731 19.2779 12.7438C19.682 12.678 20.1079 12.6934 20.5146 12.7949C21.7194 13.095 22.5937 14.3172 22.5937 15.7011L22.5935 15.7493Z" fill="var(--primary)"></path>
-                </svg>
-                <h6 className="sub-title mb-0 flex-1 font-w700">Bakery</h6>
-                <h6 className="sub-title text-soft mb-0 ms-auto font-w500">24 Items</h6>
-                <svg className="ms-2" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8.25005 20.25C8.05823 20.25 7.86623 20.1767 7.7198 20.0303C7.42673 19.7372 7.42673 19.2626 7.7198 18.9698L14.6895 12L7.7198 5.03026C7.42673 4.7372 7.42673 4.26263 7.7198 3.96976C8.01286 3.67688 8.48742 3.67669 8.7803 3.96976L16.2803 11.4698C16.5734 11.7628 16.5734 12.2374 16.2803 12.5303L8.7803 20.0303C8.63386 20.1767 8.44186 20.25 8.25005 20.25Z" fill="#7D8FAB"></path>
-                </svg>
-              </li>
-              <li className="d-flex align-items-center pb-3">
-                <svg className="me-3" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M23.9006 11.6308C22.9013 9.90325 21.4642 8.45439 19.7448 7.44081C19.1367 7.08231 18.4982 6.7818 17.8383 6.54175C17.5 5.68971 16.9526 4.93066 16.2284 4.3278C15.087 3.3777 13.6439 2.9291 12.1649 3.06424C10.686 3.19952 9.34826 3.9026 8.39815 5.0441C8.13659 5.3583 8.17924 5.82504 8.49349 6.0866L9.50566 6.92917C9.33865 7.01247 9.17196 7.09938 9.00569 7.19214C7.81971 7.8542 6.66368 8.761 5.63469 9.83359L1.10047 7.30853C0.803804 7.1433 0.432601 7.20114 0.200383 7.44897C-0.0319292 7.69675 -0.0658667 8.07081 0.118211 8.35628L2.59058 12.1919L0.127539 15.8271C-0.0586011 16.1018 -0.039148 16.4669 0.175211 16.7204C0.38957 16.9738 0.746382 17.0534 1.04816 16.9155L6.0927 14.6087C7.1269 15.5787 8.21473 16.3671 9.33232 16.956C9.39129 16.987 9.4503 17.0164 9.50932 17.0463L8.46406 17.9164C8.31316 18.0419 8.21834 18.2224 8.20048 18.4179C8.18262 18.6134 8.24313 18.808 8.36871 18.9588C9.4668 20.278 11.0511 20.9593 12.6466 20.9593C13.9008 20.9593 15.1619 20.5383 16.199 19.6751C16.9198 19.075 17.4655 18.3204 17.8041 17.4732C18.4761 17.2311 19.1261 16.9267 19.7446 16.5621C21.464 15.5485 22.9011 14.0996 23.9004 12.3721C24.0333 12.1428 24.0333 11.8601 23.9006 11.6308ZM12.2997 4.53855C13.3847 4.43904 14.4436 4.76857 15.2811 5.46569C15.48 5.63125 15.6601 5.81332 15.8214 6.0085C15.1812 5.89966 14.5302 5.84407 13.8753 5.84407C12.9363 5.84407 11.9942 5.99571 11.0575 6.29477L10.0606 5.46485C10.6907 4.93811 11.4644 4.61496 12.2997 4.53855ZM15.252 18.5372C13.7174 19.8146 11.5142 19.7723 10.032 18.5375L11.0498 17.6903C11.996 18.0016 12.9412 18.1588 13.8754 18.1588C14.5186 18.1588 15.1581 18.1053 15.7873 18.0002C15.6272 18.1932 15.4488 18.3733 15.252 18.5372ZM13.8753 16.6784C10.7376 16.6784 8.07377 14.4992 6.76517 13.2003C6.62342 13.0597 6.43493 12.9855 6.2435 12.9855C6.13948 12.9855 6.03457 13.0074 5.93586 13.0525L2.83499 14.4705L4.09067 12.6173C4.25708 12.3716 4.26078 12.0504 4.1 11.801L2.96619 10.042L5.42286 11.4101C5.72581 11.5788 6.10512 11.5146 6.33575 11.2558C8.56104 8.75744 11.3091 7.32452 13.8753 7.32452C17.3229 7.32452 20.5476 9.10576 22.3939 12.0014C20.5476 14.8971 17.3229 16.6784 13.8753 16.6784Z" fill="var(--primary)"></path>
                   <path d="M17.4574 11.985C18.1043 11.985 18.6288 11.4606 18.6288 10.8137C18.6288 10.1668 18.1043 9.64236 17.4574 9.64236C16.8105 9.64236 16.2861 10.1668 16.2861 10.8137C16.2861 11.4606 16.8105 11.985 17.4574 11.985Z" fill="var(--primary)"></path>
                 </svg>
                 <h6 className="sub-title mb-0 flex-1 font-w700">Fresh Fishes</h6>

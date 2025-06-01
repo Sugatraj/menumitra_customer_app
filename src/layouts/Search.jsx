@@ -16,6 +16,7 @@ function Search() {
   const [activeFilters, setActiveFilters] = useState(null);
   const [recentSearches, setRecentSearches] = useState([]);
   const [searchInputValue, setSearchInputValue] = useState('');
+  const [originalSearchResults, setOriginalSearchResults] = useState([]);
   
   // Get these from context/props
   const outletId = 1; // This should come from your app context/state
@@ -102,49 +103,11 @@ function Search() {
     []
   );
 
-  // Modified search API function with proper error handling and response parsing
-  const searchMenu = async (keyword) => {
-    if (!keyword || keyword.trim().length === 0) {
-      return [];
-    }
-
-    try {
-      const response = await fetch('https://men4u.xyz/v2/user/search_menu', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          outlet_id: outletId,
-          keyword: keyword.trim(),
-          user_id: userId
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Search failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log('Search API Response:', data); // Debug log
-      
-      // Check if data exists and has the expected structure
-      if (data && data.detail && Array.isArray(data.detail.menu_list)) {
-        return data.detail.menu_list;
-      } else {
-        console.error('Invalid response format:', data);
-        return [];
-      }
-    } catch (err) {
-      console.error('Search API error:', err);
-      throw new Error('Failed to search menu items');
-    }
-  };
-
-  // Modified handleSearch with debug logging
+  // Modified handleSearch to store original results
   const handleSearch = async (searchTerm) => {
     if (!searchTerm || searchTerm.trim().length === 0) {
       setSearchResults([]);
+      setOriginalSearchResults([]); // Clear original results too
       return;
     }
 
@@ -152,53 +115,55 @@ function Search() {
     setError(null);
 
     try {
-      const results = await searchMenu(searchTerm);
-      console.log('Search Results:', results); // Debug log
+      const payload = {
+        outlet_id: outletId,
+        keyword: searchTerm.trim(),
+      };
+
+      // Add user_id if exists
+      if (userId) {
+        payload.user_id = userId;
+      }
+
+      const response = await fetch('https://men4u.xyz/v2/user/search_menu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.status}`);
+      }
+
+      const data = await response.json();
       
-      if (searchTerm === searchInputValue.trim()) {
-        setSearchResults(results || []); // Ensure we always set an array
-        if (results && results.length > 0) {
-          debouncedUpdateRecentSearches(searchTerm, results);
+      if (data && data.detail && Array.isArray(data.detail.menu_list)) {
+        setOriginalSearchResults(data.detail.menu_list); // Store original results
+        setSearchResults(data.detail.menu_list);
+        if (data.detail.menu_list.length > 0) {
+          debouncedUpdateRecentSearches(searchTerm, data.detail.menu_list);
         }
+      } else {
+        setOriginalSearchResults([]);
+        setSearchResults([]);
       }
     } catch (err) {
       console.error('Search error:', err);
       setError(err.message);
+      setOriginalSearchResults([]);
       setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Modified search handler with shorter debounce
-  const debouncedSearch = useCallback(
-    debounce(async (searchTerm) => {
-      if (!searchTerm || searchTerm.trim().length === 0) {
-        setSearchResults([]);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const results = await searchMenu(searchTerm);
-        setSearchResults(results);
-      } catch (err) {
-        setError(err.message);
-        setSearchResults([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 500), // Keep this at 500ms for responsive search
-    [outletId, userId, searchInputValue] // Add searchInputValue as dependency
-  );
-
   // Modified handleSearchChange
   const handleSearchChange = (event) => {
     const searchTerm = event.target.value;
     setSearchInputValue(searchTerm); // Update the input value state
-    debouncedSearch(searchTerm);
+    handleSearch(searchTerm);
   };
 
   // Modified handleRecentSearchClick
@@ -211,16 +176,15 @@ function Search() {
       searchInput.value = searchTerm;
     }
     
-    debouncedSearch(searchTerm);
+    handleSearch(searchTerm);
   };
 
   // Cleanup both debounce functions on unmount
   useEffect(() => {
     return () => {
-      debouncedSearch.cancel();
       debouncedUpdateRecentSearches.cancel();
     };
-  }, [debouncedSearch, debouncedUpdateRecentSearches]);
+  }, [debouncedUpdateRecentSearches]);
 
   // Modified handleAddToCart function to match VerticalMenuCard logic
   const handleAddToCart = (menu) => {
@@ -274,54 +238,57 @@ function Search() {
     }
   };
 
-  const handleApplyFilter = async (filters) => {
+  // Modified handleApplyFilter to filter locally
+  const handleApplyFilter = (filters) => {
     setIsLoading(true);
     setActiveFilters(filters);
 
     try {
-      const response = await fetch('https://men4u.xyz/v2/user/search_menu', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          outlet_id: outletId,
-          user_id: userId,
-          filters: {
-            price_min: filters.priceRange.min,
-            price_max: filters.priceRange.max,
-            rating: filters.starRating,
-            food_type: getFoodTypeFilter(filters.foodType),
-            has_discount: filters.others.discount,
-            has_voucher: filters.others.voucher,
-            free_shipping: filters.others.freeShipping,
-            same_day_delivery: filters.others.sameDayDelivery
-          }
-        })
-      });
+      let filteredResults = [...originalSearchResults]; // Start with original results
 
-      if (!response.ok) {
-        throw new Error('Filter application failed');
-      }
-
-      const data = await response.json();
-      
-      let filteredResults = data.detail.menu_list;
-      if (filters.foodType.veg || filters.foodType.nonveg) {
+      // Apply price range filter
+      if (filters.priceRange.min || filters.priceRange.max) {
+        const minPrice = filters.priceRange.min ? parseFloat(filters.priceRange.min) : 0;
+        const maxPrice = filters.priceRange.max ? parseFloat(filters.priceRange.max) : Infinity;
+        
         filteredResults = filteredResults.filter(menu => {
-          if (filters.foodType.veg && !filters.foodType.nonveg) {
-            return menu.menu_food_type === 'veg';
-          }
-          if (!filters.foodType.veg && filters.foodType.nonveg) {
-            return menu.menu_food_type === 'nonveg';
-          }
-          return true;
+          const menuPrice = menu.portions?.[0]?.price || 0;
+          return menuPrice >= minPrice && menuPrice <= maxPrice;
         });
       }
-      
+
+      // Apply food type filter
+      const selectedFoodTypes = Object.entries(filters.foodType)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([type]) => type);
+
+      if (selectedFoodTypes.length > 0) {
+        filteredResults = filteredResults.filter(menu => 
+          selectedFoodTypes.includes(menu.menu_food_type)
+        );
+      }
+
+      // Apply other filters
+      if (filters.others.discount) {
+        filteredResults = filteredResults.filter(menu => menu.offer > 0);
+      }
+
+      if (filters.others.voucher) {
+        filteredResults = filteredResults.filter(menu => menu.has_voucher); // Assuming this property exists
+      }
+
+      if (filters.others.freeShipping) {
+        filteredResults = filteredResults.filter(menu => menu.free_shipping); // Assuming this property exists
+      }
+
+      if (filters.others.sameDayDelivery) {
+        filteredResults = filteredResults.filter(menu => menu.same_day_delivery); // Assuming this property exists
+      }
+
       setSearchResults(filteredResults);
     } catch (err) {
       setError(err.message);
+      setSearchResults(originalSearchResults); // Reset to original results on error
     } finally {
       setIsLoading(false);
     }
