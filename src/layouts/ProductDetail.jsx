@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import fallbackImage from '../assets/images/food/food8.png';
+import { useCart } from '../contexts/CartContext';
+import { useModal } from '../contexts/ModalContext';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -15,6 +19,8 @@ function ProductDetail() {
   const { menuId, menuCatId } = useParams();
   const [menuDetails, setMenuDetails] = useState(null);
   const [quantity, setQuantity] = useState(0);
+  const { openModal } = useModal();
+  const { cartItems, removeFromCart, updateQuantity } = useCart();
 
   useEffect(() => {
     const fetchMenuDetails = async () => {
@@ -38,10 +44,37 @@ function ProductDetail() {
     fetchMenuDetails();
   }, [menuId, menuCatId]);
 
+  // Check if item exists in cart with proper menuId comparison
+  const cartItem = cartItems.find(item => 
+    item.menuId === Number(menuId) && 
+    item.portionId === menuDetails?.portions?.[0]?.portion_id
+  );
+
+  const handleAddToCart = () => {
+    // Format menu details to include required fields for checkout
+    const formattedMenuDetails = {
+      ...menuDetails,
+      menuId: Number(menuId), // Add menuId explicitly
+      menuName: menuDetails.menu_name,
+      image: menuDetails.images?.[0] || fallbackImage,
+      portions: menuDetails.portions.map(portion => ({
+        ...portion,
+        portion_id: portion.portion_id,
+        portion_name: portion.portion_name,
+        price: portion.price,
+        unit_value: portion.unit_value
+      }))
+    };
+    
+    openModal('ADD_TO_CART', formattedMenuDetails);
+  };
+
   if (!menuDetails) return <div>Loading...</div>;
 
   return (
-    <div className="page-content">
+    <>
+      <Header />
+      <div className="page-content">
       <div className="content-body bottom-content">
         <div className="swiper-btn-center-lr my-0">
           <Swiper
@@ -147,19 +180,64 @@ function ProductDetail() {
         </div>
       </div>
       
-      <div className="footer fixed">
+      <div className="footer fixed p-b55">
         <div className="container">
-          <a href="shopping-cart.html" className="btn btn-primary text-start w-100">
-            <svg className="cart me-4" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18.1776 17.8443C16.6362 17.8428 15.3854 19.0912 15.3839 20.6326C15.3824 22.1739 16.6308 23.4247 18.1722 23.4262C19.7136 23.4277 20.9643 22.1794 20.9658 20.638C20.9658 20.6371 20.9658 20.6362 20.9658 20.6353C20.9644 19.0955 19.7173 17.8473 18.1776 17.8443Z" fill="white"></path>
-              <path d="M23.1278 4.47973C23.061 4.4668 22.9932 4.46023 22.9251 4.46012H5.93181L5.66267 2.65958C5.49499 1.46381 4.47216 0.574129 3.26466 0.573761H1.07655C0.481978 0.573761 0 1.05574 0 1.65031C0 2.24489 0.481978 2.72686 1.07655 2.72686H3.26734C3.40423 2.72586 3.52008 2.82779 3.53648 2.96373L5.19436 14.3267C5.42166 15.7706 6.66363 16.8358 8.12528 16.8405H19.3241C20.7313 16.8423 21.9454 15.8533 22.2281 14.4747L23.9802 5.74121C24.0931 5.15746 23.7115 4.59269 23.1278 4.47973Z" fill="white"></path>
-              <path d="M11.3404 20.5158C11.2749 19.0196 10.0401 17.8418 8.54244 17.847C7.0023 17.9092 5.80422 19.2082 5.86645 20.7484C5.92617 22.2262 7.1283 23.4008 8.60704 23.4262H8.67432C10.2142 23.3587 11.4079 22.0557 11.3404 20.5158Z" fill="white"></path>
-            </svg>
-            ADD TO CART
-          </a>
+          {!cartItem ? (
+            <button 
+              onClick={handleAddToCart} 
+              className="btn btn-primary text-start w-100"
+              disabled={!menuDetails.portions?.length}
+            >
+              <svg className="cart me-4" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18.1776 17.8443C16.6362 17.8428 15.3854 19.0912 15.3839 20.6326C15.3824 22.1739 16.6308 23.4247 18.1722 23.4262C19.7136 23.4277 20.9643 22.1794 20.9658 20.638C20.9658 20.6371 20.9658 20.6362 20.9658 20.6353C20.9644 19.0955 19.7173 17.8473 18.1776 17.8443Z" fill="white"></path>
+                <path d="M23.1278 4.47973C23.061 4.4668 22.9932 4.46023 22.9251 4.46012H5.93181L5.66267 2.65958C5.49499 1.46381 4.47216 0.574129 3.26466 0.573761H1.07655C0.481978 0.573761 0 1.05574 0 1.65031C0 2.24489 0.481978 2.72686 1.07655 2.72686H3.26734C3.40423 2.72586 3.52008 2.82779 3.53648 2.96373L5.19436 14.3267C5.42166 15.7706 6.66363 16.8358 8.12528 16.8405H19.3241C20.7313 16.8423 21.9454 15.8533 22.2281 14.4747L23.9802 5.74121C24.0931 5.15746 23.7115 4.59269 23.1278 4.47973Z" fill="white"></path>
+                <path d="M11.3404 20.5158C11.2749 19.0196 10.0401 17.8418 8.54244 17.847C7.0023 17.9092 5.80422 19.2082 5.86645 20.7484C5.92617 22.2262 7.1283 23.4008 8.60704 23.4262H8.67432C10.2142 23.3587 11.4079 22.0557 11.3404 20.5158Z" fill="white"></path>
+              </svg>
+              ADD TO CART
+            </button>
+          ) : (
+            <div className="dz-stepper border-1 rounded-stepper">
+              <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                <span className="input-group-btn input-group-prepend">
+                  <button 
+                    className="btn btn-primary bootstrap-touchspin-down" 
+                    type="button"
+                    onClick={() => {
+                      if (cartItem.quantity === 1) {
+                        removeFromCart(Number(menuId), cartItem.portionId);
+                      } else {
+                        updateQuantity(Number(menuId), cartItem.portionId, cartItem.quantity - 1);
+                      }
+                    }}
+                  >-</button>
+                </span>
+                <input 
+                  readOnly 
+                  className="stepper form-control" 
+                  type="text" 
+                  value={cartItem.quantity} 
+                  name="demo3"
+                />
+                <span className="input-group-btn input-group-append">
+                  <button 
+                    className="btn btn-primary bootstrap-touchspin-up" 
+                    type="button"
+                    onClick={() => {
+                      if (cartItem.quantity < 20) {
+                        updateQuantity(Number(menuId), cartItem.portionId, cartItem.quantity + 1);
+                      }
+                    }}
+                    disabled={cartItem.quantity >= 20}
+                  >+</button>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
+      <Footer />
+    </>
   );
 }
 
