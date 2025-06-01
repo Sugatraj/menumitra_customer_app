@@ -131,7 +131,7 @@ function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
               />
             </div>
           </div>
-          <div className="title-bar">
+          {/* <div className="title-bar">
             <h5 className="sub-title">Star Ratings</h5>
           </div>
           <div className="border-bottom d-flex align-items-center pb-3">
@@ -155,7 +155,7 @@ function OffcanvasSearchFilter({ onClose, onApplyFilter }) {
               </ul>
             </div>
             <h6 className="sub-title text-soft mb-0 ms-auto font-w500">4 Stars</h6>
-          </div>
+          </div> */}
           <div className="title-bar">
             <h5 className="sub-title">Others</h5>
           </div>	

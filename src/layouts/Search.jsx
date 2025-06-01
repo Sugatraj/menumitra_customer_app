@@ -4,6 +4,8 @@ import Footer from "../components/Footer";
 import HorizontalMenuCard from "../components/HorizontalMenuCard";
 import OffcanvasSearchFilter from "../components/Shared/OffcanvasSearchFilter";
 import { useAuth } from "../contexts/AuthContext"; // Assuming you have AuthContext
+import { useCart } from "../contexts/CartContext"; // Add this import
+import { useModal } from "../contexts/ModalContext"; // Add this import
 import { debounce } from 'lodash'; // Make sure to install lodash
 
 function Search() {
@@ -18,6 +20,14 @@ function Search() {
   // Get these from context/props
   const outletId = 1; // This should come from your app context/state
   const { userId } = useAuth(); // Get user_id from auth context
+
+  // Get cart context
+  const { addToCart, cartItems, updateQuantity, removeFromCart } = useCart();
+
+  // Get modal context
+  const { openModal } = useModal();
+
+  const MAX_QUANTITY = 20;
 
   // Load recent searches from localStorage on component mount
   useEffect(() => {
@@ -212,8 +222,40 @@ function Search() {
     };
   }, [debouncedSearch, debouncedUpdateRecentSearches]);
 
+  // Modified handleAddToCart function to match VerticalMenuCard logic
   const handleAddToCart = (menu) => {
-    // Implement add to cart logic
+    // Format the menu data for modal
+    const menuData = {
+      menuId: menu.menu_id,
+      menuName: menu.menu_name,
+      portions: menu.portions.map(portion => ({
+        portion_id: portion.portion_id,
+        portion_name: portion.portion_name,
+        price: portion.price
+      })),
+      image: menu.image,
+      menuFoodType: menu.menu_food_type
+    };
+
+    // Open the AddToCartModal with the menu data
+    openModal('ADD_TO_CART', menuData);
+  };
+
+  // Add helper function to check if item exists in cart
+  const getCartItem = (menuId, portionId) => {
+    return cartItems.find(item => 
+      item.menuId === menuId && 
+      item.portionId === portionId
+    );
+  };
+
+  // Add quantity change handler
+  const handleQuantityChange = (menuId, portionId, newQuantity) => {
+    if (newQuantity === 0) {
+      removeFromCart(menuId, portionId);
+    } else if (newQuantity <= MAX_QUANTITY) {
+      updateQuantity(menuId, portionId, newQuantity);
+    }
   };
 
   const handleFavoriteClick = (menuId) => {
@@ -430,29 +472,46 @@ function Search() {
                   </span>
                 </div>
                 <ul>
-                  {searchResults.map((menu) => (
-                    <li key={menu.menu_id}>
-                      <HorizontalMenuCard
-                        image={menu.image}
-                        title={menu.menu_name}
-                        currentPrice={menu.portions?.[0]?.price}
-                        originalPrice={
-                          menu.offer && menu.portions?.[0]?.price
-                            ? (menu.portions[0].price * 100) / (100 - menu.offer)
-                            : null
-                        }
-                        discount={menu.offer ? `${menu.offer}%` : null}
-                        onAddToCart={() => handleAddToCart(menu)}
-                        onFavoriteClick={() => handleFavoriteClick(menu.menu_id)}
-                        isFavorite={menu.is_favourite === 1}
-                        productUrl={`/product-detail/${menu.menu_id}`}
-                        rating={menu.rating}
-                        foodType={menu.menu_food_type}
-                        categoryName={menu.category_name}
-                        portions={menu.portions}
-                      />
-                    </li>
-                  ))}
+                  {searchResults.map((menu) => {
+                    // Get cart item if exists
+                    const cartItem = getCartItem(
+                      menu.menu_id, 
+                      menu.portions?.[0]?.portion_id
+                    );
+
+                    return (
+                      <li key={menu.menu_id}>
+                        <HorizontalMenuCard
+                          image={menu.image}
+                          title={menu.menu_name}
+                          currentPrice={menu.portions?.[0]?.price}
+                          originalPrice={
+                            menu.offer && menu.portions?.[0]?.price
+                              ? (menu.portions[0].price * 100) / (100 - menu.offer)
+                              : null
+                          }
+                          discount={menu.offer ? `${menu.offer}%` : null}
+                          onAddToCart={() => handleAddToCart(menu)}
+                          onFavoriteClick={() => handleFavoriteClick(menu.menu_id)}
+                          isFavorite={menu.is_favourite === 1}
+                          productUrl={`/product-detail/${menu.menu_id}`}
+                          rating={menu.rating}
+                          foodType={menu.menu_food_type}
+                          categoryName={menu.category_name}
+                          portions={menu.portions}
+                          cartItem={cartItem} // Pass cart item to show quantity if in cart
+                          onQuantityChange={(newQuantity) => 
+                            handleQuantityChange(
+                              menu.menu_id, 
+                              menu.portions[0].portion_id, 
+                              newQuantity
+                            )
+                          }
+                          maxQuantity={MAX_QUANTITY}
+                        />
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ) : searchInputValue.trim() !== '' ? (
