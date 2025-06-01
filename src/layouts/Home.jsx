@@ -1253,21 +1253,17 @@ function Home() {
                 <div className="row g-3 mb-3">
                   {menuItems.map((menuItem) => (
                     <div className="col-6" key={menuItem.menuId}>
-                    <VerticalMenuCard
+                      <VerticalMenuCard
                         image={menuItem.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
                         title={menuItem.menuName}
                         currentPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price : 0}
                         reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
-                        onAddToCart={() => {}} // This can be empty since we're using modal now
                         onFavoriteClick={() => handleFavoriteClick(menuItem.menuId)}
                         isFavorite={menuItem.isFavourite === 1}
                         discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
-                        productUrl={`/product/${menuItem.menuId}`}
-                        onQuantityChange={(newQuantity) => handleQuantityChange(menuItem.menuId, newQuantity)}
-                      quantity={1}
-                        menuItem={menuItem} // Pass the entire menu item
-                    />
-                  </div>
+                        menuItem={menuItem}
+                      />
+                    </div>
                   ))}
                 </div>
                 {/* Recomended Start */}

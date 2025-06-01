@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import fallbackImage from '../assets/images/food/food8.png';
 import { useModal } from '../contexts/ModalContext';
 import { useCart } from '../contexts/CartContext';
@@ -12,12 +13,14 @@ const VerticalMenuCard = ({
   onFavoriteClick,
   isFavorite = false,
   discount,
-  productUrl = '#',
   menuItem
 }) => {
   const { openModal } = useModal();
   const { cartItems, updateQuantity, removeFromCart } = useCart();
   const MAX_QUANTITY = 20;
+
+  // Generate the product URL from menuItem data
+  const detailPageUrl = menuItem ? `/product-detail/${menuItem.menuId}/${menuItem.menuCatId}` : '#';
 
   // Check if item exists in cart
   const cartItem = cartItems.find(item => 
@@ -41,7 +44,9 @@ const VerticalMenuCard = ({
   return (
     <div className="card-item style-1">
       <div className="dz-media">
-        <img alt={title} src={image || fallbackImage} />
+        <Link to={detailPageUrl}>
+          <img alt={title} src={image || fallbackImage} />
+        </Link>
         <a 
           href="javascript:void(0);" 
           className="r-btn"
@@ -55,7 +60,7 @@ const VerticalMenuCard = ({
       </div>
       <div className="dz-content">
         <h6 className="title mb-3">
-          <a href={productUrl}>{title}</a>
+          <Link to={detailPageUrl}>{title}</Link>
         </h6>
         <div className="dz-meta mb-3">
           <ul>
@@ -124,7 +129,6 @@ VerticalMenuCard.propTypes = {
   onFavoriteClick: PropTypes.func.isRequired,
   isFavorite: PropTypes.bool,
   discount: PropTypes.string,
-  productUrl: PropTypes.string,
   menuItem: PropTypes.object.isRequired
 };
 
