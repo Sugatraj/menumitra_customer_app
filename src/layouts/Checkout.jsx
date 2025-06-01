@@ -265,7 +265,8 @@ function Checkout() {
     <>
       <Header />
       <div className="page-content">
-        <div className="container bottom-content shop-cart-wrapper">
+      {/* shop-cart-wrapper */}
+        <div className="container bottom-content" style={{ paddingBottom: '390px' }}> 
           <div className="item-list style-2">
             <ul>
               {cartItems.length === 0 ? (
