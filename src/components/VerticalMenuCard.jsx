@@ -22,10 +22,9 @@ const VerticalMenuCard = ({
   // Generate the product URL from menuItem data
   const detailPageUrl = menuItem ? `/product-detail/${menuItem.menuId}/${menuItem.menuCatId}` : '#';
 
-  // Check if item exists in cart
-  const cartItem = cartItems.find(item => 
-    item.menuId === menuItem.menuId && 
-    item.portionId === menuItem.portions?.[0]?.portion_id
+  // Check if any portion of this menu exists in cart
+  const cartItemsForMenu = cartItems.filter(item => 
+    item.menuId === menuItem.menuId
   );
 
   const handleAddToCartClick = (e) => {
@@ -33,11 +32,30 @@ const VerticalMenuCard = ({
     openModal('ADD_TO_CART', menuItem);
   };
 
-  const handleQuantityChange = (newQuantity) => {
-    if (newQuantity === 0) {
-      removeFromCart(menuItem.menuId, cartItem.portionId);
-    } else if (newQuantity <= MAX_QUANTITY) {
-      updateQuantity(menuItem.menuId, cartItem.portionId, newQuantity);
+  // Get total quantity across all portions
+  const getTotalQuantity = () => {
+    return cartItemsForMenu.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  // Handle quantity changes
+  const handleQuantityChange = (increment) => {
+    const totalQuantity = getTotalQuantity();
+    
+    if (increment) {
+      // When increasing, open modal to let user select portion
+      if (totalQuantity < MAX_QUANTITY) {
+        openModal('ADD_TO_CART', menuItem);
+      }
+    } else {
+      // When decreasing, reduce from the last added portion
+      if (cartItemsForMenu.length > 0) {
+        const lastItem = cartItemsForMenu[cartItemsForMenu.length - 1];
+        if (lastItem.quantity === 1) {
+          removeFromCart(menuItem.menuId, lastItem.portionId);
+        } else {
+          updateQuantity(menuItem.menuId, lastItem.portionId, lastItem.quantity - 1);
+        }
+      }
     }
   };
 
@@ -74,7 +92,7 @@ const VerticalMenuCard = ({
           </ul>
         </div>
         <div className="mt-2" style={{ minHeight: '38px' }}>
-          {!cartItem ? (
+          {!cartItemsForMenu.length ? (
             <a 
               className="btn btn-primary add-btn light w-100"
               href="javascript:void(0);"
@@ -83,36 +101,56 @@ const VerticalMenuCard = ({
               Add to cart
             </a>
           ) : null}
-          <div className={`dz-stepper border-1 rounded-stepper stepper-fill ${cartItem ? 'active' : ''}`}>
-            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-              <span className="input-group-btn input-group-prepend">
-                <button 
-                  className="btn btn-primary bootstrap-touchspin-down" 
-                  type="button"
-                  onClick={() => handleQuantityChange(Math.max(0, (cartItem?.quantity || 0) - 1))}
-                  disabled={!cartItem}
-                >
-                  -
-                </button>
-              </span>
-              <input 
-                className="stepper form-control" 
-                type="text" 
-                name="demo3"
-                value={cartItem?.quantity || 0}
-                readOnly
-              />
-              <span className="input-group-btn input-group-append">
-                <button 
-                  className="btn btn-primary bootstrap-touchspin-up" 
-                  type="button"
-                  onClick={() => handleQuantityChange((cartItem?.quantity || 0) + 1)}
-                  disabled={!cartItem || cartItem.quantity >= MAX_QUANTITY}
-                  style={{ opacity: cartItem?.quantity >= MAX_QUANTITY ? 0.5 : 1 }}
-                >
-                  +
-                </button>
-              </span>
+          <div className={`dz-stepper border-1 rounded-stepper stepper-fill ${cartItemsForMenu.length ? 'active' : ''}`}>
+            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected d-flex align-items-center">
+              <button 
+                className="btn btn-primary rounded-circle p-2"
+                type="button"
+                onClick={() => handleQuantityChange(false)}
+                disabled={!cartItemsForMenu.length}
+                style={{ width: '35px', height: '35px' }}
+              >
+                -
+              </button>
+              
+              <div className="d-flex align-items-center justify-content-center mx-2" style={{ flex: 1 }}>
+                {cartItemsForMenu.length > 0 ? (
+                  <div className="row g-0 w-100">
+                    {cartItemsForMenu.map((item, index) => {
+                      const portion = menuItem.portions.find(p => p.portion_id === item.portionId);
+                      return (
+                        <div 
+                          key={item.portionId} 
+                          className={`col text-center ${
+                            index < cartItemsForMenu.length - 1 ? 'border-end' : ''
+                          }`}
+                        >
+                          <div className="fw-bold">{item.quantity}</div>
+                          <div className="text-muted small">{portion?.portion_name.toUpperCase()}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center w-100">
+                    <span className="fw-bold">0</span>
+                  </div>
+                )}
+              </div>
+
+              <button 
+                className="btn btn-primary rounded-circle p-2"
+                type="button"
+                onClick={() => handleQuantityChange(true)}
+                disabled={getTotalQuantity() >= MAX_QUANTITY}
+                style={{ 
+                  width: '35px', 
+                  height: '35px',
+                  opacity: getTotalQuantity() >= MAX_QUANTITY ? 0.5 : 1 
+                }}
+              >
+                +
+              </button>
             </div>
           </div>
         </div>
