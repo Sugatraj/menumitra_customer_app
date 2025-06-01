@@ -18,7 +18,6 @@ const OUTLET_ID = 1;
 function ProductDetail() {
   const { menuId, menuCatId } = useParams();
   const [menuDetails, setMenuDetails] = useState(null);
-  const [quantity, setQuantity] = useState(0);
   const { openModal } = useModal();
   const { cartItems, removeFromCart, updateQuantity } = useCart();
 
@@ -143,31 +142,44 @@ function ProductDetail() {
                   {menuDetails.portions[1] && <del>₹{menuDetails.portions[1].price}</del>}
                 </h3>
               </div>
-              <div className="dz-stepper border-1 rounded-stepper">
-                <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                  <span className="input-group-btn input-group-prepend">
-                    <button 
-                      className="btn btn-primary bootstrap-touchspin-down" 
-                      type="button"
-                      onClick={() => setQuantity(prev => Math.max(0, prev - 1))}
-                    >-</button>
-                  </span>
-                  <input 
-                    readOnly 
-                    className="stepper form-control" 
-                    type="text" 
-                    value={quantity} 
-                    name="demo3"
-                  />
-                  <span className="input-group-btn input-group-append">
-                    <button 
-                      className="btn btn-primary bootstrap-touchspin-up" 
-                      type="button"
-                      onClick={() => setQuantity(prev => prev + 1)}
-                    >+</button>
-                  </span>
+              {cartItem && (
+                <div className="dz-stepper border-1 rounded-stepper">
+                  <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
+                    <span className="input-group-btn input-group-prepend">
+                      <button 
+                        className="btn btn-primary bootstrap-touchspin-down" 
+                        type="button"
+                        onClick={() => {
+                          if (cartItem.quantity === 1) {
+                            removeFromCart(Number(menuId), cartItem.portionId);
+                          } else {
+                            updateQuantity(Number(menuId), cartItem.portionId, cartItem.quantity - 1);
+                          }
+                        }}
+                      >-</button>
+                    </span>
+                    <input 
+                      readOnly 
+                      className="stepper form-control" 
+                      type="text" 
+                      value={cartItem.quantity} 
+                      name="demo3"
+                    />
+                    <span className="input-group-btn input-group-append">
+                      <button 
+                        className="btn btn-primary bootstrap-touchspin-up" 
+                        type="button"
+                        onClick={() => {
+                          if (cartItem.quantity < 20) {
+                            updateQuantity(Number(menuId), cartItem.portionId, cartItem.quantity + 1);
+                          }
+                        }}
+                        disabled={cartItem.quantity >= 20}
+                      >+</button>
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             {menuDetails.offer > 0 && (
               <div className="d-flex align-items-center justify-content-between">
@@ -196,41 +208,19 @@ function ProductDetail() {
               ADD TO CART
             </button>
           ) : (
-            <div className="dz-stepper border-1 rounded-stepper">
-              <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                <span className="input-group-btn input-group-prepend">
-                  <button 
-                    className="btn btn-primary bootstrap-touchspin-down" 
-                    type="button"
-                    onClick={() => {
-                      if (cartItem.quantity === 1) {
-                        removeFromCart(Number(menuId), cartItem.portionId);
-                      } else {
-                        updateQuantity(Number(menuId), cartItem.portionId, cartItem.quantity - 1);
-                      }
-                    }}
-                  >-</button>
-                </span>
-                <input 
-                  readOnly 
-                  className="stepper form-control" 
-                  type="text" 
-                  value={cartItem.quantity} 
-                  name="demo3"
-                />
-                <span className="input-group-btn input-group-append">
-                  <button 
-                    className="btn btn-primary bootstrap-touchspin-up" 
-                    type="button"
-                    onClick={() => {
-                      if (cartItem.quantity < 20) {
-                        updateQuantity(Number(menuId), cartItem.portionId, cartItem.quantity + 1);
-                      }
-                    }}
-                    disabled={cartItem.quantity >= 20}
-                  >+</button>
-                </span>
-              </div>
+            <div className="d-flex gap-3">
+              <button 
+                onClick={() => window.history.back()} 
+                className="btn btn-outline-primary flex-1"
+              >
+                ADD MORE MENUS
+              </button>
+              <button 
+                onClick={() => window.location.href = '/checkout'} 
+                className="btn btn-primary flex-1"
+              >
+                CHECKOUT
+              </button>
             </div>
           )}
         </div>
