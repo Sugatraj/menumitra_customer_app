@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HorizontalMenuCard from "../components/HorizontalMenuCard";
@@ -12,13 +12,92 @@ function Search() {
   const [error, setError] = useState(null);
   const [showFilter, setShowFilter] = useState(false);
   const [activeFilters, setActiveFilters] = useState(null);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [searchInputValue, setSearchInputValue] = useState('');
   
   // Get these from context/props
   const outletId = 1; // This should come from your app context/state
   const { userId } = useAuth(); // Get user_id from auth context
 
-  // Search API function
+  // Load recent searches from localStorage on component mount
+  useEffect(() => {
+    const savedSearches = localStorage.getItem('recentSearches');
+    if (savedSearches) {
+      setRecentSearches(JSON.parse(savedSearches));
+    }
+  }, []);
+
+  // Function to update recent searches
+  const updateRecentSearches = (searchTerm) => {
+    if (!searchTerm || searchTerm.trim().length === 0) return;
+    
+    setRecentSearches(prev => {
+      // Remove the search term if it already exists
+      const filtered = prev.filter(term => term !== searchTerm);
+      // Add the new search term at the beginning
+      const updated = [searchTerm, ...filtered].slice(0, 3);
+      // Save to localStorage
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // Function to clear all recent searches
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentSearches');
+  };
+
+  // Function to remove a single search term
+  const removeSearchTerm = (termToRemove) => {
+    setRecentSearches(prev => {
+      const updated = prev.filter(term => term !== termToRemove);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // Modified debounced function for recent searches
+  const debouncedUpdateRecentSearches = useCallback(
+    debounce((searchTerm, results) => {
+      // Only update if we have results and a valid search term
+      if (results && results.length > 0 && searchTerm && searchTerm.trim()) {
+        setRecentSearches(prev => {
+          // Check if the search term is a substring of any existing term
+          const isSubstring = prev.some(term => 
+            term.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            searchTerm.toLowerCase().includes(term.toLowerCase())
+          );
+
+          // If it's a substring and shorter than existing term, don't add it
+          if (isSubstring && prev.some(term => term.length > searchTerm.length)) {
+            return prev;
+          }
+
+          // Remove similar terms (case insensitive)
+          const filtered = prev.filter(term => {
+            const termLower = term.toLowerCase();
+            const searchTermLower = searchTerm.toLowerCase();
+            return !termLower.includes(searchTermLower) && 
+                   !searchTermLower.includes(termLower);
+          });
+
+          // Add the new search term at the beginning
+          const updated = [searchTerm, ...filtered].slice(0, 3);
+          localStorage.setItem('recentSearches', JSON.stringify(updated));
+          return updated;
+        });
+      }
+    }, 1000), // Increased delay to 1 second
+    []
+  );
+
+  // Modified search API function with proper error handling and response parsing
   const searchMenu = async (keyword) => {
+    if (!keyword || keyword.trim().length === 0) {
+      return [];
+    }
+
     try {
       const response = await fetch('https://men4u.xyz/v2/user/search_menu', {
         method: 'POST',
@@ -27,25 +106,68 @@ function Search() {
         },
         body: JSON.stringify({
           outlet_id: outletId,
-          keyword: keyword || "", // Send empty string if no keyword
+          keyword: keyword.trim(),
           user_id: userId
         })
       });
 
       if (!response.ok) {
-        throw new Error('Search failed');
+        throw new Error(`Search failed: ${response.status}`);
       }
 
       const data = await response.json();
-      return data.detail.menu_list;
+      console.log('Search API Response:', data); // Debug log
+      
+      // Check if data exists and has the expected structure
+      if (data && data.detail && Array.isArray(data.detail.menu_list)) {
+        return data.detail.menu_list;
+      } else {
+        console.error('Invalid response format:', data);
+        return [];
+      }
     } catch (err) {
-      throw new Error(err.message || 'Failed to search menu items');
+      console.error('Search API error:', err);
+      throw new Error('Failed to search menu items');
     }
   };
 
-  // Debounced search handler
+  // Modified handleSearch with debug logging
+  const handleSearch = async (searchTerm) => {
+    if (!searchTerm || searchTerm.trim().length === 0) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const results = await searchMenu(searchTerm);
+      console.log('Search Results:', results); // Debug log
+      
+      if (searchTerm === searchInputValue.trim()) {
+        setSearchResults(results || []); // Ensure we always set an array
+        if (results && results.length > 0) {
+          debouncedUpdateRecentSearches(searchTerm, results);
+        }
+      }
+    } catch (err) {
+      console.error('Search error:', err);
+      setError(err.message);
+      setSearchResults([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Modified search handler with shorter debounce
   const debouncedSearch = useCallback(
     debounce(async (searchTerm) => {
+      if (!searchTerm || searchTerm.trim().length === 0) {
+        setSearchResults([]);
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
 
@@ -58,22 +180,37 @@ function Search() {
       } finally {
         setIsLoading(false);
       }
-    }, 500), // 500ms delay
-    [outletId, userId] // Dependencies
+    }, 500), // Keep this at 500ms for responsive search
+    [outletId, userId, searchInputValue] // Add searchInputValue as dependency
   );
 
-  // Handle search input change
+  // Modified handleSearchChange
   const handleSearchChange = (event) => {
     const searchTerm = event.target.value;
+    setSearchInputValue(searchTerm); // Update the input value state
     debouncedSearch(searchTerm);
   };
 
-  // Cleanup debounce on unmount
-  React.useEffect(() => {
+  // Modified handleRecentSearchClick
+  const handleRecentSearchClick = (searchTerm) => {
+    setSearchInputValue(searchTerm); // Update the input value state
+    
+    // Update the search input value
+    const searchInput = document.querySelector('input[type="search"]');
+    if (searchInput) {
+      searchInput.value = searchTerm;
+    }
+    
+    debouncedSearch(searchTerm);
+  };
+
+  // Cleanup both debounce functions on unmount
+  useEffect(() => {
     return () => {
       debouncedSearch.cancel();
+      debouncedUpdateRecentSearches.cancel();
     };
-  }, [debouncedSearch]);
+  }, [debouncedSearch, debouncedUpdateRecentSearches]);
 
   const handleAddToCart = (menu) => {
     // Implement add to cart logic
@@ -184,6 +321,12 @@ function Search() {
                     className="form-control main-in px-0 bs-0"
                     placeholder="Search menu items..."
                     onChange={handleSearchChange}
+                    value={searchInputValue}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSearch(searchInputValue);
+                      }
+                    }}
                   />
                   <span className="input-group-text">
                     <a
@@ -213,126 +356,110 @@ function Search() {
                 </div>
               </div>
             </div>
-            <div className="title-bar mt-0">
-              <span className="title mb-0 font-18">Recent Search</span>
-              <a
-                className="font-14 font-w500 text-accent all-close"
-                href="javascript:void(0);"
-              >
-                Clear All
-              </a>
-            </div>
-            <ul className="recent-search-list">
-              <li>
-                <div className="d-flex align-items-center">
-                  <svg
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+            {/* Recent Searches Section */}
+            {recentSearches.length > 0 && (
+              <>
+                <div className="title-bar mt-0">
+                  <span className="title mb-0 font-18">Recent Search</span>
+                  <a
+                    className="font-14 font-w500 text-accent all-close"
+                    href="javascript:void(0);"
+                    onClick={clearRecentSearches}
                   >
-                    <path
-                      d="M22 11C21.7348 11 21.4804 11.1054 21.2929 11.2929C21.1053 11.4804 21 11.7348 21 12C21.0041 14.046 20.3124 16.0325 19.0384 17.6334C17.7645 19.2344 15.984 20.3545 13.9894 20.8099C11.9948 21.2654 9.90455 21.029 8.062 20.1397C6.21945 19.2503 4.73407 17.7608 3.8498 15.9159C2.96552 14.0709 2.7349 11.98 3.19581 9.98665C3.65672 7.99328 4.78176 6.21589 6.38618 4.94634C7.99061 3.67679 9.97905 2.99055 12.025 3.00031C14.0709 3.01006 16.0527 3.71523 17.645 5.00002H16C15.7348 5.00002 15.4804 5.10537 15.2929 5.29291C15.1053 5.48044 15 5.7348 15 6.00002C15 6.26523 15.1053 6.51959 15.2929 6.70712C15.4804 6.89466 15.7348 7.00002 16 7.00002H20C20.2652 7.00002 20.5195 6.89466 20.7071 6.70712C20.8946 6.51959 21 6.26523 21 6.00002V2.00002C21 1.7348 20.8946 1.48044 20.7071 1.29291C20.5195 1.10537 20.2652 1.00002 20 1.00002C19.7348 1.00002 19.4804 1.10537 19.2929 1.29291C19.1053 1.48044 19 1.7348 19 2.00002V3.53102C17.0727 1.94258 14.6617 1.05806 12.1644 1.02319C9.66714 0.988309 7.23246 1.80516 5.26153 3.33915C3.2906 4.87314 1.901 7.03275 1.32169 9.46217C0.742374 11.8916 1.00791 14.4459 2.07453 16.7042C3.14116 18.9625 4.94525 20.7901 7.18956 21.8859C9.43387 22.9817 11.9845 23.2803 14.4212 22.7325C16.858 22.1847 19.0354 20.8232 20.5948 18.8723C22.1542 16.9214 23.0025 14.4976 23 12C23 11.7348 22.8946 11.4804 22.7071 11.2929C22.5195 11.1054 22.2652 11 22 11Z"
-                      fill="#7D8FAB"
-                    />
-                    <path
-                      d="M12 5.00002C11.7348 5.00002 11.4804 5.10537 11.2929 5.29291C11.1054 5.48045 11 5.7348 11 6.00002V12C11.0001 12.2652 11.1055 12.5195 11.293 12.707L14.293 15.707C14.4816 15.8892 14.7342 15.99 14.9964 15.9877C15.2586 15.9854 15.5094 15.8803 15.6948 15.6948C15.8802 15.5094 15.9854 15.2586 15.9877 14.9964C15.99 14.7342 15.8892 14.4816 15.707 14.293L13 11.586V6.00002C13 5.7348 12.8946 5.48045 12.7071 5.29291C12.5196 5.10537 12.2652 5.00002 12 5.00002Z"
-                      fill="#7D8FAB"
-                    />
-                  </svg>
-                  <h5 className="sub-title ms-2 mb-0">Tomatoes</h5>
+                    Clear All
+                  </a>
                 </div>
-                <a href="javascript:void(0);" className="close-1 remove-tag">
-                  <i className="fa-solid fa-xmark cross" />
-                </a>
-              </li>
-              <li>
-                <div className="d-flex align-items-center">
-                  <svg
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M22 11C21.7348 11 21.4804 11.1054 21.2929 11.2929C21.1053 11.4804 21 11.7348 21 12C21.0041 14.046 20.3124 16.0325 19.0384 17.6334C17.7645 19.2344 15.984 20.3545 13.9894 20.8099C11.9948 21.2654 9.90455 21.029 8.062 20.1397C6.21945 19.2503 4.73407 17.7608 3.8498 15.9159C2.96552 14.0709 2.7349 11.98 3.19581 9.98665C3.65672 7.99328 4.78176 6.21589 6.38618 4.94634C7.99061 3.67679 9.97905 2.99055 12.025 3.00031C14.0709 3.01006 16.0527 3.71523 17.645 5.00002H16C15.7348 5.00002 15.4804 5.10537 15.2929 5.29291C15.1053 5.48044 15 5.7348 15 6.00002C15 6.26523 15.1053 6.51959 15.2929 6.70712C15.4804 6.89466 15.7348 7.00002 16 7.00002H20C20.2652 7.00002 20.5195 6.89466 20.7071 6.70712C20.8946 6.51959 21 6.26523 21 6.00002V2.00002C21 1.7348 20.8946 1.48044 20.7071 1.29291C20.5195 1.10537 20.2652 1.00002 20 1.00002C19.7348 1.00002 19.4804 1.10537 19.2929 1.29291C19.1053 1.48044 19 1.7348 19 2.00002V3.53102C17.0727 1.94258 14.6617 1.05806 12.1644 1.02319C9.66714 0.988309 7.23246 1.80516 5.26153 3.33915C3.2906 4.87314 1.901 7.03275 1.32169 9.46217C0.742374 11.8916 1.00791 14.4459 2.07453 16.7042C3.14116 18.9625 4.94525 20.7901 7.18956 21.8859C9.43387 22.9817 11.9845 23.2803 14.4212 22.7325C16.858 22.1847 19.0354 20.8232 20.5948 18.8723C22.1542 16.9214 23.0025 14.4976 23 12C23 11.7348 22.8946 11.4804 22.7071 11.2929C22.5195 11.1054 22.2652 11 22 11Z"
-                      fill="#7D8FAB"
-                    />
-                    <path
-                      d="M12 5.00002C11.7348 5.00002 11.4804 5.10537 11.2929 5.29291C11.1054 5.48045 11 5.7348 11 6.00002V12C11.0001 12.2652 11.1055 12.5195 11.293 12.707L14.293 15.707C14.4816 15.8892 14.7342 15.99 14.9964 15.9877C15.2586 15.9854 15.5094 15.8803 15.6948 15.6948C15.8802 15.5094 15.9854 15.2586 15.9877 14.9964C15.99 14.7342 15.8892 14.4816 15.707 14.293L13 11.586V6.00002C13 5.7348 12.8946 5.48045 12.7071 5.29291C12.5196 5.10537 12.2652 5.00002 12 5.00002Z"
-                      fill="#7D8FAB"
-                    />
-                  </svg>
-                  <h5 className="sub-title ms-2 mb-0">Local Fresh Spinach</h5>
+                <ul className="recent-search-list">
+                  {recentSearches.map((term, index) => (
+                    <li key={index}>
+                      <div 
+                        className="d-flex align-items-center"
+                        onClick={() => handleRecentSearchClick(term)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <svg
+                          width={24}
+                          height={24}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M22 11C21.7348 11 21.4804 11.1054 21.2929 11.2929C21.1053 11.4804 21 11.7348 21 12C21.0041 14.046 20.3124 16.0325 19.0384 17.6334C17.7645 19.2344 15.984 20.3545 13.9894 20.8099C11.9948 21.2654 9.90455 21.029 8.062 20.1397C6.21945 19.2503 4.73407 17.7608 3.8498 15.9159C2.96552 14.0709 2.7349 11.98 3.19581 9.98665C3.65672 7.99328 4.78176 6.21589 6.38618 4.94634C7.99061 3.67679 9.97905 2.99055 12.025 3.00031C14.0709 3.01006 16.0527 3.71523 17.645 5.00002H16C15.7348 5.00002 15.4804 5.10537 15.2929 5.29291C15.1053 5.48044 15 5.7348 15 6.00002C15 6.26523 15.1053 6.51959 15.2929 6.70712C15.4804 6.89466 15.7348 7.00002 16 7.00002H20C20.2652 7.00002 20.5195 6.89466 20.7071 6.70712C20.8946 6.51959 21 6.26523 21 6.00002V2.00002C21 1.7348 20.8946 1.48044 20.7071 1.29291C20.5195 1.10537 20.2652 1.00002 20 1.00002C19.7348 1.00002 19.4804 1.10537 19.2929 1.29291C19.1053 1.48044 19 1.7348 19 2.00002V3.53102C17.0727 1.94258 14.6617 1.05806 12.1644 1.02319C9.66714 0.988309 7.23246 1.80516 5.26153 3.33915C3.2906 4.87314 1.901 7.03275 1.32169 9.46217C0.742374 11.8916 1.00791 14.4459 2.07453 16.7042C3.14116 18.9625 4.94525 20.7901 7.18956 21.8859C9.43387 22.9817 11.9845 23.2803 14.4212 22.7325C16.858 22.1847 19.0354 20.8232 20.5948 18.8723C22.1542 16.9214 23.0025 14.4976 23 12C23 11.7348 22.8946 11.4804 22.7071 11.2929C22.5195 11.1054 22.2652 11 22 11Z"
+                            fill="#7D8FAB"
+                          />
+                          <path
+                            d="M12 5.00002C11.7348 5.00002 11.4804 5.10537 11.2929 5.29291C11.1054 5.48045 11 5.7348 11 6.00002V12C11.0001 12.2652 11.1055 12.5195 11.293 12.707L14.293 15.707C14.4816 15.8892 14.7342 15.99 14.9964 15.9877C15.2586 15.9854 15.5094 15.8803 15.6948 15.6948C15.8802 15.5094 15.9854 15.2586 15.9877 14.9964C15.99 14.7342 15.8892 14.4816 15.707 14.293L13 11.586V6.00002C13 5.7348 12.8946 5.48045 12.7071 5.29291C12.5196 5.10537 12.2652 5.00002 12 5.00002Z"
+                            fill="#7D8FAB"
+                          />
+                        </svg>
+                        <h5 className="sub-title ms-2 mb-0">{term}</h5>
+                      </div>
+                      <a 
+                        href="javascript:void(0);" 
+                        className="close-1 remove-tag"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSearchTerm(term);
+                        }}
+                      >
+                        <i className="fa-solid fa-xmark" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {/* Search Results Section */}
+            {isLoading ? (
+              <div className="text-center py-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
-                <a href="javascript:void(0);" className="close-1 remove-tag">
-                  <i className="fa-solid fa-xmark" />
-                </a>
-              </li>
-              <li>
-                <div className="d-flex align-items-center">
-                  <svg
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M22 11C21.7348 11 21.4804 11.1054 21.2929 11.2929C21.1053 11.4804 21 11.7348 21 12C21.0041 14.046 20.3124 16.0325 19.0384 17.6334C17.7645 19.2344 15.984 20.3545 13.9894 20.8099C11.9948 21.2654 9.90455 21.029 8.062 20.1397C6.21945 19.2503 4.73407 17.7608 3.8498 15.9159C2.96552 14.0709 2.7349 11.98 3.19581 9.98665C3.65672 7.99328 4.78176 6.21589 6.38618 4.94634C7.99061 3.67679 9.97905 2.99055 12.025 3.00031C14.0709 3.01006 16.0527 3.71523 17.645 5.00002H16C15.7348 5.00002 15.4804 5.10537 15.2929 5.29291C15.1053 5.48044 15 5.7348 15 6.00002C15 6.26523 15.1053 6.51959 15.2929 6.70712C15.4804 6.89466 15.7348 7.00002 16 7.00002H20C20.2652 7.00002 20.5195 6.89466 20.7071 6.70712C20.8946 6.51959 21 6.26523 21 6.00002V2.00002C21 1.7348 20.8946 1.48044 20.7071 1.29291C20.5195 1.10537 20.2652 1.00002 20 1.00002C19.7348 1.00002 19.4804 1.10537 19.2929 1.29291C19.1053 1.48044 19 1.7348 19 2.00002V3.53102C17.0727 1.94258 14.6617 1.05806 12.1644 1.02319C9.66714 0.988309 7.23246 1.80516 5.26153 3.33915C3.2906 4.87314 1.901 7.03275 1.32169 9.46217C0.742374 11.8916 1.00791 14.4459 2.07453 16.7042C3.14116 18.9625 4.94525 20.7901 7.18956 21.8859C9.43387 22.9817 11.9845 23.2803 14.4212 22.7325C16.858 22.1847 19.0354 20.8232 20.5948 18.8723C22.1542 16.9214 23.0025 14.4976 23 12C23 11.7348 22.8946 11.4804 22.7071 11.2929C22.5195 11.1054 22.2652 11 22 11Z"
-                      fill="#7D8FAB"
-                    />
-                    <path
-                      d="M12 5.00002C11.7348 5.00002 11.4804 5.10537 11.2929 5.29291C11.1054 5.48045 11 5.7348 11 6.00002V12C11.0001 12.2652 11.1055 12.5195 11.293 12.707L14.293 15.707C14.4816 15.8892 14.7342 15.99 14.9964 15.9877C15.2586 15.9854 15.5094 15.8803 15.6948 15.6948C15.8802 15.5094 15.9854 15.2586 15.9877 14.9964C15.99 14.7342 15.8892 14.4816 15.707 14.293L13 11.586V6.00002C13 5.7348 12.8946 5.48045 12.7071 5.29291C12.5196 5.10537 12.2652 5.00002 12 5.00002Z"
-                      fill="#7D8FAB"
-                    />
-                  </svg>
-                  <h5 className="sub-title ms-2 mb-0">Fresh Orange</h5>
-                </div>
-                <a href="javascript:void(0);" className="close-1 remove-tag">
-                  <i className="fa-solid fa-xmark" />
-                </a>
-              </li>
-            </ul>
-            {/* Product List */}
-            <div className="item-list style-2">
-              <div className="saprater" />
-              <div className="title-bar">
-                <span className="title mb-0 font-18">Search Results</span>
-                <select
-                  className="form-select dz-form-select style-2"
-                  aria-label="Default select example"
-                >
-                  <option selected="">Newest</option>
-                  <option value={1}>One</option>
-                  <option value={2}>Three</option>
-                </select>
               </div>
-              <ul>
-                {searchResults.map((menu) => (
-                  <li key={menu.menu_id}>
-                    <HorizontalMenuCard
-                      image={menu.image}
-                      title={menu.menu_name}
-                      currentPrice={menu.portions[0].price}
-                      originalPrice={menu.offer ? (menu.portions[0].price * 100) / (100 - menu.offer) : null}
-                      discount={menu.offer ? `${menu.offer}%` : null}
-                      onAddToCart={() => handleAddToCart(menu)}
-                      onFavoriteClick={() => handleFavoriteClick(menu.menu_id)}
-                      isFavorite={menu.is_favourite === 1}
-                      productUrl={`/product-detail/${menu.menu_id}`}
-                      rating={menu.rating}
-                      foodType={menu.menu_food_type}
-                      categoryName={menu.category_name}
-                      portions={menu.portions}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Product List */}
+            ) : error ? (
+              <div className="alert alert-danger" role="alert">
+                {error}
+              </div>
+            ) : searchResults && searchResults.length > 0 ? (
+              <div className="item-list style-2">
+                <div className="saprater" />
+                <div className="title-bar">
+                  <span className="title mb-0 font-18">
+                    Search Results ({searchResults.length})
+                  </span>
+                </div>
+                <ul>
+                  {searchResults.map((menu) => (
+                    <li key={menu.menu_id}>
+                      <HorizontalMenuCard
+                        image={menu.image}
+                        title={menu.menu_name}
+                        currentPrice={menu.portions?.[0]?.price}
+                        originalPrice={
+                          menu.offer && menu.portions?.[0]?.price
+                            ? (menu.portions[0].price * 100) / (100 - menu.offer)
+                            : null
+                        }
+                        discount={menu.offer ? `${menu.offer}%` : null}
+                        onAddToCart={() => handleAddToCart(menu)}
+                        onFavoriteClick={() => handleFavoriteClick(menu.menu_id)}
+                        isFavorite={menu.is_favourite === 1}
+                        productUrl={`/product-detail/${menu.menu_id}`}
+                        rating={menu.rating}
+                        foodType={menu.menu_food_type}
+                        categoryName={menu.category_name}
+                        portions={menu.portions}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : searchInputValue.trim() !== '' ? (
+              <div className="text-center py-4">
+                <p>No results found for "{searchInputValue}"</p>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -350,21 +477,6 @@ function Search() {
             onClose={() => setShowFilter(false)} 
             onApplyFilter={handleApplyFilter}
           />
-        </div>
-      )}
-
-      {/* Loading and Error states */}
-      {isLoading && (
-        <div className="text-center py-4">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="alert alert-danger" role="alert">
-          {error}
         </div>
       )}
 
