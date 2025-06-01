@@ -156,9 +156,9 @@ function Profile() {
               <li className="border-0">
                 {isAuthenticated ? (
                   <a href="#" onClick={onLogoutClick}>
-                    <i className="fa-solid fa-power-off" />
-                    LogOut
-                  </a>
+                  <i className="fa-solid fa-power-off" />
+                  LogOut
+                </a>
                 ) : (
                   <a href="#" onClick={handleLoginClick}>
                     <i className="fa-solid fa-sign-in-alt" />

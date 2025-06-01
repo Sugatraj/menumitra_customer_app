@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import HorizontalMenuCard from "../components/HorizontalMenuCard";
+import OffcanvasSearchFilter from "../components/Shared/OffcanvasSearchFilter";
 import { useAuth } from "../contexts/AuthContext"; // Assuming you have AuthContext
 import { debounce } from 'lodash'; // Make sure to install lodash
 
@@ -9,8 +10,10 @@ function Search() {
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [activeFilters, setActiveFilters] = useState(null);
   
-  // Assuming you get these from context/props
+  // Get these from context/props
   const outletId = 1; // This should come from your app context/state
   const { userId } = useAuth(); // Get user_id from auth context
 
@@ -21,11 +24,10 @@ function Search() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Add any auth headers if required
         },
         body: JSON.stringify({
           outlet_id: outletId,
-          keyword: keyword,
+          keyword: keyword || "", // Send empty string if no keyword
           user_id: userId
         })
       });
@@ -44,11 +46,6 @@ function Search() {
   // Debounced search handler
   const debouncedSearch = useCallback(
     debounce(async (searchTerm) => {
-      if (!searchTerm || searchTerm.trim().length === 0) {
-        setSearchResults([]);
-        return;
-      }
-
       setIsLoading(true);
       setError(null);
 
@@ -86,6 +83,77 @@ function Search() {
     // Implement favorite toggle logic
   };
 
+  // Add this helper function
+  const hasSearchResults = () => {
+    return searchResults && searchResults.length > 0;
+  };
+
+  // Modify the toggle filter function
+  const toggleFilter = () => {
+    if (hasSearchResults()) {
+      setShowFilter(!showFilter);
+    }
+  };
+
+  const handleApplyFilter = async (filters) => {
+    setIsLoading(true);
+    setActiveFilters(filters);
+
+    try {
+      const response = await fetch('https://men4u.xyz/v2/user/search_menu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          outlet_id: outletId,
+          user_id: userId,
+          filters: {
+            price_min: filters.priceRange.min,
+            price_max: filters.priceRange.max,
+            rating: filters.starRating,
+            food_type: getFoodTypeFilter(filters.foodType),
+            has_discount: filters.others.discount,
+            has_voucher: filters.others.voucher,
+            free_shipping: filters.others.freeShipping,
+            same_day_delivery: filters.others.sameDayDelivery
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Filter application failed');
+      }
+
+      const data = await response.json();
+      
+      let filteredResults = data.detail.menu_list;
+      if (filters.foodType.veg || filters.foodType.nonveg) {
+        filteredResults = filteredResults.filter(menu => {
+          if (filters.foodType.veg && !filters.foodType.nonveg) {
+            return menu.menu_food_type === 'veg';
+          }
+          if (!filters.foodType.veg && filters.foodType.nonveg) {
+            return menu.menu_food_type === 'nonveg';
+          }
+          return true;
+        });
+      }
+      
+      setSearchResults(filteredResults);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getFoodTypeFilter = (foodType) => {
+    if (foodType.veg && !foodType.nonveg) return 'veg';
+    if (!foodType.veg && foodType.nonveg) return 'nonveg';
+    return 'all';
+  };
+
   return (
     <>
       <Header />
@@ -120,10 +188,13 @@ function Search() {
                   <span className="input-group-text">
                     <a
                       href="javascript:void(0);"
-                      className="input-icon search-icon"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasLeft"
-                      aria-controls="offcanvasLeft"
+                      className={`input-icon search-icon ${!hasSearchResults() ? 'disabled' : ''}`}
+                      onClick={hasSearchResults() ? toggleFilter : undefined}
+                      style={{
+                        opacity: hasSearchResults() ? 1 : 0.5,
+                        cursor: hasSearchResults() ? 'pointer' : 'not-allowed'
+                      }}
+                      title={hasSearchResults() ? 'Filter results' : 'Search for items to enable filtering'}
                     >
                       <svg
                         width={24}
@@ -250,8 +321,12 @@ function Search() {
                       discount={menu.offer ? `${menu.offer}%` : null}
                       onAddToCart={() => handleAddToCart(menu)}
                       onFavoriteClick={() => handleFavoriteClick(menu.menu_id)}
-                      isFavorite={false}
+                      isFavorite={menu.is_favourite === 1}
                       productUrl={`/product-detail/${menu.menu_id}`}
+                      rating={menu.rating}
+                      foodType={menu.menu_food_type}
+                      categoryName={menu.category_name}
+                      portions={menu.portions}
                     />
                   </li>
                 ))}
@@ -261,9 +336,48 @@ function Search() {
           </div>
         </div>
       </div>
+
+      {/* Only render the offcanvas if there are search results */}
+      {hasSearchResults() && (
+        <div 
+          className={`offcanvas offcanvas-start be-0 ${showFilter ? 'show' : ''}`} 
+          tabIndex="-1" 
+          id="offcanvasLeft" 
+          aria-modal="true" 
+          role="dialog"
+        >
+          <OffcanvasSearchFilter 
+            onClose={() => setShowFilter(false)} 
+            onApplyFilter={handleApplyFilter}
+          />
+        </div>
+      )}
+
+      {/* Loading and Error states */}
+      {isLoading && (
+        <div className="text-center py-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+
       <Footer />
     </>
   );
 }
+
+// Add some CSS to your stylesheet
+const styles = `
+  .input-icon.search-icon.disabled {
+    pointer-events: none;
+  }
+`;
 
 export default Search;

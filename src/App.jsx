@@ -34,23 +34,23 @@ function App() {
         <CartProvider>
           <ModalProvider>
             <AuthOffcanvas />
-            <Router basename={import.meta.env.BASE_URL}>
-              <SidebarProvider>
-                <Routes>
-                  <Route path="/" element={<Home />} />
+      <Router basename={import.meta.env.BASE_URL}>
+        <SidebarProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
                   <Route path="/all-outlets" element={<AllOutlets />} />
-                  <Route path="/favourites" element={<Favourite />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/orders" element={<Orders />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/edit-profile" element={<EditProfile />} />
-                  <Route path="/categories" element={<Categories />} />
-                  <Route path="/search" element={<Search />} />
-                  <Route path="/product-detail" element={<ProductDetail />} />
-                </Routes>
-                <Sidebar />
-              </SidebarProvider>
-            </Router>
+            <Route path="/favourites" element={<Favourite />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/edit-profile" element={<EditProfile />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/product-detail" element={<ProductDetail />} />
+          </Routes>
+          <Sidebar />
+        </SidebarProvider>
+      </Router>
             <ModalManager />
           </ModalProvider>
         </CartProvider>
