@@ -5,36 +5,33 @@ import { useModal } from '../../../contexts/ModalContext';
 
 export const AddToCartModal = () => {
   const { closeModal, modalConfig } = useModal();
-  const { addToCart, cartItems, updateQuantity, removeFromCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   
   console.log('Modal Config Data:', modalConfig.data);
   console.log('Current Cart Items:', cartItems);
 
-  // Find existing cart item for this menu and portion
-  const existingCartItem = cartItems.find(item => 
-    item.menuId === modalConfig.data?.menuId && 
-    item.portionId === modalConfig.data?.portions?.[0]?.portion_id
-  );
-  
-  console.log('Existing Cart Item:', existingCartItem);
+  // Track quantities for all portions
+  const [quantities, setQuantities] = useState(() => {
+    const initial = {};
+    modalConfig.data?.portions?.forEach(portion => {
+      const cartItem = cartItems.find(item => 
+        item.menuId === modalConfig.data?.menuId && 
+        item.portionId === portion.portion_id
+      );
+      initial[portion.portion_id] = cartItem?.quantity || 1;
+    });
+    return initial;
+  });
 
   const [selectedPortion, setSelectedPortion] = useState(
-    existingCartItem?.portionId || modalConfig.data?.portions?.[0]?.portion_id
+    modalConfig.data?.portions?.[0]?.portion_id
   );
   
-  // Initialize quantity from cart if exists, otherwise default to 1
-  const [quantity, setQuantity] = useState(
-    existingCartItem?.quantity || 1
-  );
+  const [comment, setComment] = useState('');
+  const MAX_QUANTITY = 20;
 
   console.log('Initial Selected Portion:', selectedPortion);
-  console.log('Initial Quantity:', quantity);
-  
-  const [comment, setComment] = useState(
-    existingCartItem?.comment || ''
-  );
-
-  const MAX_QUANTITY = 20;
+  console.log('Initial Quantities:', quantities);
 
   // Check if item exists in cart
   const isInCart = cartItems.some(item => 
@@ -57,8 +54,6 @@ export const AddToCartModal = () => {
     });
     
     setSelectedPortion(portionId);
-    const portionCartItem = getCurrentCartItem(portionId);
-    setQuantity(portionCartItem?.quantity || 1);
   };
 
   // Set modal title based on cart status and include menu name
@@ -66,25 +61,27 @@ export const AddToCartModal = () => {
 
   const handleQuantityChange = (newQuantity) => {
     console.log('Quantity Change:', {
-      currentQuantity: quantity,
+      currentQuantity: quantities[selectedPortion],
       newQuantity: newQuantity,
       selectedPortion: selectedPortion,
-      maxQuantity: MAX_QUANTITY
+      maxQuantity: MAX_QUANTITY,
+      isInCart
     });
 
     const finalQuantity = Math.min(Math.max(1, newQuantity), MAX_QUANTITY);
-    
-    // Update local state
-    setQuantity(finalQuantity);
+    setQuantities(prev => ({
+      ...prev,
+      [selectedPortion]: finalQuantity
+    }));
 
-    // Immediately update cart context
-    if (modalConfig.data) {
+    // Only update cart immediately if item is already in cart
+    if (isInCart && modalConfig.data) {
       addToCart(
         modalConfig.data, 
         selectedPortion, 
         finalQuantity, 
         comment,
-        true // Add an immediate flag to indicate instant update
+        true
       );
     }
   };
@@ -93,12 +90,15 @@ export const AddToCartModal = () => {
     console.log('Final Cart Update:', {
       menuData: modalConfig.data,
       selectedPortion: selectedPortion,
-      quantity: quantity,
-      comment: comment
+      quantity: quantities[selectedPortion],
+      comment: comment,
+      isInCart
     });
     
-    // Final update to cart
-    addToCart(modalConfig.data, selectedPortion, quantity, comment);
+    // Add/Update all portions at once
+    Object.entries(quantities).forEach(([portionId, quantity]) => {
+      addToCart(modalConfig.data, Number(portionId), quantity, comment);
+    });
     closeModal();
   };
 
@@ -338,10 +338,10 @@ export const AddToCartModal = () => {
             type="button"
             onClick={() => {
               console.log('Decrease Button Clicked', {
-                currentQuantity: quantity,
-                newQuantity: quantity - 1
+                currentQuantity: quantities[selectedPortion],
+                newQuantity: quantities[selectedPortion] - 1
               });
-              handleQuantityChange(quantity - 1);
+              handleQuantityChange(quantities[selectedPortion] - 1);
             }}
             style={{
               width: '40px',
@@ -357,9 +357,9 @@ export const AddToCartModal = () => {
               justifyContent: 'center',
               marginRight: '20px',
               transition: 'background 0.2s',
-              opacity: quantity <= 1 ? 0.5 : 1,
+              opacity: quantities[selectedPortion] <= 1 ? 0.5 : 1,
             }}
-            disabled={quantity <= 1}
+            disabled={quantities[selectedPortion] <= 1}
           >
             –
           </button>
@@ -373,16 +373,16 @@ export const AddToCartModal = () => {
               flex: '1'
             }}
           >
-            {quantity}
+            {quantities[selectedPortion]}
           </span>
           <button
             type="button"
             onClick={() => {
               console.log('Increase Button Clicked', {
-                currentQuantity: quantity,
-                newQuantity: quantity + 1
+                currentQuantity: quantities[selectedPortion],
+                newQuantity: quantities[selectedPortion] + 1
               });
-              handleQuantityChange(quantity + 1);
+              handleQuantityChange(quantities[selectedPortion] + 1);
             }}
             style={{
               width: '40px',
@@ -398,9 +398,9 @@ export const AddToCartModal = () => {
               justifyContent: 'center',
               marginLeft: '20px',
               transition: 'background 0.2s',
-              opacity: quantity >= MAX_QUANTITY ? 0.5 : 1,
+              opacity: quantities[selectedPortion] >= MAX_QUANTITY ? 0.5 : 1,
             }}
-            disabled={quantity >= MAX_QUANTITY}
+            disabled={quantities[selectedPortion] >= MAX_QUANTITY}
           >
             +
           </button>
@@ -423,7 +423,7 @@ export const AddToCartModal = () => {
           {isInCart ? 'Update Cart' : 'Add to Cart'}
         </button>
       </div>
-      {quantity >= MAX_QUANTITY && (
+      {quantities[selectedPortion] >= MAX_QUANTITY && (
         <div className="text-center mt-2" style={{ color: '#dc3545', fontSize: '12px' }}>
           Maximum quantity limit reached
         </div>

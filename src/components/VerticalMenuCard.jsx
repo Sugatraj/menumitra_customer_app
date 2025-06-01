@@ -91,7 +91,6 @@ const VerticalMenuCard = ({
                 className="btn btn-primary rounded-circle p-2"
                 type="button"
                 onClick={() => handleQuantityChange(false)}
-                disabled={!cartItemsForMenu.length}
                 style={{ width: '35px', height: '35px' }}
               >
                 -
@@ -126,12 +125,7 @@ const VerticalMenuCard = ({
                 className="btn btn-primary rounded-circle p-2"
                 type="button"
                 onClick={() => handleQuantityChange(true)}
-                disabled={getTotalQuantity() >= MAX_QUANTITY}
-                style={{ 
-                  width: '35px', 
-                  height: '35px',
-                  opacity: getTotalQuantity() >= MAX_QUANTITY ? 0.5 : 1 
-                }}
+                style={{ width: '35px', height: '35px' }}
               >
                 +
               </button>
