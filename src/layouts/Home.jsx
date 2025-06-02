@@ -391,8 +391,8 @@ function Home() {
         {/* Banner End */}
         {/* Page Content */}
         <div className="page-content">
-          <div className="content-inner pt-0">
-            <div className="container p-b30">
+          <div className=" pt-0">
+            <div className="container p-b40">
               {/* Search */}
               <div className="search-box mb-4">
                 <div className="mb-3 input-group input-radius">
@@ -1229,7 +1229,7 @@ function Home() {
                 <div className="title-bar">
                   <span className="title mb-0 font-18">Popular Menus</span>
                 </div>
-                {/* <div className="row g-3 mb-3">
+                <div className="row g-3 mb-3">
                   {menuItems.map((menuItem) => (
                     <div className="col-6" key={menuItem.menuId}>
                       <VerticalMenuCard
@@ -1243,7 +1243,7 @@ function Home() {
                       />
                     </div>
                   ))}
-                </div> */}
+                </div>
 
                 {/* Show loading skeleton only when no cached data is available */}
                 {isLoading && menuItems.length === 0 && (
