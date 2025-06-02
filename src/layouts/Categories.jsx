@@ -9,16 +9,6 @@ function Categories() {
   const [categories, setCategories] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
 
-  // Function to check if image URL is valid
-  const checkImageUrl = async (url) => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  };
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -39,29 +29,15 @@ function Categories() {
 
         const data = await response.json();
 
-        // Map categories and validate image URLs
-        const mappedCategories = await Promise.all(
-          data.detail.menu_list.map(async (category) => {
-            const isValidImage = category.image ? await checkImageUrl(category.image) : false;
-            
-            // If image URL is invalid, mark it as an error immediately
-            if (!isValidImage) {
-              setImageErrors(prev => ({
-                ...prev,
-                [category.menu_cat_id]: true
-              }));
-            }
-
-            return {
-              menuCatId: category.menu_cat_id,
-              categoryName: category.category_name,
-              image: category.image,
-              outletId: category.outlet_id,
-              outletVegNonveg: category.outlet_veg_nonveg,
-              menuCount: category.menu_count
-            };
-          })
-        );
+        // Map categories without image validation
+        const mappedCategories = data.detail.menu_list.map(category => ({
+          menuCatId: category.menu_cat_id,
+          categoryName: category.category_name,
+          image: category.image,
+          outletId: category.outlet_id,
+          outletVegNonveg: category.outlet_veg_nonveg,
+          menuCount: category.menu_count
+        }));
 
         setCategories(mappedCategories);
       } catch (error) {
@@ -80,12 +56,9 @@ function Categories() {
     }));
   };
 
-  // Function to get the correct image URL
+  // Simplified function to get the image URL
   const getImageUrl = (category) => {
-    if (!category.image || imageErrors[category.menuCatId]) {
-      return DEFAULT_IMAGE;
-    }
-    return category.image;
+    return imageErrors[category.menuCatId] ? DEFAULT_IMAGE : (category.image || DEFAULT_IMAGE);
   };
 
   return (
@@ -97,10 +70,10 @@ function Categories() {
             <ul className="categore-list">
               {categories.map((category) => (
                 <li key={category.menuCatId}>
-                <a
-                  href="product.html"
-                  className="categore-box box-lg"
-                  style={{
+                  <a
+                    href="product.html"
+                    className="categore-box box-lg"
+                    style={{
                       backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url(${getImageUrl(category)})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center center',
@@ -115,7 +88,7 @@ function Categories() {
                   >
                     {/* Hidden image for error handling */}
                     <img 
-                      src={category.image}
+                      src={category.image || DEFAULT_IMAGE}
                       alt=""
                       style={{ display: 'none' }}
                       onError={() => handleImageError(category.menuCatId)}
@@ -123,7 +96,7 @@ function Categories() {
                     
                     <h6 
                       className="text-white mb-0"
-                  style={{
+                      style={{
                         fontSize: '14px',
                         lineHeight: '1.2',
                         color: '#FFFFFF',
@@ -136,7 +109,7 @@ function Categories() {
                     </h6>
                     <span 
                       className="text-white"
-                  style={{
+                      style={{
                         fontSize: '12px',
                         lineHeight: '1.2',
                         color: 'rgba(255, 255, 255, 0.8)',
@@ -146,14 +119,13 @@ function Categories() {
                     >
                       {category.menuCount} Items
                     </span>
-                </a>
-              </li>
+                  </a>
+                </li>
               ))}
             </ul>
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );
