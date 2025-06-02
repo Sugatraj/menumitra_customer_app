@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import fallbackImage from '../assets/images/food/food8.png';
@@ -11,10 +11,12 @@ const VerticalMenuCard = ({
   currentPrice,
   reviewCount,
   onFavoriteClick,
-  isFavorite = false,
+  isFavorite: initialIsFavorite = false,
   discount,
   menuItem
 }) => {
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+  const [isLoading, setIsLoading] = useState(false);
   const { openModal } = useModal();
   const { cartItems, updateQuantity, removeFromCart } = useCart();
   const MAX_QUANTITY = 20;
@@ -26,6 +28,66 @@ const VerticalMenuCard = ({
   const cartItemsForMenu = cartItems.filter(item => 
     item.menuId === menuItem.menuId
   );
+
+  const handleFavoriteToggle = async (e) => {
+    e.preventDefault();
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+      
+      // Get auth data from localStorage
+      const authData = localStorage.getItem('auth');
+      const auth = authData ? JSON.parse(authData) : null;
+      
+      if (!auth || !auth.userId || !auth.accessToken) {
+        openModal('LOGIN_REQUIRED');
+        return;
+      }
+
+      // Choose API endpoint based on current favorite status
+      const apiUrl = isFavorite 
+        ? 'https://men4u.xyz/v2/user/remove_favourite_menu'
+        : 'https://men4u.xyz/v2/user/save_favourite_menu';
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${auth.accessToken}`
+        },
+        body: JSON.stringify({
+          outlet_id: 1,
+          menu_id: menuItem.menuId,
+          user_id: auth.userId
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Toggle favorite state locally
+        setIsFavorite(!isFavorite);
+        
+        if (onFavoriteClick) {
+          onFavoriteClick(!isFavorite, menuItem.menuId);
+        }
+      } else {
+        console.error('Failed to update favorite status:', data.detail);
+        openModal('ERROR', {
+          message: data.detail || 'Failed to update favorite status'
+        });
+      }
+    } catch (error) {
+      console.error('Error updating favorite status:', error);
+      openModal('ERROR', {
+        message: 'Failed to connect to the server'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAddToCartClick = (e) => {
     e.preventDefault();
@@ -51,11 +113,16 @@ const VerticalMenuCard = ({
         </Link>
         <a 
           href="javascript:void(0);" 
-          className="r-btn"
-          onClick={onFavoriteClick}
+          className={`r-btn ${isLoading ? 'disabled' : ''}`}
+          onClick={handleFavoriteToggle}
+          style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
         >
           <div className={`like-button ${isFavorite ? 'active' : ''}`}>
-            <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i>
+            {isLoading ? (
+              <i className="fas fa-spinner fa-spin"></i>
+            ) : (
+              <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i>
+            )}
           </div>
         </a>
         {discount && <div className="label">{discount} OFF</div>}
@@ -142,7 +209,7 @@ VerticalMenuCard.propTypes = {
   title: PropTypes.string.isRequired,
   currentPrice: PropTypes.number.isRequired,
   reviewCount: PropTypes.number,
-  onFavoriteClick: PropTypes.func.isRequired,
+  onFavoriteClick: PropTypes.func,
   isFavorite: PropTypes.bool,
   discount: PropTypes.string,
   menuItem: PropTypes.object.isRequired

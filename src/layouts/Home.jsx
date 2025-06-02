@@ -1302,8 +1302,7 @@ function Home() {
                         title={menuItem.menuName}
                         currentPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price : 0}
                         reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
-                        onFavoriteClick={() => handleFavoriteClick(menuItem.menuId)}
-                        isFavorite={menuItem.isFavourite === 1}
+                        isFavorite={menuItem.is_favourite === 1}
                         discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
                         menuItem={menuItem}
                       />
