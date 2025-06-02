@@ -87,53 +87,86 @@ function AllOutlets() {
       <div className="page-content">
         <div className="container">
           {/* Title Section */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
+          {/* <div className="d-flex justify-content-between align-items-center mb-3">
             <h6 className="mb-0">All Restaurants</h6>
             <span className="text-muted small">Total: {filteredOutlets.length} outlets</span>
-          </div>
+          </div> */}
 
           {/* Filter Section */}
           <div className="mb-3">
             <div className="d-flex justify-content-between align-items-center">
               {/* Restaurant Type Filter - Left Side */}
-              <div className="nav nav-pills">
+              <div className="nav nav-pills gap-1">
                 <button 
-                  className={`nav-link ${filters.type === 'all' ? 'active' : ''}`}
+                  className={`nav-link py-1 px-3`}
                   onClick={() => setFilters(prev => ({ ...prev, type: 'all' }))}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: filters.type === 'all' ? '1px solid var(--primary)' : 'none',
+                    color: filters.type === 'all' ? 'var(--primary)' : '#666'
+                  }}
                 >
                   All
                 </button>
                 <button 
-                  className={`nav-link ${filters.type === 'veg' ? 'active' : ''}`}
+                  className={`nav-link py-1 px-3 d-flex align-items-center gap-1`}
                   onClick={() => setFilters(prev => ({ ...prev, type: 'veg' }))}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: filters.type === 'veg' ? '1px solid #008000' : 'none',
+                    color: '#008000'
+                  }}
                 >
-                  Veg
+                  <VegIcon />
                 </button>
                 <button 
-                  className={`nav-link ${filters.type === 'nonveg' ? 'active' : ''}`}
+                  className={`nav-link py-1 px-3 d-flex align-items-center gap-1`}
                   onClick={() => setFilters(prev => ({ ...prev, type: 'nonveg' }))}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: filters.type === 'nonveg' ? '1px solid #FF0000' : 'none',
+                    color: '#FF0000'
+                  }}
                 >
-                  Non Veg
+                  <NonVegIcon />
                 </button>
               </div>
 
+              {/* Vertical Divider */}
+              <div className="vr mx-3 opacity-25" style={{ height: '35px' }}></div>
+
               {/* Status Filter - Right Side */}
-              <div className="nav nav-pills">
+              <div className="nav nav-pills gap-1">
                 <button 
-                  className={`nav-link ${filters.status === 'all' ? 'active' : ''}`}
+                  className={`nav-link py-1 px-3`}
                   onClick={() => setFilters(prev => ({ ...prev, status: 'all' }))}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: filters.status === 'all' ? '1px solid var(--primary)' : 'none',
+                    color: filters.status === 'all' ? 'var(--primary)' : '#666'
+                  }}
                 >
                   All
                 </button>
                 <button 
-                  className={`nav-link ${filters.status === 'open' ? 'active' : ''}`}
+                  className={`nav-link py-1 px-3`}
                   onClick={() => setFilters(prev => ({ ...prev, status: 'open' }))}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: filters.status === 'open' ? '1px solid #198754' : 'none',
+                    color: filters.status === 'open' ? '#198754' : '#666'
+                  }}
                 >
                   Open
                 </button>
                 <button 
-                  className={`nav-link ${filters.status === 'closed' ? 'active' : ''}`}
+                  className={`nav-link py-1 px-3`}
                   onClick={() => setFilters(prev => ({ ...prev, status: 'closed' }))}
+                  style={{ 
+                    backgroundColor: 'transparent',
+                    border: filters.status === 'closed' ? '1px solid #dc3545' : 'none',
+                    color: filters.status === 'closed' ? '#dc3545' : '#666'
+                  }}
                 >
                   Closed
                 </button>
@@ -155,36 +188,50 @@ function AllOutlets() {
               No restaurants found matching your filters
             </div>
           ) : (
-            <div className="restaurant-list">
+            <div className="d-flex flex-column gap-2">
               {filteredOutlets.map((outlet) => (
                 <div 
                   key={outlet.outlet_id} 
-                  className="restaurant-card bg-white rounded-3 mb-3"
+                  className="card border shadow-sm"
                   onClick={() => {
                     if (outlet.resto_url) {
                       window.open(outlet.resto_url, '_blank', 'noopener,noreferrer');
                     }
                   }}
+                  style={{ 
+                    cursor: outlet.resto_url ? 'pointer' : 'default',
+                    transition: 'transform 0.2s, box-shadow 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (outlet.resto_url) {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 .5rem 1rem rgba(0,0,0,.15)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (outlet.resto_url) {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.boxShadow = '0 .125rem .25rem rgba(0,0,0,.075)';
+                    }
+                  }}
                 >
-                  <div className="p-3">
-                    {/* Restaurant Header */}
+                  <div className="card-body p-3">
                     <div className="d-flex justify-content-between align-items-start mb-2">
-                      <h6 className="mb-0">{outlet.outlet_name}</h6>
+                      <h6 className="card-title mb-0">{outlet.outlet_name}</h6>
                       <span className={`badge ${outlet.is_open ? 'bg-success' : 'bg-danger'} rounded-pill`}>
                         {outlet.is_open ? 'OPEN' : 'CLOSED'}
                       </span>
                     </div>
                     
-                    {/* Restaurant Info */}
-                    <div className="restaurant-info">
-                      <div className="text-muted small mb-1">
+                    <div className="card-text">
+                      <p className="text-muted small mb-1">
                         <i className="fas fa-map-marker-alt me-2"></i>
                         {outlet.address}
-                      </div>
-                      <div className="text-muted small mb-2">
+                      </p>
+                      <p className="text-muted small mb-2">
                         <i className="fas fa-phone me-2"></i>
                         {outlet.mobile}
-                      </div>
+                      </p>
                       <div className="d-flex align-items-center">
                         {outlet.veg_nonveg === 'veg' ? (
                           <span className="d-flex align-items-center" title="Veg">
