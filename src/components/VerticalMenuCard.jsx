@@ -18,7 +18,7 @@ const VerticalMenuCard = ({
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isLoading, setIsLoading] = useState(false);
   const { openModal } = useModal();
-  const { cartItems, updateQuantity, removeFromCart } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, getCartItemComment } = useCart();
   const MAX_QUANTITY = 20;
 
   // Generate the product URL from menuItem data
@@ -28,6 +28,9 @@ const VerticalMenuCard = ({
   const cartItemsForMenu = cartItems.filter(item => 
     item.menuId === menuItem.menuId
   );
+
+  // Get the comment for this menu item
+  const menuComment = getCartItemComment(menuItem.menuId);
 
   const handleFavoriteToggle = async (e) => {
     e.preventDefault();
@@ -171,7 +174,8 @@ const VerticalMenuCard = ({
                         const cartItem = cartItemsForMenu.find(item => item.portionId === portion.portion_id);
                         return {
                           ...portion,
-                          quantity: cartItem?.quantity || 0
+                          quantity: cartItem?.quantity || 0,
+                          comment: cartItem?.comment || ''
                         };
                       })
                       .filter(portion => portion.quantity > 0)
@@ -209,6 +213,12 @@ const VerticalMenuCard = ({
             </div>
           </div>
         </div>
+        {menuComment && (
+          <div className="text-muted small mt-1" style={{ fontSize: '12px' }}>
+            <i className="fas fa-comment-alt me-1"></i>
+            {menuComment}
+          </div>
+        )}
       </div>
     </div>
   );

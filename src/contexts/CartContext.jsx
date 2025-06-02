@@ -53,16 +53,16 @@ export const CartProvider = ({ children }) => {
           // Remove item if quantity is 0
           updatedItems.splice(existingItemIndex, 1);
         } else {
-          // Update quantity
+          // Update quantity and comment for specific portion
           updatedItems[existingItemIndex] = {
             ...updatedItems[existingItemIndex],
             quantity: quantity,
-            comment: comment
+            comment: comment // Store comment for this specific portion
           };
         }
         return updatedItems;
       } else if (quantity > 0) {
-        // Add new item
+        // Add new item with portion-specific comment
         return [...prevItems, {
           menuId: menuItem.menuId,
           menuName: menuItem.menuName,
@@ -159,6 +159,14 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  // Update getCartItemComment to be portion-specific
+  const getCartItemComment = (menuId, portionId) => {
+    const cartItem = cartItems.find(item => 
+      item.menuId === menuId && item.portionId === portionId
+    );
+    return cartItem?.comment || '';
+  };
+
   const value = {
     cartItems,
     orderSettings,
@@ -170,7 +178,8 @@ export const CartProvider = ({ children }) => {
     getCartCount,
     updateOrderSettings,
     getFormattedOrderData,
-    updateComment
+    updateComment,
+    getCartItemComment
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

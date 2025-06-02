@@ -23,11 +23,23 @@ export const AddToCartModal = () => {
     return initial;
   });
 
+  // Track comments for all portions
+  const [comments, setComments] = useState(() => {
+    const initial = {};
+    modalConfig.data?.portions?.forEach(portion => {
+      const cartItem = cartItems.find(item => 
+        item.menuId === modalConfig.data?.menuId && 
+        item.portionId === portion.portion_id
+      );
+      initial[portion.portion_id] = cartItem?.comment || '';
+    });
+    return initial;
+  });
+
   const [selectedPortion, setSelectedPortion] = useState(
     modalConfig.data?.portions?.[0]?.portion_id
   );
   
-  const [comment, setComment] = useState('');
   const MAX_QUANTITY = 20;
 
   console.log('Initial Selected Portion:', selectedPortion);
@@ -80,24 +92,61 @@ export const AddToCartModal = () => {
         modalConfig.data, 
         selectedPortion, 
         finalQuantity, 
-        comment,
-        true
+        comments[selectedPortion] || ''
       );
     }
   };
 
+  // Update comment handler to work with selected portion
+  const handleCommentChange = (newComment) => {
+    if (newComment.length <= 30) {
+      setComments(prev => ({
+        ...prev,
+        [selectedPortion]: newComment
+      }));
+    }
+  };
+
+  // Update suggestion handler
+  const handleSuggestionClick = (suggestionText) => {
+    const currentComment = comments[selectedPortion];
+    const isSelected = currentComment.includes(suggestionText);
+    
+    if (isSelected) {
+      // Remove the suggestion
+      const suggestions = currentComment.split(', ');
+      const filteredSuggestions = suggestions.filter(s => s !== suggestionText);
+      const newComment = filteredSuggestions.join(', ');
+      if (newComment.length <= 30) {
+        handleCommentChange(newComment);
+      }
+    } else {
+      // Add the suggestion if within limits
+      const newComment = currentComment ? `${currentComment}, ${suggestionText}` : suggestionText;
+      if (newComment.length <= 30) {
+        handleCommentChange(newComment);
+      }
+    }
+  };
+
+  // Update handleAddToCart to include portion-specific comments
   const handleAddToCart = () => {
     console.log('Final Cart Update:', {
       menuData: modalConfig.data,
       selectedPortion: selectedPortion,
       quantity: quantities[selectedPortion],
-      comment: comment,
+      comment: comments[selectedPortion],
       isInCart
     });
     
     // Add/Update all portions at once
     Object.entries(quantities).forEach(([portionId, quantity]) => {
-      addToCart(modalConfig.data, Number(portionId), quantity, comment);
+      addToCart(
+        modalConfig.data, 
+        Number(portionId), 
+        quantity, 
+        comments[portionId] || ''
+      );
     });
     closeModal();
   };
@@ -171,16 +220,20 @@ export const AddToCartModal = () => {
 
       <div className="mb-4">
         <label className="text-secondary mb-2 d-flex justify-content-between align-items-center">
-          <span style={{ fontSize: '14px' }}>Special Instructions</span>
+          <span style={{ fontSize: '14px' }}>
+            Special Instructions for {
+              modalConfig.data?.portions?.find(p => p.portion_id === selectedPortion)?.portion_name
+            }
+          </span>
           <small style={{ 
-            color: comment.length < 5 || comment.length > 30 ? '#dc3545' : '#6c757d',
+            color: (comments[selectedPortion]?.length || 0) > 30 ? '#dc3545' : '#6c757d',
             fontSize: '12px' 
           }}>
-            {comment.length}/30
+            {comments[selectedPortion]?.length || 0}/30
           </small>
         </label>
 
-        {/* Quick Suggestions with toggle functionality */}
+        {/* Quick Suggestions */}
         <div className="d-flex flex-wrap gap-2 mb-3">
           {[
             { icon: '🌶️', text: 'Extra spicy' },
@@ -192,30 +245,12 @@ export const AddToCartModal = () => {
             { icon: '🥚', text: 'No egg' },
             { icon: '🥜', text: 'No nuts' }
           ].map((suggestion, index) => {
-            const isSelected = comment.includes(suggestion.text);
+            const isSelected = comments[selectedPortion]?.includes(suggestion.text);
             
-            const handleSuggestionClick = () => {
-              if (isSelected) {
-                // Remove the suggestion
-                const suggestions = comment.split(', ');
-                const filteredSuggestions = suggestions.filter(s => s !== suggestion.text);
-                const newComment = filteredSuggestions.join(', ');
-                if (newComment.length <= 30) {
-                  setComment(newComment);
-                }
-              } else {
-                // Add the suggestion if within limits
-                const newComment = comment ? `${comment}, ${suggestion.text}` : suggestion.text;
-                if (newComment.length <= 30) {
-                  setComment(newComment);
-                }
-              }
-            };
-
             return (
               <div
                 key={index}
-                onClick={handleSuggestionClick}
+                onClick={() => handleSuggestionClick(suggestion.text)}
                 style={{
                   backgroundColor: isSelected ? '#e8f5e9' : '#f8f9fa',
                   border: `1px solid ${isSelected ? '#28a745' : '#e9ecef'}`,
@@ -223,13 +258,13 @@ export const AddToCartModal = () => {
                   padding: '8px 12px',
                   fontSize: '13px',
                   color: isSelected ? '#28a745' : '#6c757d',
-                  cursor: comment.length > 30 && !isSelected ? 'not-allowed' : 'pointer',
+                  cursor: comments[selectedPortion]?.length > 30 && !isSelected ? 'not-allowed' : 'pointer',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
                   userSelect: 'none',
-                  opacity: comment.length > 30 && !isSelected ? 0.5 : 1
+                  opacity: comments[selectedPortion]?.length > 30 && !isSelected ? 0.5 : 1
                 }}
               >
                 <span>{suggestion.icon}</span>
@@ -240,21 +275,19 @@ export const AddToCartModal = () => {
           })}
         </div>
 
+        {/* Comment textarea */}
         <div className="position-relative">
           <textarea
             className="form-control"
-            value={comment}
-            onChange={(e) => {
-              const newValue = e.target.value;
-              if (newValue.length <= 30) {
-                setComment(newValue);
-              }
-            }}
-            placeholder="Add any specific instructions..."
+            value={comments[selectedPortion] || ''}
+            onChange={(e) => handleCommentChange(e.target.value)}
+            placeholder={`Add instructions for ${
+              modalConfig.data?.portions?.find(p => p.portion_id === selectedPortion)?.portion_name
+            } portion...`}
             style={{
               border: `1.5px solid ${
-                comment.length < 5 && comment.length > 0 ? '#dc3545' : 
-                comment.length > 30 ? '#dc3545' : 
+                comments[selectedPortion]?.length < 5 && comments[selectedPortion]?.length > 0 ? '#dc3545' : 
+                comments[selectedPortion]?.length > 30 ? '#dc3545' : 
                 '#e9ecef'
               }`,
               borderRadius: '12px',
@@ -268,21 +301,21 @@ export const AddToCartModal = () => {
               transition: 'all 0.2s ease'
             }}
             onFocus={(e) => {
-              if (comment.length <= 30) {
+              if (comments[selectedPortion]?.length <= 30) {
                 e.target.style.border = '1.5px solid #28a745';
               }
             }}
             onBlur={(e) => {
-              e.target.style.border = comment.length < 5 || comment.length > 30 
+              e.target.style.border = comments[selectedPortion]?.length < 5 || comments[selectedPortion]?.length > 30 
                 ? '1.5px solid #dc3545' 
                 : '1.5px solid #e9ecef';
             }}
           />
           
           {/* Clear button */}
-          {comment && (
+          {comments[selectedPortion] && (
             <button
-              onClick={() => setComment('')}
+              onClick={() => handleCommentChange('')}
               className="d-flex align-items-center gap-1"
               style={{
                 position: 'absolute',
@@ -304,15 +337,15 @@ export const AddToCartModal = () => {
         </div>
 
         {/* Validation message */}
-        {comment.length > 0 && (
+        {comments[selectedPortion]?.length > 0 && (
           <small style={{ 
             color: '#dc3545', 
             fontSize: '12px',
             marginTop: '6px',
             display: 'block' 
           }}>
-            {comment.length < 5 ? 'Instructions must be at least 5 characters' :
-             comment.length > 30 ? 'Instructions cannot exceed 30 characters' : ''}
+            {comments[selectedPortion]?.length < 5 ? 'Instructions must be at least 5 characters' :
+             comments[selectedPortion]?.length > 30 ? 'Instructions cannot exceed 30 characters' : ''}
           </small>
         )}
 
@@ -320,7 +353,7 @@ export const AddToCartModal = () => {
         <small style={{ 
           color: '#6c757d', 
           fontSize: '12px',
-          marginTop: comment.length > 0 ? '2px' : '6px',
+          marginTop: comments[selectedPortion]?.length > 0 ? '2px' : '6px',
           display: 'block' 
         }}>
           Click to add/remove suggestions or type your custom instructions
