@@ -25,85 +25,16 @@ import { FreeMode } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/free-mode';
 import { Autoplay } from 'swiper/modules';
+import { useMenuItems } from '../hooks/useMenuItems';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
 function Home() {
-  const { data: categories, isError, error } = useCategories();
+  const { menuCategories, menuItems, isLoading } = useMenuItems();
   const { user } = useAuth();
   const [greeting, setGreeting] = useState('');
-  const [menuCategories, setMenuCategories] = useState([]);
-  const [menuItems, setMenuItems] = useState([]);
   const { cartItems, updateQuantity, addToCart } = useCart();
   const [specialMenuItems, setSpecialMenuItems] = useState([]);
-
-  // No need for loading state as we're doing optimistic UI
-  const optimisticCategories = categories || [
-    // Provide some default categories that are likely to exist
-    { id: 1, name: 'Starters', image: 'default-starter.jpg' },
-    { id: 2, name: 'Main Course', image: 'default-main.jpg' },
-    { id: 3, name: 'Desserts', image: 'default-dessert.jpg' },
-    // Add more default categories
-  ];
-
-  useEffect(() => {
-    const fetchMenusByCategory = async () => {
-      try {
-        const authData = localStorage.getItem('auth');
-        const userData = authData ? JSON.parse(authData) : null;
-
-        const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${userData?.accessToken}`
-          },
-          body: JSON.stringify({
-            outlet_id: 1
-          })
-        });
-
-        const data = await response.json();
-
-        // Set categories from the response
-        if (data.detail && data.detail.category) {
-          setMenuCategories(data.detail.category.map(category => ({
-            menuCatId: category.menu_cat_id,
-            categoryName: category.category_name,
-            menuCount: category.menu_count
-          })));
-        }
-
-        // Set menu items from the response
-        if (data.detail && data.detail.menus) {
-          setMenuItems(data.detail.menus.map(menu => ({
-            menuId: menu.menu_id,
-            menuName: menu.menu_name,
-            menuFoodType: menu.menu_food_type,
-            outletId: menu.outlet_id,
-            menuCatId: menu.menu_cat_id,
-            categoryName: menu.category_name,
-            spicyIndex: menu.spicy_index,
-            portions: menu.portions,
-            rating: menu.rating,
-            offer: menu.offer,
-            isSpecial: menu.is_special,
-            isFavourite: menu.is_favourite,
-            isActive: menu.is_active,
-            image: menu.image
-          })));
-        }
-
-      } catch (error) {
-        console.error('Error fetching menus by category:', error);
-        setMenuCategories([]);
-        setMenuItems([]);
-      }
-    };
-
-    fetchMenusByCategory();
-  }, []); // Empty dependency array means this runs once on mount
 
   const handleCategoryClick = (category) => {
     console.log("Selected category:", category.name);
@@ -316,7 +247,7 @@ function Home() {
               width="24px"
               fill="#000000"
             >
-              <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 9h10c.55 0 1 .45 1 1s-.45 1-1 1H7c-.55 0-1-.45-1-1s.45-1 1-1zm6 5H7c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1zm4-6H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z" />
+              <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 9h10c.55 0 1 .45 1 1s-.45 1-1 1H7c-.55 0-1-.45-1-1s.45-1 1-1zm6 5H7c-.55 0-1-.45-1-1s.45-1 1-1h6c.55 0 1 .45 1 1s-.45 1-1 1z" />
             </svg>
           </span>
           <span>Chat</span>
@@ -734,7 +665,11 @@ function Home() {
                   </Link>
                 </div>
                 <CategorySwiper
-                  categories={optimisticCategories}
+                  categories={menuCategories.length > 0 ? menuCategories : [
+                    { id: 1, name: 'Starters', image: 'default-starter.jpg' },
+                    { id: 2, name: 'Main Course', image: 'default-main.jpg' },
+                    { id: 3, name: 'Desserts', image: 'default-dessert.jpg' },
+                  ]}
                   onCategoryClick={handleCategoryClick}
                   ui={{
                     card: {
@@ -1300,9 +1235,9 @@ function Home() {
                       <VerticalMenuCard
                         image={menuItem.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
                         title={menuItem.menuName}
-                        currentPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price : 0}
+                        currentPrice={menuItem.portions?.[0]?.price ?? 0}
                         reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
-                        isFavorite={menuItem.is_favourite === 1}
+                        isFavorite={menuItem.isFavourite === 1}
                         discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
                         menuItem={menuItem}
                       />
@@ -1310,7 +1245,23 @@ function Home() {
                   ))}
                 </div>
 
-                
+                {/* Show loading skeleton only when no cached data is available */}
+                {isLoading && menuItems.length === 0 && (
+                  <div className="row g-3 mb-3">
+                    {[...Array(6)].map((_, index) => (
+                      <div className="col-6" key={`skeleton-${index}`}>
+                        <div className="card-item style-1 skeleton">
+                          <div className="dz-media skeleton-image"></div>
+                          <div className="dz-content">
+                            <div className="skeleton-text"></div>
+                            <div className="skeleton-text"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Recomended Start */}
               </div>
               {/* Other Package */}

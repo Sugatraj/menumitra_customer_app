@@ -18,14 +18,7 @@ import { ModalProvider } from "./contexts/ModalContext";
 import ModalManager from "./components/Modal/ModalManager";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 function App() {
   return (
