@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 const AuthContext = createContext(null);
@@ -30,19 +30,10 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const handleLogout = () => {
-    // Clear all auth-related data from localStorage
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('auth');
-    
-    // Clear any other app-specific data if needed
-    // localStorage.removeItem('other_data');
-    
-    // Clear user state
     setUser(null);
-    
-    // Close auth modal if it's open
-    setShowAuthOffcanvas(false);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider 

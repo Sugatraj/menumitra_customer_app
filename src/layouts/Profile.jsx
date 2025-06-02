@@ -4,14 +4,17 @@ import Footer from "../components/Footer";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useModal } from '../contexts/ModalContext';
+import { useCart } from "../contexts/CartContext";
 
 function Profile() {
   const { handleLogout, user, isAuthenticated, setShowAuthOffcanvas } = useAuth();
+  const { clearCart } = useCart();
   const navigate = useNavigate();
   const { openModal } = useModal();
 
   const onLogoutClick = (e) => {
     e.preventDefault();
+    clearCart();
     handleLogout();
     navigate("/");
   };

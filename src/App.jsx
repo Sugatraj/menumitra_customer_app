@@ -17,14 +17,22 @@ import { CartProvider } from "./contexts/CartContext";
 import { ModalProvider } from "./contexts/ModalContext";
 import ModalManager from "./components/Modal/ModalManager";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState, useCallback } from "react";
+import { clearAppData } from './utils/clearAppData';
 
 const queryClient = new QueryClient();
 
 function App() {
+  const [shouldClearCart, setShouldClearCart] = useState(false);
+
+  const handleLogout = useCallback(() => {
+    setShouldClearCart(true);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <CartProvider>
+        <CartProvider onLogout={handleLogout}>
           <ModalProvider>
             <AuthOffcanvas />
             <Router basename={import.meta.env.BASE_URL}>
@@ -51,5 +59,12 @@ function App() {
     </QueryClientProvider>
   );
 }
+
+// Add an event listener for storage changes
+window.addEventListener('storage', (e) => {
+  if (e.key === 'auth' && !e.newValue) {
+    clearAppData();
+  }
+});
 
 export default App;

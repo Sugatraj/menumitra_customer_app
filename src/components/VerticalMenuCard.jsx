@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import fallbackImage from '../assets/images/food/food8.png';
 import { useModal } from '../contexts/ModalContext';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const VerticalMenuCard = ({
   image,
@@ -19,6 +20,7 @@ const VerticalMenuCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const { openModal } = useModal();
   const { cartItems, updateQuantity, removeFromCart, getCartItemComment } = useCart();
+  const { user, setShowAuthOffcanvas } = useAuth();
   const MAX_QUANTITY = 20;
 
   // Generate the product URL from menuItem data
@@ -94,6 +96,14 @@ const VerticalMenuCard = ({
 
   const handleAddToCartClick = (e) => {
     e.preventDefault();
+    
+    // Check if user is authenticated
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      setShowAuthOffcanvas(true); // Show auth modal if not logged in
+      return;
+    }
+
     openModal('ADD_TO_CART', menuItem);
   };
 
@@ -104,7 +114,13 @@ const VerticalMenuCard = ({
 
   // Handle quantity changes
   const handleQuantityChange = (increment) => {
-    // Always open modal regardless of + or - click
+    // Check if user is authenticated
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      setShowAuthOffcanvas(true); // Show auth modal if not logged in
+      return;
+    }
+
     openModal('ADD_TO_CART', menuItem);
   };
 

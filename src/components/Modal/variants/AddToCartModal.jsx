@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BaseModal from '../BaseModal';
 import { useCart } from '../../../contexts/CartContext';
 import { useModal } from '../../../contexts/ModalContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export const AddToCartModal = () => {
   const { closeModal, modalConfig } = useModal();
   const { addToCart, cartItems } = useCart();
+  const { user, setShowAuthOffcanvas } = useAuth();
   
   console.log('Modal Config Data:', modalConfig.data);
   console.log('Current Cart Items:', cartItems);
@@ -71,7 +73,25 @@ export const AddToCartModal = () => {
   // Set modal title based on cart status and include menu name
   const modalTitle = `${isInCart ? "Update" : "Add"} - ${modalConfig.data?.menuName || modalConfig.data?.menu_name || ''}`;
 
+  // Add auth check at the start of the component
+  useEffect(() => {
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      closeModal(); // Close the cart modal
+      setShowAuthOffcanvas(true); // Show auth modal
+      return;
+    }
+  }, [user, closeModal, setShowAuthOffcanvas]);
+
   const handleQuantityChange = (newQuantity) => {
+    // Check if user is authenticated
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      closeModal(); // Close the cart modal
+      setShowAuthOffcanvas(true); // Show auth modal
+      return;
+    }
+
     console.log('Quantity Change:', {
       currentQuantity: quantities[selectedPortion],
       newQuantity: newQuantity,
@@ -131,6 +151,14 @@ export const AddToCartModal = () => {
 
   // Update handleAddToCart to include portion-specific comments
   const handleAddToCart = () => {
+    // Check if user is authenticated
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      closeModal(); // Close the cart modal
+      setShowAuthOffcanvas(true); // Show auth modal
+      return;
+    }
+
     console.log('Final Cart Update:', {
       menuData: modalConfig.data,
       selectedPortion: selectedPortion,
@@ -141,12 +169,14 @@ export const AddToCartModal = () => {
     
     // Add/Update all portions at once
     Object.entries(quantities).forEach(([portionId, quantity]) => {
-      addToCart(
-        modalConfig.data, 
-        Number(portionId), 
-        quantity, 
-        comments[portionId] || ''
-      );
+      if (quantity > 0) {
+        addToCart(
+          modalConfig.data, 
+          Number(portionId), 
+          quantity, 
+          comments[portionId] || ''
+        );
+      }
     });
     closeModal();
   };

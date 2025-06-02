@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from './AuthContext';
+import { clearAppData } from '../utils/clearAppData';
 
 const CartContext = createContext();
 
@@ -10,7 +12,9 @@ export const useCart = () => {
   return context;
 };
 
-export const CartProvider = ({ children }) => {
+export const CartProvider = ({ children, onLogout }) => {
+  const { user, setShowAuthOffcanvas } = useAuth();
+
   // Initialize cart items from localStorage
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem('cart');
@@ -41,6 +45,13 @@ export const CartProvider = ({ children }) => {
 
   // Add item to cart with comment
   const addToCart = (menuItem, portionId, quantity, comment, immediate = false) => {
+    // Check if user is authenticated
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      setShowAuthOffcanvas(true);
+      return;
+    }
+
     setCartItems(prevItems => {
       const existingItemIndex = prevItems.findIndex(
         item => item.menuId === menuItem.menuId && item.portionId === portionId
@@ -118,6 +129,13 @@ export const CartProvider = ({ children }) => {
 
   // Update item quantity
   const updateQuantity = (menuId, portionId, quantity) => {
+    // Check if user is authenticated
+    const authData = localStorage.getItem('auth');
+    if (!authData || !user) {
+      setShowAuthOffcanvas(true);
+      return;
+    }
+
     if (quantity === 0) {
       removeFromCart(menuId, portionId);
       return;
@@ -132,11 +150,17 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  // Clear cart
+  // Update the clearCart method to be more comprehensive
   const clearCart = useCallback(() => {
     setCartItems([]);
     localStorage.removeItem('cart');
-  }, []);
+    localStorage.removeItem('orderSettings');
+    
+    // Call onLogout callback if provided
+    if (onLogout) {
+      onLogout();
+    }
+  }, [onLogout]);
 
   // Get cart total
   const getCartTotal = () => {
