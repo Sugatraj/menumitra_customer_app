@@ -1304,7 +1304,7 @@ function Home() {
                   {specialMenuItems && specialMenuItems.length > 0 ? (
                     <div className="swiper-btn-center-lr">
                       <Swiper
-                        spaceBetween={30}
+                        spaceBetween={10}
                         slidesPerView={1}
                         className="special-menu-swiper"
                         breakpoints={{
