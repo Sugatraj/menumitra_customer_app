@@ -3,60 +3,33 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VerticalMenuCard from "../components/VerticalMenuCard";
 import { useAuth } from '../contexts/AuthContext';
+import { useFavorite } from '../hooks/api/useFavorite';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_WzIoR2LV2Cgy33oxy6eEKQYSkaWr8AFU.jpg';
 
 function Favourite() {
   const [favoriteMenus, setFavoriteMenus] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { getFavorites, toggleFavorite, loading, error } = useFavorite();
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchFavorites = async () => {
+    const loadFavorites = async () => {
       try {
-        const authData = localStorage.getItem('auth');
-        const userData = authData ? JSON.parse(authData) : null;
-
-        if (!userData?.accessToken) {
-          setError('Please login to view favorites');
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/user/get_favourite_list`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${userData.accessToken}`
-          },
-          body: JSON.stringify({
-            outlet_id: 1,
-            user_id: userData.userId
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.detail && data.detail.lists) {
-          // Flatten the nested structure into a single array of menu items
-          const allMenus = Object.values(data.detail.lists).flat();
-          setFavoriteMenus(allMenus);
-        } else {
-          setFavoriteMenus([]);
-        }
+        const favorites = await getFavorites();
+        setFavoriteMenus(favorites);
       } catch (err) {
-        console.error('Error fetching favorites:', err);
-        setError('Failed to load favorite items');
-      } finally {
-        setLoading(false);
+        // Error handling is managed by the hook
       }
     };
 
-    fetchFavorites();
+    loadFavorites();
   }, []);
+
+  const navigateToMenus = () => {
+    // Using window.location for navigation to menu page
+    window.location.href = '/menu';
+  };
 
   if (loading) {
     return (
@@ -85,6 +58,17 @@ function Favourite() {
       </>
     );
   }
+
+  const handleFavoriteToggle = async (menuId) => {
+    try {
+      await toggleFavorite(menuId, true);
+      // Refresh the favorites list
+      const updatedFavorites = await getFavorites();
+      setFavoriteMenus(updatedFavorites);
+    } catch (err) {
+      // Error handling is managed by the hook
+    }
+  };
 
   return (
     <>
@@ -117,9 +101,9 @@ function Favourite() {
               </div>
             </div>
             <div className="dashboard-area">
-              <div className="title-bar">
+              {/* <div className="title-bar">
                 <span className="title mb-0 font-18">Favorite Items</span>
-              </div>
+              </div> */}
               <div className="row g-3 mb-3">
                 {favoriteMenus.length > 0 ? (
                   favoriteMenus.map((menu) => (
@@ -146,13 +130,37 @@ function Favourite() {
                           isActive: true,
                           image: menu.image || DEFAULT_IMAGE
                         }}
+                        onFavoriteToggle={() => handleFavoriteToggle(menu.menu_id)}
                       />
                     </div>
                   ))
                 ) : (
                   <div className="col-12">
-                    <div className="alert alert-info text-center">
-                      No favorite items found
+                    <div className="text-center py-5">
+                      <div className="mb-4">
+                        <svg 
+                          width="80" 
+                          height="80" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="1.5" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                          style={{ opacity: '0.5' }}
+                          className="text-muted"
+                        >
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                        </svg>
+                      </div>
+                      <h5 className="mb-3">No Favourite Menus</h5>
+                      <p className="text-muted mb-4">You haven't added any menus to your favorites yet</p>
+                      <button 
+                        className="btn btn-primary" 
+                        onClick={navigateToMenus}
+                      >
+                        See Menus
+                      </button>
                     </div>
                   </div>
                 )}
