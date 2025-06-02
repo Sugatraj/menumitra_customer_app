@@ -34,7 +34,8 @@ function CategoryFilteredMenuList() {
             'Authorization': `Bearer ${userData?.accessToken}`
           },
           body: JSON.stringify({
-            outlet_id: 1
+            outlet_id: 1,
+            user_id: userData?.userId
           })
         });
 
@@ -117,8 +118,15 @@ function CategoryFilteredMenuList() {
             {categoryData.menus.map((menu) => (
               <div key={menu.menu_id} className="col-12">
                 <VerticalMenuCard
+                  image={menu.image || DEFAULT_IMAGE}
+                  title={menu.menu_name}
+                  currentPrice={menu.portions?.[0]?.price || 0}
+                  reviewCount={menu.rating || 0}
+                  isFavorite={menu.is_favourite === 1}
+                  discount={menu.offer > 0 ? `${menu.offer}%` : null}
                   menuItem={{
                     menuId: menu.menu_id,
+                    menuCatId: menu.menu_cat_id,
                     menuName: menu.menu_name,
                     menuFoodType: menu.menu_food_type,
                     categoryName: menu.category_name,
@@ -127,9 +135,20 @@ function CategoryFilteredMenuList() {
                     rating: menu.rating,
                     offer: menu.offer,
                     isSpecial: menu.is_special,
-                    isFavourite: menu.is_favourite,
+                    isFavourite: menu.is_favourite === 1,
                     isActive: menu.is_active,
                     image: menu.image || DEFAULT_IMAGE
+                  }}
+                  onFavoriteClick={(isFavorite, menuId) => {
+                    // Update the local state when favorite status changes
+                    setCategoryData(prevData => ({
+                      ...prevData,
+                      menus: prevData.menus.map(m => 
+                        m.menu_id === menuId 
+                          ? { ...m, is_favourite: isFavorite ? 1 : 0 }
+                          : m
+                      )
+                    }));
                   }}
                 />
               </div>
