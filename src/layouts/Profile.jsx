@@ -150,18 +150,18 @@ function Profile() {
                   Blog &amp; Blog Detail
                 </a>
               </li>
-              <Link to="/all-outlets">
-                <a href="blog.html">
+              <li>
+                <Link to="/all-outlets">
                   <i className="fa-brands fa-microblog me-2" />
                   All Outlets
-                </a>
-              </Link>
+                </Link>
+              </li>
               <li className="border-0">
                 {isAuthenticated ? (
                   <a href="#" onClick={onLogoutClick}>
-                  <i className="fa-solid fa-power-off" />
-                  LogOut
-                </a>
+                    <i className="fa-solid fa-power-off" />
+                    LogOut
+                  </a>
                 ) : (
                   <a href="#" onClick={handleLoginClick}>
                     <i className="fa-solid fa-sign-in-alt" />
