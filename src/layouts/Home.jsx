@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import CategorySwiper from "../components/CategorySwiper/CategorySwiper";
@@ -35,10 +35,11 @@ function Home() {
   const [greeting, setGreeting] = useState('');
   const { cartItems, updateQuantity, addToCart } = useCart();
   const [specialMenuItems, setSpecialMenuItems] = useState([]);
+  const navigate = useNavigate();
 
   const handleCategoryClick = (category) => {
-    console.log("Selected category:", category.name);
-    // Add your navigation or other logic here
+    // Navigate to category-menu with the category ID
+    navigate(`/category-menu/${category.menuCatId}`);
   };
 
   const getGreeting = () => {
@@ -649,7 +650,14 @@ function Home() {
                 {/* Categorie */}
                 <div className="title-bar mt-0">
                   <span className="title mb-0 font-18">Categories</span>
-                  <Link className="btn-link" to="/categories">
+                  <Link 
+                    className="btn-link" 
+                    to="/categories"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate('/categories');
+                    }}
+                  >
                     <svg
                       width={24}
                       height={24}

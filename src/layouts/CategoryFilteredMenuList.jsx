@@ -102,7 +102,7 @@ function CategoryFilteredMenuList() {
     <>
       <Header />
       <div className="page-content">
-        <div className="container">
+        <div className="container p-b80">
           {categoryData.category && (
             <div className="category-header mb-4">
               <h4 className="title mb-1">{categoryData.category.category_name}</h4>
