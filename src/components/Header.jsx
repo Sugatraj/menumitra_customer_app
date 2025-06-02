@@ -12,6 +12,20 @@ function Header() {
   const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
   const { isAuthenticated, user, setShowAuthOffcanvas } = useAuth();
   const location = useLocation();
+
+  // Function to check if current route is profile related
+  const isProfileRoute = () => {
+    const pathname = location.pathname;
+    return pathname === '/profile' || 
+           pathname.startsWith('/profile/') || 
+           pathname === '/edit-profile';
+  };
+
+  // Function to check if banner should be hidden
+  const shouldHideBanner = () => {
+    return location.pathname.includes('/all-outlets') || isProfileRoute();
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (!mainBarRef.current) return;
@@ -117,7 +131,7 @@ function Header() {
           </div>
         </div>
       </header>
-      {!location.pathname.includes('/all-outlets') && <OutletInfoBanner />}
+      {!shouldHideBanner() && <OutletInfoBanner />}
     </>
   );
 }

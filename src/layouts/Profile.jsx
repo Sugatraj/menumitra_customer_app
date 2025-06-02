@@ -44,7 +44,7 @@ function Profile() {
                 <i className="fa-solid fa-pencil" />
               </Link>
             </div>
-            <div className="location-box">
+            {/* <div className="location-box">
               <i className="location fa-solid fa-location-dot" />
               <div className="flex-1">
                 <h6 className="text-white font-w400 mb-0">324002</h6>
@@ -53,7 +53,7 @@ function Profile() {
               <a href="javascript:void(0);" className="change-btn">
                 Change
               </a>
-            </div>
+            </div> */}
           </div>
           <div className="profile-content border-0">
             <ul>
@@ -119,13 +119,13 @@ function Profile() {
                   Search Menu
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <a href="review.html">
                   <i className="fa-solid fa-star" />
                   Ratings &amp; Review
                 </a>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <a href="notification.html">
                   <i className="fa-solid fa-bell" />
                   Notification
@@ -133,8 +133,8 @@ function Profile() {
                     1
                   </span>
                 </a>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <a
                   href="javascript:void(0);"
                   data-bs-toggle="modal"
@@ -143,13 +143,13 @@ function Profile() {
                   <i className="fa-solid fa-location-dot" />
                   Delivery Address
                 </a>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <a href="blog.html">
                   <i className="fa-brands fa-microblog" />
                   Blog &amp; Blog Detail
                 </a>
-              </li>
+              </li> */}
               <li>
                 <Link to="/all-outlets">
                   <i className="fa-brands fa-microblog me-2" />
