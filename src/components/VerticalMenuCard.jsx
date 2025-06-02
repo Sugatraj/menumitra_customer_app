@@ -144,7 +144,7 @@ const VerticalMenuCard = ({
             {isLoading ? (
               <i className="fas fa-spinner fa-spin"></i>
             ) : (
-              <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i>
+            <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i>
             )}
           </div>
         </a>

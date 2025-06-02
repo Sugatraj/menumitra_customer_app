@@ -59,11 +59,11 @@ function Sidebar() {
             </div>
           </div>
         )}
-        <a href="index.html" className="side-menu-logo">
+        {/* <a href="index.html" className="side-menu-logo">
           <img src="assets/images/logo-sidebar.svg" alt="logo" />
-        </a>
+        </a> */}
         <ul className="nav navbar-nav">
-      <li className="nav-label">Main Menu</li>
+      {/* <li className="nav-label">Main Menu</li> */}
       <li>
         <NavLink
           to="/"
@@ -181,7 +181,7 @@ function Sidebar() {
           <span>Orders</span>
         </NavLink>
       </li>
-      <li>
+      {/* <li>
         <NavLink
           to="/package"
           className={({ isActive }) => 
@@ -246,7 +246,7 @@ function Sidebar() {
           </span>
           <span>Components</span>
         </NavLink>
-      </li>
+      </li> */}
       {isAuthenticated && (
         <li>
           <NavLink
@@ -271,7 +271,7 @@ function Sidebar() {
           </NavLink>
         </li>
       )}
-      <li>
+      {/* <li>
         <NavLink
           to="/chat"
           className={({ isActive }) => 
@@ -293,7 +293,7 @@ function Sidebar() {
           <span>Chat</span>
           <span className="badge badge-circle badge-info">5</span>
         </NavLink>
-      </li>
+      </li> */}
       <li>
         <NavLink
           to="/logout"
@@ -394,13 +394,13 @@ function Sidebar() {
         </div>
       </li>
     </ul>
-    <a
+    {/* <a
       href="javascript:void(0);"
       onClick={() => alert('Delete Cookie clicked!')}
       className="btn btn-primary btn-sm cookie-btn"
     >
       Delete Cookie
-    </a>
+    </a> */}
     <div className="sidebar-bottom">
       <h6 className="name">MenuMitra</h6>
       <span className="ver-info">App Version 1.0</span>
