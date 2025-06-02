@@ -4,13 +4,16 @@ import { useSidebar } from '../contexts/SidebarContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { useTheme } from '../contexts/ThemeContext'
+import { useThemeColor } from '../contexts/ThemeColorContext'
 import '../assets/css/style.css'
+import ThemeColorOffcanvas from './ThemeColorOffcanvas'
 
 function Sidebar() {
     const { isOpen, closeSidebar } = useSidebar();
     const { user, isAuthenticated } = useAuth();
     const { getCartCount } = useCart();
     const { isDarkMode, toggleTheme } = useTheme();
+    const { showThemeColorOffcanvas, toggleThemeColorOffcanvas } = useThemeColor();
     const cartCount = getCartCount();
     const location = useLocation();
 
@@ -326,18 +329,11 @@ function Sidebar() {
         </NavLink>
       </li>
       <li className="nav-label">Settings</li>
-      <li
-        className="nav-color"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#offcanvasBottom"
-        aria-controls="offcanvasBottom"
-      >
-        <NavLink
-          to="/color-theme"
-          className={({ isActive }) => 
-            `nav-link ${isActive ? 'active bg-success text-white fw-bold px-2 rounded-5' : ''}`
-          }
-          onClick={handleLinkClick}
+      <li className="nav-color">
+        <div
+          className="nav-link"
+          onClick={toggleThemeColorOffcanvas}
+          style={{ cursor: 'pointer' }}
         >
           <span className="dz-icon">
             <svg
@@ -352,7 +348,7 @@ function Sidebar() {
             </svg>
           </span>
           <span>Color Theme</span>
-        </NavLink>
+        </div>
       </li>
       <li>
         <div className="mode">
@@ -423,6 +419,10 @@ function Sidebar() {
       <h6 className="name">MenuMitra</h6>
       <span className="ver-info">App Version 1.0</span>
     </div>
+    <ThemeColorOffcanvas 
+      show={showThemeColorOffcanvas} 
+      onClose={() => toggleThemeColorOffcanvas(false)} 
+    />
   </div>
     )
 }

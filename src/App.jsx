@@ -21,6 +21,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
 import { clearAppData } from './utils/clearAppData';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeColorProvider } from './contexts/ThemeColorContext';
 
 const queryClient = new QueryClient();
 
@@ -32,36 +33,38 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <CartProvider onLogout={handleLogout}>
-            <ModalProvider>
-              <AuthOffcanvas />
-              <Router basename={import.meta.env.BASE_URL}>
-                <SidebarProvider>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/all-outlets" element={<AllOutlets />} />
-                    <Route path="/favourites" element={<Favourite />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="/orders" element={<Orders />} />
-                    <Route path="/order-detail/:orderId" element={<OrderDetail />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/edit-profile" element={<EditProfile />} />
-                    <Route path="/categories" element={<Categories />} />
-                    <Route path="/search" element={<Search />} />
-                    <Route path="/product-detail/:menuId/:menuCatId" element={<ProductDetail />} />
-                  </Routes>
-                  <Sidebar />
-                </SidebarProvider>
-              </Router>
-              <ModalManager />
-            </ModalProvider>
-          </CartProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <ThemeColorProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <CartProvider onLogout={handleLogout}>
+              <ModalProvider>
+                <AuthOffcanvas />
+                <Router basename={import.meta.env.BASE_URL}>
+                  <SidebarProvider>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/all-outlets" element={<AllOutlets />} />
+                      <Route path="/favourites" element={<Favourite />} />
+                      <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/orders" element={<Orders />} />
+                      <Route path="/order-detail/:orderId" element={<OrderDetail />} />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/edit-profile" element={<EditProfile />} />
+                      <Route path="/categories" element={<Categories />} />
+                      <Route path="/search" element={<Search />} />
+                      <Route path="/product-detail/:menuId/:menuCatId" element={<ProductDetail />} />
+                    </Routes>
+                    <Sidebar />
+                  </SidebarProvider>
+                </Router>
+                <ModalManager />
+              </ModalProvider>
+            </CartProvider>
+          </AuthProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ThemeColorProvider>
   );
 }
 
