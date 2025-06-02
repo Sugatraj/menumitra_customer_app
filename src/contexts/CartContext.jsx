@@ -118,7 +118,7 @@ export const CartProvider = ({ children }) => {
 
   // Update item quantity
   const updateQuantity = (menuId, portionId, quantity) => {
-    if (quantity < 1) {
+    if (quantity === 0) {
       removeFromCart(menuId, portionId);
       return;
     }

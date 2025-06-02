@@ -166,20 +166,30 @@ const VerticalMenuCard = ({
               <div className="d-flex align-items-center justify-content-center mx-2" style={{ flex: 1 }}>
                 {cartItemsForMenu.length > 0 ? (
                   <div className="row g-0 w-100">
-                    {cartItemsForMenu.map((item, index) => {
-                      const portion = menuItem.portions.find(p => p.portion_id === item.portionId);
-                      return (
+                    {menuItem.portions
+                      .map(portion => {
+                        const cartItem = cartItemsForMenu.find(item => item.portionId === portion.portion_id);
+                        return {
+                          ...portion,
+                          quantity: cartItem?.quantity || 0
+                        };
+                      })
+                      .filter(portion => portion.quantity > 0)
+                      .map((portion, index, filteredArray) => (
                         <div 
-                          key={item.portionId} 
+                          key={portion.portion_id} 
                           className={`col text-center ${
-                            index < cartItemsForMenu.length - 1 ? 'border-end' : ''
+                            index < filteredArray.length - 1 ? 'border-end' : ''
                           }`}
                         >
-                          <div className="fw-bold">{item.quantity}</div>
-                          <div className="text-muted small">{portion?.portion_name.charAt(0).toUpperCase()}</div>
+                          <div className="fw-bold">{portion.quantity}</div>
+                          <div className="text-muted small">
+                            {portion.portion_name.toLowerCase() === 'full' ? 'F' : 
+                             portion.portion_name.toLowerCase() === 'half' ? 'H' : 
+                             portion.portion_name.charAt(0).toUpperCase()}
+                          </div>
                         </div>
-                      );
-                    })}
+                      ))}
                   </div>
                 ) : (
                   <div className="text-center w-100">

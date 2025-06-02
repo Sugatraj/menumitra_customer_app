@@ -18,7 +18,7 @@ export const AddToCartModal = () => {
         item.menuId === modalConfig.data?.menuId && 
         item.portionId === portion.portion_id
       );
-      initial[portion.portion_id] = cartItem?.quantity || 1;
+      initial[portion.portion_id] = cartItem?.quantity || 0;
     });
     return initial;
   });
@@ -68,7 +68,7 @@ export const AddToCartModal = () => {
       isInCart
     });
 
-    const finalQuantity = Math.min(Math.max(1, newQuantity), MAX_QUANTITY);
+    const finalQuantity = Math.min(Math.max(0, newQuantity), MAX_QUANTITY);
     setQuantities(prev => ({
       ...prev,
       [selectedPortion]: finalQuantity
@@ -100,6 +100,11 @@ export const AddToCartModal = () => {
       addToCart(modalConfig.data, Number(portionId), quantity, comment);
     });
     closeModal();
+  };
+
+  // Add a function to check if any portion has quantity > 0
+  const hasValidQuantity = () => {
+    return Object.values(quantities).some(quantity => quantity > 0);
   };
 
   return (
@@ -336,13 +341,7 @@ export const AddToCartModal = () => {
         >
           <button
             type="button"
-            onClick={() => {
-              console.log('Decrease Button Clicked', {
-                currentQuantity: quantities[selectedPortion],
-                newQuantity: quantities[selectedPortion] - 1
-              });
-              handleQuantityChange(quantities[selectedPortion] - 1);
-            }}
+            onClick={() => handleQuantityChange(quantities[selectedPortion] - 1)}
             style={{
               width: '40px',
               height: '40px',
@@ -357,9 +356,9 @@ export const AddToCartModal = () => {
               justifyContent: 'center',
               marginRight: '20px',
               transition: 'background 0.2s',
-              opacity: quantities[selectedPortion] <= 1 ? 0.5 : 1,
+              opacity: quantities[selectedPortion] <= 0 ? 0.5 : 1,
             }}
-            disabled={quantities[selectedPortion] <= 1}
+            disabled={quantities[selectedPortion] <= 0}
           >
             –
           </button>
@@ -377,13 +376,7 @@ export const AddToCartModal = () => {
           </span>
           <button
             type="button"
-            onClick={() => {
-              console.log('Increase Button Clicked', {
-                currentQuantity: quantities[selectedPortion],
-                newQuantity: quantities[selectedPortion] + 1
-              });
-              handleQuantityChange(quantities[selectedPortion] + 1);
-            }}
+            onClick={() => handleQuantityChange(quantities[selectedPortion] + 1)}
             style={{
               width: '40px',
               height: '40px',
@@ -410,6 +403,7 @@ export const AddToCartModal = () => {
           type="button" 
           className="btn btn-success" 
           onClick={handleAddToCart}
+          disabled={!hasValidQuantity()}
           style={{
             backgroundColor: '#28a745',
             border: 'none',
@@ -417,7 +411,8 @@ export const AddToCartModal = () => {
             padding: '12px 24px',
             fontSize: '15px',
             fontWeight: '500',
-            flex: '1'
+            flex: '1',
+            opacity: hasValidQuantity() ? 1 : 0.5
           }}
         >
           {isInCart ? 'Update Cart' : 'Add to Cart'}
