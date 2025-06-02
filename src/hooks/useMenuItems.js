@@ -57,7 +57,8 @@ export const useMenuItems = () => {
           'Authorization': `Bearer ${userData?.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1
+          outlet_id: 1,
+          user_id: userData?.userId || null
         })
       });
 

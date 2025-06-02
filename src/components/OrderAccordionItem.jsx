@@ -40,7 +40,13 @@ const OrderAccordionItem = ({
 
   const handleViewDetails = (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent accordion toggle
     navigate(`/order-detail/${orderId}`);
+  };
+
+  const handleAccordionToggle = (e) => {
+    e.preventDefault();
+    // Let Bootstrap handle the accordion toggle
   };
 
   return (
@@ -53,7 +59,7 @@ const OrderAccordionItem = ({
           data-bs-target={`#${collapseId}`}
           aria-expanded={isExpanded}
           aria-controls={collapseId}
-          onClick={handleViewDetails}
+          onClick={handleAccordionToggle} // Handle accordion toggle
         >
           <div className="d-flex align-items-center justify-content-between w-100">
             <div className="d-flex align-items-center">
@@ -69,8 +75,16 @@ const OrderAccordionItem = ({
               </div>
             </div>
             <button 
-              className="btn btn-primary btn-sm ms-3"
-              onClick={handleViewDetails}
+              className="btn btn-sm ms-3"
+              style={{
+                backgroundColor: status.toLowerCase() === 'cancelled' ? '#FFEBEE' : '#E8F5E9',
+                color: status.toLowerCase() === 'cancelled' ? '#E74C3C' : '#00B67A',
+                border: `1px solid ${status.toLowerCase() === 'cancelled' ? '#E74C3C' : '#00B67A'}`,
+                padding: '4px 12px',
+                fontSize: '12px',
+                fontWeight: '600'
+              }}
+              onClick={handleViewDetails} // Only navigate on button click
             >
               View Details
             </button>

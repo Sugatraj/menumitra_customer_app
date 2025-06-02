@@ -36,32 +36,119 @@ function Orders() {
   ];
 
   // Dummy orders data
-  const dummyOrders = [
-    {
-      id: '0012345',
-      itemCount: 12,
-      status: 'On Delivery',
-      iconColor: '#FFA902',
-      iconBgClass: '',
-      isExpanded: true
-    },
-    {
-      id: '0012346',
-      itemCount: 8,
-      status: 'On Delivery',
-      iconColor: 'var(--primary)',
-      iconBgClass: 'bg-primary',
-      isExpanded: false
-    },
-    {
-      id: '0012347',
-      itemCount: 15,
-      status: 'On Delivery',
-      iconColor: 'var(--primary)',
-      iconBgClass: 'bg-danger',
-      isExpanded: false
-    }
-  ];
+  const dummyOrders = {
+    ongoing: [
+      {
+        id: '0012345',
+        itemCount: 12,
+        status: 'On Delivery',
+        iconColor: '#FFA902',
+        iconBgClass: '',
+        isExpanded: true,
+        orderSteps: [
+          {
+            title: 'Order Created',
+            timestamp: 'Feb 8,2023-12:20pm',
+            completed: true
+          },
+          {
+            title: 'Order Received',
+            timestamp: 'Feb 8,2023-12:25pm',
+            completed: true
+          },
+          {
+            title: 'Order Confirmed',
+            timestamp: 'Feb 8,2023-12:30pm',
+            completed: true
+          },
+          {
+            title: 'Order Processed',
+            timestamp: 'Feb 8,2023-12:45pm',
+            completed: false
+          },
+          {
+            title: 'Order Delivered',
+            timestamp: 'Feb 8,2023-1:20pm',
+            completed: false
+          }
+        ]
+      }
+    ],
+    completed: [
+      {
+        id: '0012346',
+        itemCount: 8,
+        status: 'Completed',
+        iconColor: '#00B67A',
+        iconBgClass: 'bg-success',
+        isExpanded: false,
+        orderSteps: [
+          {
+            title: 'Order Created',
+            timestamp: 'Feb 8,2023-12:20pm',
+            completed: true
+          },
+          {
+            title: 'Order Received',
+            timestamp: 'Feb 8,2023-12:25pm',
+            completed: true
+          },
+          {
+            title: 'Order Confirmed',
+            timestamp: 'Feb 8,2023-12:30pm',
+            completed: true
+          },
+          {
+            title: 'Order Processed',
+            timestamp: 'Feb 8,2023-12:45pm',
+            completed: true
+          },
+          {
+            title: 'Order Delivered',
+            timestamp: 'Feb 8,2023-1:20pm',
+            completed: true
+          }
+        ]
+      }
+    ],
+    cancelled: [
+      {
+        id: '0012347',
+        itemCount: 15,
+        status: 'Cancelled',
+        iconColor: '#E74C3C',
+        iconBgClass: 'bg-danger',
+        isExpanded: false,
+        orderSteps: [
+          {
+            title: 'Order Created',
+            timestamp: 'Feb 8,2023-12:20pm',
+            completed: true
+          },
+          {
+            title: 'Order Cancelled',
+            timestamp: 'Feb 8,2023-12:25pm',
+            completed: true
+          },
+          {
+            title: 'Order Confirmed',
+            timestamp: 'Feb 8,2023-12:30pm',
+            completed: false
+          },
+          {
+            title: 'Order Processed',
+            timestamp: 'Feb 8,2023-12:45pm',
+            completed: false
+          },
+          {
+            title: 'Order Delivered',
+            timestamp: 'Feb 8,2023-1:20pm',
+            completed: false
+          }
+        ]
+      }
+    ]
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -173,15 +260,15 @@ function Orders() {
                 {/* All Orders Tab */}
                 <div className="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabIndex={0}>
             <div className="accordion style-3" id="accordionExample">
-                    {(ordersData.paid?.orders || dummyOrders).map((order) => (
+                    {[...dummyOrders.ongoing, ...dummyOrders.completed, ...dummyOrders.cancelled].map((order) => (
                       <OrderAccordionItem
                         key={order.id}
                         orderId={order.id}
-                        itemCount={order.item_count || order.itemCount}
+                        itemCount={order.itemCount}
                         status={order.status}
-                        iconColor={order.iconColor || '#FFA902'}
-                        iconBgClass={order.iconBgClass || ''}
-                        orderSteps={orderSteps}
+                        iconColor={order.iconColor}
+                        iconBgClass={order.iconBgClass}
+                        orderSteps={order.orderSteps}
                         isExpanded={order.isExpanded}
                         parentId="accordionExample"
                       />
@@ -192,15 +279,15 @@ function Orders() {
                 {/* Completed Orders Tab */}
                 <div className="tab-pane fade" id="completed-tab-pane" role="tabpanel" aria-labelledby="completed-tab" tabIndex={0}>
                   <div className="accordion style-3" id="accordionExample3">
-                    {dummyOrders.slice(0, 2).map((order) => (
+                    {dummyOrders.completed.map((order) => (
                       <OrderAccordionItem
                         key={order.id}
                         orderId={order.id}
                         itemCount={order.itemCount}
-                        status="Completed"
+                        status={order.status}
                         iconColor={order.iconColor}
                         iconBgClass={order.iconBgClass}
-                        orderSteps={orderSteps.map(step => ({ ...step, completed: true }))}
+                        orderSteps={order.orderSteps}
                         isExpanded={order.isExpanded}
                         parentId="accordionExample3"
                       />
@@ -211,15 +298,15 @@ function Orders() {
                 {/* Cancelled Orders Tab */}
                 <div className="tab-pane fade" id="cancelled-tab-pane" role="tabpanel" aria-labelledby="cancelled-tab" tabIndex={0}>
             <div className="accordion style-3" id="accordionExample2">
-                    {dummyOrders.slice(2).map((order) => (
+                    {dummyOrders.cancelled.map((order) => (
                       <OrderAccordionItem
                         key={order.id}
                         orderId={order.id}
                         itemCount={order.itemCount}
-                        status="Cancelled"
-                        iconColor="var(--primary)"
-                        iconBgClass="bg-danger"
-                        orderSteps={orderSteps.map(step => ({ ...step, completed: false }))}
+                        status={order.status}
+                        iconColor={order.iconColor}
+                        iconBgClass={order.iconBgClass}
+                        orderSteps={order.orderSteps}
                         isExpanded={order.isExpanded}
                         parentId="accordionExample2"
                       />

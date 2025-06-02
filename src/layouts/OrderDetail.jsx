@@ -51,7 +51,7 @@ function OrderDetail() {
         {
           status: "Order Confirmed",
           time: "Feb 8,2023-12:30pm",
-          isActive: false
+          isActive: true
         },
         {
           status: "Order Processed",
@@ -78,8 +78,7 @@ function OrderDetail() {
       },
       status: 'On Delivery',
       iconColor: '#FFA902',
-      iconBgClass: '',
-      itemCount: 12
+      iconBgClass: ''
     },
     '0012346': {
       items: [
@@ -150,8 +149,8 @@ function OrderDetail() {
         image: "../assets/images/store/store2.jpg"
       },
       status: 'Completed',
-      iconColor: 'var(--primary)',
-      iconBgClass: 'bg-primary',
+      iconColor: '#00B67A',
+      iconBgClass: 'bg-success',
       itemCount: 8
     },
     '0012347': {
@@ -223,7 +222,7 @@ function OrderDetail() {
         image: "../assets/images/store/store3.jpg"
       },
       status: 'Cancelled',
-      iconColor: 'var(--primary)',
+      iconColor: '#E74C3C',
       iconBgClass: 'bg-danger',
       itemCount: 15
     }
@@ -235,64 +234,147 @@ function OrderDetail() {
     return <div>Order not found</div>;
   }
 
+  const getStatusStyles = (status) => {
+    switch (status.toLowerCase()) {
+      case 'cancelled':
+        return {
+          headerClass: 'text-danger',
+          badgeClass: 'status-badge cancelled',
+          iconColor: '#E74C3C',
+          iconBgClass: 'bg-custom-red',
+          timelineClass: 'cancelled',
+          badgeBg: '#FFEBEE',
+          statusColors: {
+            background: '#FFF5F5',
+            border: '#FFCDD2',
+            text: '#C0392B',
+            accent: '#E74C3C',
+            muted: '#EF5350'
+          }
+        };
+      case 'completed':
+        return {
+          headerClass: 'text-success',
+          badgeClass: 'status-badge completed',
+          iconColor: '#00B67A',
+          iconBgClass: 'bg-custom-green',
+          timelineClass: 'completed',
+          statusColors: {
+            background: '#E8F5E9',
+            border: '#A5D6A7',
+            text: '#2E7D32',
+            accent: '#00B67A',
+            muted: '#81C784'
+          }
+        };
+      default:
+        return {
+          headerClass: 'text-warning',
+          badgeClass: 'status-badge pending',
+          iconColor: '#FFA902',
+          iconBgClass: 'bg-warning',
+          timelineClass: 'pending',
+          statusColors: {
+            background: '#FFF8E1',
+            border: '#FFE082',
+            text: '#F57C00',
+            accent: '#FFA902',
+            muted: '#FFB74D'
+          }
+        };
+    }
+  };
+
+  const statusStyles = getStatusStyles(orderDetails.status);
+
   return (
     <>
       <Header />
       <div className="page-content bottom-content">
         <div className="container">
-          <h5 className="title border-bottom pb-1 font-w600">Order #{orderId}</h5>
-          <div className="order-summery">
-            <ul className="summery-list mb-4">
-              {orderDetails.items.map((item, index) => (
-                <li key={index}>
-                  <p className="order-name">
-                    {item.name} - ${item.price}
-                  </p>
-                  <span className="order-quantity">x{item.quantity}</span>
+          <div className="d-flex justify-content-between align-items-center">
+            <h5 className="title border-bottom pb-1 font-w600">
+              Order #{orderId}
+            </h5>
+            <span className={`${statusStyles.badgeClass} ms-2`}>
+              {orderDetails.status}
+            </span>
+          </div>
+          <div className={`order-summery ${orderDetails.status.toLowerCase() === 'cancelled' ? 'cancelled-order' : ''}`}>
+            {orderDetails.status.toLowerCase() === 'cancelled' && (
+              <div className="alert alert-custom-red mb-3">
+                <i className="fas fa-exclamation-triangle me-2"></i>
+                <strong>Order Cancelled</strong>
+                <p className="mb-0 mt-1 small">This order has been cancelled and cannot be processed further.</p>
+              </div>
+            )}
+
+            <div className="d-flex align-items-center mb-3">
+              <h5 className="title mb-0">Order #{orderId}</h5>
+              <span className={`${statusStyles.badgeClass} ms-2`}>
+                {orderDetails.status}
+              </span>
+            </div>
+
+            <div className="summary-section p-3 mb-4" style={{ 
+              borderRadius: '8px', 
+              background: orderDetails.status.toLowerCase() === 'cancelled' ? '#FFEBEE' : 'white',
+              borderColor: orderDetails.status.toLowerCase() === 'cancelled' ? statusStyles.statusColors?.border : '#e4e4e4'
+            }}>
+              <ul className={`summery-list mb-4 ${orderDetails.status.toLowerCase() === 'cancelled' ? 'text-muted' : ''}`}>
+                {orderDetails.items.map((item, index) => (
+                  <li key={index}>
+                    <p className="order-name">
+                      {item.name} - ${item.price}
+                    </p>
+                    <span className="order-quantity">x{item.quantity}</span>
+                  </li>
+                ))}
+                <li>
+                  <h6 className="mb-0 font-12">Order item Total</h6>
+                  <span className="font-12 font-w600 text-dark">
+                    ${orderDetails.summary.itemTotal}
+                  </span>
                 </li>
-              ))}
-              <li>
-                <h6 className="mb-0 font-12">Order item Total</h6>
-                <span className="font-12 font-w600 text-dark">
-                  ${orderDetails.summary.itemTotal}
-                </span>
-              </li>
-              <li>
-                <h6 className="mb-0 font-12">Order Delivery Charge</h6>
-                <span className="font-12 font-w600 text-dark">
-                  ${orderDetails.summary.deliveryCharge}
-                </span>
-              </li>
-              <li>
-                <h6 className="mb-0 font-12">Split Order Tax</h6>
-                <span className="font-12 font-w600 text-dark">
-                  ${orderDetails.summary.tax}
-                </span>
-              </li>
-              <li>
-                <h6 className="mb-0 font-12">Split Order Discount</h6>
-                <span className="font-12 font-w600 text-dark">
-                  ${orderDetails.summary.discount}
-                </span>
-              </li>
-              <li>
-                <h6 className="mb-0 font-12">Split Order Wallet Discount</h6>
-                <span className="font-12 font-w600 text-dark">
-                  ${orderDetails.summary.walletDiscount}
-                </span>
-              </li>
-              <li>
-                <h6 className="mb-0 font-14 text-primary">AMOUNT TO COLLECT</h6>
-                <span className="font-14 font-w600 text-primary">
-                  ${orderDetails.summary.totalAmount}
-                </span>
-              </li>
-            </ul>
+                <li>
+                  <h6 className="mb-0 font-12">Order Delivery Charge</h6>
+                  <span className="font-12 font-w600 text-dark">
+                    ${orderDetails.summary.deliveryCharge}
+                  </span>
+                </li>
+                <li>
+                  <h6 className="mb-0 font-12">Split Order Tax</h6>
+                  <span className="font-12 font-w600 text-dark">
+                    ${orderDetails.summary.tax}
+                  </span>
+                </li>
+                <li>
+                  <h6 className="mb-0 font-12">Split Order Discount</h6>
+                  <span className="font-12 font-w600 text-dark">
+                    ${orderDetails.summary.discount}
+                  </span>
+                </li>
+                <li>
+                  <h6 className="mb-0 font-12">Split Order Wallet Discount</h6>
+                  <span className="font-12 font-w600 text-dark">
+                    ${orderDetails.summary.walletDiscount}
+                  </span>
+                </li>
+                <li>
+                  <h6 className="mb-0 font-14 text-primary">AMOUNT TO COLLECT</h6>
+                  <span className="font-14 font-w600 text-primary">
+                    ${orderDetails.summary.totalAmount}
+                  </span>
+                </li>
+              </ul>
+            </div>
 
             <div className="deliver-location mb-4">
               <div className="d-flex align-items-center mb-3">
                 <span className="font-w600 flex-1">Deliver to</span>
-                <span className="font-w800">{orderDetails.delivery.type}</span>
+                <span className={`font-w800 ${statusStyles.headerClass}`}>
+                  {orderDetails.delivery.type}
+                </span>
               </div>
               <h6 className="address font-14">{orderDetails.delivery.address}</h6>
             </div>
@@ -304,30 +386,62 @@ function OrderDetail() {
               <ul>
                 <li>
                   <span>Order ID</span>
-                  <span className="text-dark">{orderId}</span>
+                  <span className={`text-dark ${statusStyles.headerClass}`}>{orderId}</span>
                 </li>
                 <li>
                   <span>Payment Method</span>
-                  <span className="text-dark">{orderDetails.payment.method}</span>
+                  <span className={`text-dark ${statusStyles.headerClass}`}>
+                    {orderDetails.payment.method}
+                  </span>
                 </li>
                 <li>
                   <span>Delivery On</span>
-                  <span className="text-dark">{orderDetails.payment.deliveryTime}</span>
+                  <span className={`text-dark ${orderDetails.status.toLowerCase() === 'cancelled' ? 'text-danger' : ''}`}>
+                    {orderDetails.payment.deliveryTime}
+                  </span>
                 </li>
               </ul>
             </div>
 
-            <h5 className="title border-bottom pb-2 mb-2 font-w600">
-              Order Tracking
-            </h5>
-            <ul className="dz-timeline style-2 mb-5">
-              {orderDetails.tracking.map((step, index) => (
-                <li key={index} className={`timeline-item ${step.isActive ? 'active' : ''}`}>
-                  <h6 className="timeline-tilte">{step.status}</h6>
-                  <p className="timeline-date">{step.time}</p>
-                </li>
-              ))}
-            </ul>
+            <div className="tracking-section">
+              <h5 className={`title border-bottom pb-2 mb-2 font-w600 ${statusStyles.headerClass}`}>
+                Order Tracking
+                <span 
+                  className={`badge ms-2`} 
+                  style={{ 
+                    fontSize: '12px',
+                    backgroundColor: statusStyles.iconColor
+                  }}
+                >
+                  {orderDetails.status}
+                </span>
+              </h5>
+              <ul className={`dz-timeline style-2 mb-5 ${statusStyles.timelineClass}`}>
+                {orderDetails.tracking.map((step, index) => (
+                  <li 
+                    key={index} 
+                    className={`timeline-item ${
+                      step.isActive ? 'active' : ''
+                    } ${
+                      orderDetails.status.toLowerCase() === 'cancelled' && 
+                      step.status === 'Order Cancelled' ? 'cancelled' : 
+                      orderDetails.status.toLowerCase() === 'completed' ? 'completed' : ''
+                    }`}
+                  >
+                    <h6 className="timeline-tilte">
+                      {step.status}
+                      {step.status === 'Order Cancelled' && orderDetails.status.toLowerCase() === 'cancelled' && (
+                        <i className="fas fa-ban ms-2"></i>
+                      )}
+                      {step.status === 'Order Delivered' && orderDetails.status.toLowerCase() === 'completed' && (
+                        <i className="fas fa-check-circle ms-2"></i>
+                      )}
+                    </h6>
+                    <p className="timeline-date">{step.time}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             {/* User Information */}
             <h5 className="title border-bottom pb-2 mb-2 font-w600">
@@ -390,6 +504,8 @@ function OrderDetail() {
                 </li>
               </ul>
             </div>
+
+            <div className="cancelled-watermark"></div>
           </div>
         </div>
       </div>
