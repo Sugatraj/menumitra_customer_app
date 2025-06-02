@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -6,6 +7,7 @@ const API_BASE_URL = "https://men4u.xyz/v2";
 const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_WzIoR2LV2Cgy33oxy6eEKQYSkaWr8AFU.jpg';
 
 function Categories() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
 
@@ -61,6 +63,17 @@ function Categories() {
     return imageErrors[category.menuCatId] ? DEFAULT_IMAGE : (category.image || DEFAULT_IMAGE);
   };
 
+  // Add navigation handler
+  const handleCategoryClick = (e, category) => {
+    e.preventDefault(); // Prevent default link behavior
+    navigate(`/category-menu/${category.menuCatId}`, { 
+      state: { 
+        categoryName: category.categoryName,
+        menuCount: category.menuCount 
+      } 
+    });
+  };
+
   return (
     <div>
       <Header />
@@ -71,9 +84,11 @@ function Categories() {
               {categories.map((category) => (
                 <li key={category.menuCatId}>
                   <a
-                    href="product.html"
+                    href="#"
+                    onClick={(e) => handleCategoryClick(e, category)}
                     className="categore-box box-lg"
                     style={{
+                      cursor: 'pointer', // Add cursor pointer
                       backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.8)), url(${getImageUrl(category)})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center center',

@@ -11,6 +11,7 @@ import OrderDetail from "./layouts/OrderDetail";
 import Profile from "./layouts/Profile";
 import EditProfile from "./layouts/EditProfile";
 import Categories from "./layouts/Categories";
+import CategoryFilteredMenuList from "./layouts/CategoryFilteredMenuList";
 import Search from "./layouts/Search";
 import ProductDetail from "./layouts/ProductDetail";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -52,6 +53,7 @@ function App() {
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/edit-profile" element={<EditProfile />} />
                       <Route path="/categories" element={<Categories />} />
+                      <Route path="/category-menu/:categoryId" element={<CategoryFilteredMenuList />} />
                       <Route path="/search" element={<Search />} />
                       <Route path="/product-detail/:menuId/:menuCatId" element={<ProductDetail />} />
                     </Routes>
