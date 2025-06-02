@@ -200,7 +200,7 @@ function AllOutlets() {
                   }}
                   style={{ 
                     cursor: outlet.resto_url ? 'pointer' : 'default',
-                    transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)';

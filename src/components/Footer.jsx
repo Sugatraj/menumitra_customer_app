@@ -1,10 +1,18 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 
 function Footer() {
   const { getCartCount } = useCart();
   const cartCount = getCartCount();
+  const location = useLocation();
+
+  const isOrderRoute = () => {
+    const pathname = location.pathname;
+    return pathname === '/orders' || 
+           pathname.startsWith('/orders/') || 
+           pathname.startsWith('/order-detail/');
+  };
 
   return (
     <div>
@@ -37,7 +45,7 @@ function Footer() {
             }
           >
             <svg
-              enable-background="new 0 0 512.001 512.001"
+              enableBackground="new 0 0 512.001 512.001"
               height="512"
               viewBox="0 0 512.001 512.001"
               width="512"
@@ -88,7 +96,7 @@ function Footer() {
           <NavLink
             to="/orders"
             className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
+              isOrderRoute() ? "nav-link active" : "nav-link"
             }
           >
             <svg
