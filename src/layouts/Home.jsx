@@ -36,6 +36,7 @@ function Home() {
   const { cartItems, updateQuantity, addToCart } = useCart();
   const [specialMenuItems, setSpecialMenuItems] = useState([]);
   const navigate = useNavigate();
+  const [favoriteMenuIds, setFavoriteMenuIds] = useState(new Set());
 
   const handleCategoryClick = (category) => {
     // Navigate to category-menu with the category ID
@@ -130,6 +131,19 @@ function Home() {
   useEffect(() => {
     fetchSpecialMenuItems();
   }, []); // Empty dependency array means this runs once when component mounts
+
+  // Add this function to handle favorite updates
+  const handleFavoriteUpdate = (menuId, isFavorite) => {
+    setFavoriteMenuIds(prevIds => {
+      const newIds = new Set(prevIds);
+      if (isFavorite) {
+        newIds.add(menuId);
+      } else {
+        newIds.delete(menuId);
+      }
+      return newIds;
+    });
+  };
 
   return (
     <>
@@ -1245,9 +1259,10 @@ function Home() {
                         title={menuItem.menuName}
                         currentPrice={menuItem.portions?.[0]?.price ?? 0}
                         reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
-                        isFavorite={menuItem.isFavourite === 1}
+                        isFavorite={favoriteMenuIds.has(menuItem.menuId) || menuItem.isFavourite === 1}
                         discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
                         menuItem={menuItem}
+                        onFavoriteUpdate={handleFavoriteUpdate}
                       />
                     </div>
                   ))}

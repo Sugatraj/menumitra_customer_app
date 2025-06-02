@@ -11,12 +11,11 @@ const VerticalMenuCard = ({
   title,
   currentPrice,
   reviewCount,
-  onFavoriteClick,
   isFavorite: initialIsFavorite = false,
   discount,
-  menuItem = {}
+  menuItem = {},
+  onFavoriteUpdate
 }) => {
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isLoading, setIsLoading] = useState(false);
   const { openModal } = useModal();
   const { cartItems, updateQuantity, removeFromCart, getCartItemComment } = useCart();
@@ -53,7 +52,7 @@ const VerticalMenuCard = ({
       }
 
       // Choose API endpoint based on current favorite status
-      const apiUrl = isFavorite 
+      const apiUrl = initialIsFavorite 
         ? 'https://men4u.xyz/v2/user/remove_favourite_menu'
         : 'https://men4u.xyz/v2/user/save_favourite_menu';
 
@@ -74,10 +73,8 @@ const VerticalMenuCard = ({
       const data = await response.json();
 
       if (response.ok) {
-        setIsFavorite(!isFavorite);
-        if (onFavoriteClick) {
-          onFavoriteClick(!isFavorite, menuItem.menuId);
-        }
+        // Update parent component's state immediately
+        onFavoriteUpdate(menuItem.menuId, !initialIsFavorite);
       } else {
         console.error('Failed to update favorite status:', data.detail);
         openModal('ERROR', {
@@ -140,11 +137,11 @@ const VerticalMenuCard = ({
           onClick={handleFavoriteToggle}
           style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
         >
-          <div className={`like-button ${isFavorite ? 'active' : ''}`}>
+          <div className={`like-button ${initialIsFavorite ? 'active' : ''}`}>
             {isLoading ? (
               <i className="fas fa-spinner fa-spin"></i>
             ) : (
-            <i className={`fa-${isFavorite ? 'solid' : 'regular'} fa-heart`}></i>
+            <i className={`fa-${initialIsFavorite ? 'solid' : 'regular'} fa-heart`}></i>
             )}
           </div>
         </a>
@@ -249,10 +246,10 @@ VerticalMenuCard.propTypes = {
   title: PropTypes.string.isRequired,
   currentPrice: PropTypes.number.isRequired,
   reviewCount: PropTypes.number,
-  onFavoriteClick: PropTypes.func,
   isFavorite: PropTypes.bool,
   discount: PropTypes.string,
-  menuItem: PropTypes.object
+  menuItem: PropTypes.object,
+  onFavoriteUpdate: PropTypes.func.isRequired,
 };
 
 export default VerticalMenuCard;
