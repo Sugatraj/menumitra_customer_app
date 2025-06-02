@@ -192,7 +192,7 @@ function AllOutlets() {
               {filteredOutlets.map((outlet) => (
                 <div 
                   key={outlet.outlet_id} 
-                  className="card border shadow-sm"
+                  className="card border-0 mb-2"
                   onClick={() => {
                     if (outlet.resto_url) {
                       window.open(outlet.resto_url, '_blank', 'noopener,noreferrer');
@@ -200,22 +200,18 @@ function AllOutlets() {
                   }}
                   style={{ 
                     cursor: outlet.resto_url ? 'pointer' : 'default',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
+                    transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
-                    if (outlet.resto_url) {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 .5rem 1rem rgba(0,0,0,.15)';
-                    }
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 .5rem 1rem rgba(0,0,0,.15)';
                   }}
                   onMouseLeave={(e) => {
-                    if (outlet.resto_url) {
-                      e.currentTarget.style.transform = 'none';
-                      e.currentTarget.style.boxShadow = '0 .125rem .25rem rgba(0,0,0,.075)';
-                    }
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.boxShadow = '0 .125rem .25rem rgba(0,0,0,.075)';
                   }}
                 >
-                  <div className="card-body p-3">
+                  <div className="card-body p-3 rounded border border-1">
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <h6 className="card-title mb-0">{outlet.outlet_name}</h6>
                       <span className={`badge ${outlet.is_open ? 'bg-success' : 'bg-danger'} rounded-pill`}>
