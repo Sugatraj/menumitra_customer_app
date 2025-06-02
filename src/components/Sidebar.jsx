@@ -1,13 +1,41 @@
 import React from 'react'
 import { useSidebar } from '../contexts/SidebarContext'
+import { useAuth } from '../contexts/AuthContext'
 import '../assets/css/style.css'
 
 function Sidebar() {
-    const {isOpen} = useSidebar();
+    const { isOpen } = useSidebar();
+    const { user, isAuthenticated } = useAuth();
 
-    // Always render the sidebar, let CSS handle visibility/animation
     return (
       <div className={`sidebar style-2${isOpen ? ' show' : ''}`} >
+        {isAuthenticated && (
+          <div className="user-info p-3 border-bottom">
+            <div className="d-flex align-items-center mb-2">
+              <div className="avatar-lg me-3">
+                {user?.profileImage ? (
+                  <img 
+                    src={user.profileImage} 
+                    alt="Profile" 
+                    className="rounded-circle"
+                    style={{ width: 60, height: 60, objectFit: 'cover' }}
+                  />
+                ) : (
+                  <div 
+                    className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                    style={{ width: 60, height: 60, fontSize: '24px' }}
+                  >
+                    {user?.name?.charAt(0) || 'U'}
+                  </div>
+                )}
+              </div>
+              <div>
+                <h6 className="mb-1 text-dark">{user?.name}</h6>
+                <small className="text-muted">{user?.mobile}</small>
+              </div>
+            </div>
+          </div>
+        )}
         <a href="index.html" className="side-menu-logo">
           <img src="assets/images/logo-sidebar.svg" alt="logo" />
         </a>
@@ -77,22 +105,24 @@ function Sidebar() {
           <span>Components</span>
         </a>
       </li>
-      <li>
-        <a className="nav-link" href="profile.html">
-          <span className="dz-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 0 24 24"
-              width="24px"
-              fill="#000000"
-            >
-              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4z" />
-            </svg>
-          </span>
-          <span>Profile</span>
-        </a>
-      </li>
+      {isAuthenticated && (
+        <li>
+          <a className="nav-link" href="profile.html">
+            <span className="dz-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                fill="#000000"
+              >
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </span>
+            <span>Profile</span>
+          </a>
+        </li>
+      )}
       <li>
         <a className="nav-link" href="chat.html">
           <span className="dz-icon">
@@ -197,18 +227,9 @@ function Sidebar() {
     >
       Delete Cookie
     </a>
-    <div className="sidebar-bottom d-none">
-      <h6 className="name">W3Grocery - Multipurpose App</h6>
-      <span className="ver-info">App Version 2.0</span>
-    </div>
-    <div className="author-box mt-auto mb-0">
-      <div className="dz-media">
-        <img src="assets/images/avatar/5.jpg" alt="author-image" />
-      </div>
-      <div className="dz-info">
-        <h5 className="name">James Hawkins</h5>
-        <span>jameshawkins@mail.com</span>
-      </div>
+    <div className="sidebar-bottom">
+      <h6 className="name">MenuMitra</h6>
+      <span className="ver-info">App Version 1.0</span>
     </div>
   </div>
     )
