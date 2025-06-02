@@ -19,6 +19,12 @@ import VerticalMenuCard from "../components/VerticalMenuCard";
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useCategories } from '../hooks/useCategories';
+import HorizontalMenuCard from "../components/HorizontalMenuCard";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import { Autoplay } from 'swiper/modules';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
@@ -29,6 +35,7 @@ function Home() {
   const [menuCategories, setMenuCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const { cartItems, updateQuantity, addToCart } = useCart();
+  const [specialMenuItems, setSpecialMenuItems] = useState([]);
 
   // No need for loading state as we're doing optimistic UI
   const optimisticCategories = categories || [
@@ -154,6 +161,43 @@ function Home() {
     const cartItem = cartItems.find(item => item.menuId === menuId);
     return cartItem ? cartItem.quantity : 0;
   };
+
+  // Add this function to fetch special menu items
+  const fetchSpecialMenuItems = async () => {
+    try {
+      const authData = localStorage.getItem('auth');
+      const userData = authData ? JSON.parse(authData) : null;
+      const userId = userData?.userId || '1'; // Default to '1' if not found
+
+      const response = await fetch(`${API_BASE_URL}/user/get_special_menu_list`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${userData?.accessToken}`
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          outlet_id: "1" // Hardcoded as requested
+        })
+      });
+
+      const data = await response.json();
+      console.log('Special menu response:', data); // Add this log to debug
+
+      if (data.detail && data.detail.special_menu_list) {
+        setSpecialMenuItems(data.detail.special_menu_list);
+      }
+
+    } catch (error) {
+      console.error('Error fetching special menu items:', error);
+    }
+  };
+
+  // Add this to the existing useEffect or create a new one
+  useEffect(() => {
+    fetchSpecialMenuItems();
+  }, []); // Empty dependency array means this runs once when component mounts
 
   return (
     <>
@@ -1266,6 +1310,8 @@ function Home() {
                     </div>
                   ))}
                 </div>
+
+                
                 {/* Recomended Start */}
               </div>
               {/* Other Package */}
@@ -1299,6 +1345,89 @@ function Home() {
           </div>
         </div> */}
               {/* Other Package */}
+
+                {/* Special Menus Section */}
+                <div className="title-bar mt-4">
+                  <span className="title mb-0 font-18">Special Menus</span>
+                </div>
+                <div className="categories-box p-0 m-0">
+                  {specialMenuItems && specialMenuItems.length > 0 ? (
+                    <div className="swiper-btn-center-lr">
+                      <Swiper
+                        spaceBetween={12}
+                        slidesPerView={1.2}
+                        className="special-menu-swiper"
+                        breakpoints={{
+                          320: { 
+                            slidesPerView: 1.2,
+                            slidesOffsetAfter: 0
+                          },
+                          576: { 
+                            slidesPerView: 2.2,
+                            slidesOffsetAfter: 0
+                          },
+                          768: { 
+                            slidesPerView: 2.5,
+                            slidesOffsetAfter: 0
+                          }
+                        }}
+                        loop={true}
+                        autoplay={{
+                          delay: 3000,
+                          disableOnInteraction: false,
+                          pauseOnMouseEnter: true
+                        }}
+                        watchSlidesProgress={true}
+                        watchSlidesVisibility={true}
+                        centeredSlidesBounds={true}
+                        resistanceRatio={0}
+                        touchRatio={1}
+                        touchAngle={45}
+                        grabCursor={true}
+                        momentumBounce={false}
+                        momentumBounceRatio={1}
+                        momentumRatio={1}
+                        touchEventsTarget="wrapper"
+                        touchStartPreventDefault={false}
+                        touchMoveStopPropagation={true}
+                        cssMode={true}
+                        modules={[Autoplay]}
+                      >
+                        {specialMenuItems.map((menuItem) => (
+                          <SwiperSlide 
+                            key={menuItem.menu_id}
+                            style={{
+                              width: 'auto',
+                              height: 'auto'
+                            }}
+                          >
+                            <div className="px-2">
+                              <HorizontalMenuCard
+                                image={menuItem.image || null}
+                                title={menuItem.menu_name}
+                                currentPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price : 0}
+                                originalPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price + (menuItem.portions[0].price * menuItem.offer / 100) : 0}
+                                discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
+                                onAddToCart={() => handleAddToCart(menuItem.menu_id)}
+                                onFavoriteClick={() => handleFavoriteClick(menuItem.menu_id)}
+                                isFavorite={menuItem.is_favourite === 1}
+                                productUrl="#"
+                                isInCart={false}
+                                quantity={getCartItemQuantity(menuItem.menu_id)}
+                                onIncrement={() => handleQuantityChange(menuItem.menu_id, getCartItemQuantity(menuItem.menu_id) + 1)}
+                                onDecrement={() => handleQuantityChange(menuItem.menu_id, getCartItemQuantity(menuItem.menu_id) - 1)}
+                              />
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+                  ) : (
+                    <div className="text-center text-muted">
+                      <p>No special menus available</p>
+                    </div>
+                  )}
+                </div>
             </div>
           </div>
         </div>
