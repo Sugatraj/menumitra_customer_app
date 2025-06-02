@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const OrderAccordionItem = ({
   orderId,
@@ -10,6 +11,8 @@ const OrderAccordionItem = ({
   isExpanded = false,
   parentId = 'accordionExample'
 }) => {
+  const navigate = useNavigate();
+
   // Generate unique IDs for accessibility
   const headingId = `heading${orderId}`;
   const collapseId = `collapse${orderId}`;
@@ -35,6 +38,11 @@ const OrderAccordionItem = ({
     </svg>
   );
 
+  const handleViewDetails = (e) => {
+    e.preventDefault();
+    navigate(`/order-detail/${orderId}`);
+  };
+
   return (
     <div className="accordion-item">
       <div className="accordion-header" id={headingId}>
@@ -45,19 +53,27 @@ const OrderAccordionItem = ({
           data-bs-target={`#${collapseId}`}
           aria-expanded={isExpanded}
           aria-controls={collapseId}
-          onClick={(e) => e.preventDefault()}
+          onClick={handleViewDetails}
         >
-          <div className="d-flex align-items-center">
-            <div className={`icon-box ${iconBgClass} me-3`}>
-              <BoxIcon color={iconColor} />
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <div className="d-flex align-items-center">
+              <div className={`icon-box ${iconBgClass} me-3`}>
+                <BoxIcon color={iconColor} />
+              </div>
+              <div>
+                <h6 className="sub-title">Order ID #{orderId}</h6>
+                <ul className="item-status d-flex align-items-center">
+                  <li className="me-2 text-soft">{itemCount} Items</li>
+                  <li className="text-soft">{status}</li>
+                </ul>
+              </div>
             </div>
-            <div>
-              <h6 className="sub-title">Order ID #{orderId}</h6>
-              <ul className="item-status d-flex align-items-center">
-                <li className="me-2 text-soft">{itemCount} Items</li>
-                <li className="text-soft">{status}</li>
-              </ul>
-            </div>
+            <button 
+              className="btn btn-primary btn-sm ms-3"
+              onClick={handleViewDetails}
+            >
+              View Details
+            </button>
           </div>
         </a>
       </div>

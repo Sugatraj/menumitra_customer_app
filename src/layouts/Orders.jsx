@@ -111,83 +111,83 @@ function Orders() {
   return (
     <>
       <Header />
-      <div className="page-content">
+  <div className="page-content">
         {isLoading ? (
           <div>Loading orders...</div>
         ) : error ? (
           <div>Error: {error}</div>
         ) : (
-          <div className="container pb">
-            <div className="default-tab style-1">
-              <ul className="nav nav-tabs" id="myTab3" role="tablist">
-                <li className="nav-item" role="presentation">
-                  <button
-                    className="nav-link active"
+    <div className="container pb">
+      <div className="default-tab style-1">
+        <ul className="nav nav-tabs" id="myTab3" role="tablist">
+          <li className="nav-item" role="presentation">
+            <button
+              className="nav-link active"
                     id="all-tab"
-                    data-bs-toggle="tab"
+              data-bs-toggle="tab"
                     data-bs-target="#all-tab-pane"
-                    type="button"
-                    role="tab"
+              type="button"
+              role="tab"
                     aria-controls="all-tab-pane"
-                    aria-selected="true"
-                  >
-                    All
-                  </button>
-                </li>
-                <li className="nav-item" role="presentation">
-                  <button
-                    className="nav-link d-flex align-items-center"
+              aria-selected="true"
+            >
+              All
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className="nav-link d-flex align-items-center"
                     id="completed-tab"
-                    data-bs-toggle="tab"
+              data-bs-toggle="tab"
                     data-bs-target="#completed-tab-pane"
-                    type="button"
-                    role="tab"
+              type="button"
+              role="tab"
                     aria-controls="completed-tab-pane"
-                    aria-selected="false"
-                  >
+              aria-selected="false"
+            >
                     <svg className="me-2" width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle cx={8} cy={8} r={7} fill="#027335" stroke="(--bg-white)" strokeWidth={2} />
-                    </svg>
+              </svg>
                     Completed
-                  </button>
-                </li>
-                <li className="nav-item" role="presentation">
-                  <button
-                    className="nav-link d-flex align-items-center"
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className="nav-link d-flex align-items-center"
                     id="cancelled-tab"
-                    data-bs-toggle="tab"
+              data-bs-toggle="tab"
                     data-bs-target="#cancelled-tab-pane"
-                    type="button"
-                    role="tab"
+              type="button"
+              role="tab"
                     aria-controls="cancelled-tab-pane"
-                    aria-selected="false"
-                  >
+              aria-selected="false"
+            >
                     <svg className="me-2" width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle cx={8} cy={8} r={7} fill="#FF0000" stroke="var(--bg-white)" strokeWidth={2} />
-                    </svg>
+              </svg>
                     Cancelled
-                  </button>
-                </li>
-              </ul>
-              <div className="tab-content" id="myTabContent3">
+            </button>
+          </li>
+        </ul>
+        <div className="tab-content" id="myTabContent3">
                 {/* All Orders Tab */}
                 <div className="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabIndex={0}>
-                  <div className="accordion style-3" id="accordionExample">
-                    {dummyOrders.map((order) => (
+            <div className="accordion style-3" id="accordionExample">
+                    {(ordersData.paid?.orders || dummyOrders).map((order) => (
                       <OrderAccordionItem
                         key={order.id}
                         orderId={order.id}
-                        itemCount={order.itemCount}
+                        itemCount={order.item_count || order.itemCount}
                         status={order.status}
-                        iconColor={order.iconColor}
-                        iconBgClass={order.iconBgClass}
+                        iconColor={order.iconColor || '#FFA902'}
+                        iconBgClass={order.iconBgClass || ''}
                         orderSteps={orderSteps}
                         isExpanded={order.isExpanded}
                         parentId="accordionExample"
                       />
                     ))}
-                  </div>
-                </div>
+                      </div>
+                      </div>
 
                 {/* Completed Orders Tab */}
                 <div className="tab-pane fade" id="completed-tab-pane" role="tabpanel" aria-labelledby="completed-tab" tabIndex={0}>
@@ -205,12 +205,12 @@ function Orders() {
                         parentId="accordionExample3"
                       />
                     ))}
-                  </div>
-                </div>
+                        </div>
+                        </div>
 
                 {/* Cancelled Orders Tab */}
                 <div className="tab-pane fade" id="cancelled-tab-pane" role="tabpanel" aria-labelledby="cancelled-tab" tabIndex={0}>
-                  <div className="accordion style-3" id="accordionExample2">
+            <div className="accordion style-3" id="accordionExample2">
                     {dummyOrders.slice(2).map((order) => (
                       <OrderAccordionItem
                         key={order.id}
@@ -224,13 +224,13 @@ function Orders() {
                         parentId="accordionExample2"
                       />
                     ))}
-                  </div>
+                      </div>
+                      </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
+                        </div>
         )}
-      </div>
+                        </div>
       <Footer />
     </>
   );
