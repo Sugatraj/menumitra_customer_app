@@ -106,21 +106,14 @@ const CategorySwiper = ({
             disableOnInteraction: false,
             pauseOnMouseEnter: true
           }}
-          watchSlidesProgress={true}
-          watchSlidesVisibility={true}
-          centeredSlidesBounds={true}
-          resistanceRatio={0}
+          modules={[Autoplay]}
+          grabCursor={true}
+          cssMode={true}
+          touchEventsTarget="container"
           touchRatio={1}
           touchAngle={45}
-          grabCursor={true}
-          momentumBounce={false}
-          momentumBounceRatio={1}
-          momentumRatio={1}
-          touchEventsTarget="wrapper"
-          touchStartPreventDefault={false}
-          touchMoveStopPropagation={true}
-          cssMode={true}
-          modules={[Autoplay]}
+          resistance={true}
+          resistanceRatio={0.85}
         >
           {customCategories.map((category) => (
             <SwiperSlide key={category.menuCatId}>

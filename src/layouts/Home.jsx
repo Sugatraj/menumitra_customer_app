@@ -1328,15 +1328,15 @@ function Home() {
                           pauseOnMouseEnter: true
                         }}
                         watchSlidesProgress={true}
-                        watchSlidesVisibility={true}
+                        watchslidesvisibility={1}
                         centeredSlidesBounds={true}
                         resistanceRatio={0}
                         touchRatio={1}
                         touchAngle={45}
                         grabCursor={true}
-                        momentumBounce={false}
-                        momentumBounceRatio={1}
-                        momentumRatio={1}
+                        momentumbounce={1}
+                        momentumbounceratio={1}
+                        momentumratio={1}
                         touchEventsTarget="wrapper"
                         touchStartPreventDefault={false}
                         touchMoveStopPropagation={true}
