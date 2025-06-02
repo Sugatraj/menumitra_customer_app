@@ -14,6 +14,13 @@ function Footer() {
            pathname.startsWith('/order-detail/');
   };
 
+  const isProfileRoute = () => {
+    const pathname = location.pathname;
+    return pathname === '/profile' || 
+           pathname.startsWith('/profile/') || 
+           pathname === '/edit-profile';
+  };
+
   return (
     <div>
       <div className="menubar-area style-2 footer-fixed border-top">
@@ -122,7 +129,7 @@ function Footer() {
           <NavLink
             to="/profile"
             className={({ isActive }) =>
-              isActive ? "nav-link active" : "nav-link"
+              isProfileRoute() ? "nav-link active" : "nav-link"
             }
           >
             <svg
