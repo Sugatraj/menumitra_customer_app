@@ -14,7 +14,7 @@ const VerticalMenuCard = ({
   onFavoriteClick,
   isFavorite: initialIsFavorite = false,
   discount,
-  menuItem
+  menuItem = {}
 }) => {
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,20 +23,22 @@ const VerticalMenuCard = ({
   const { user, setShowAuthOffcanvas } = useAuth();
   const MAX_QUANTITY = 20;
 
-  // Generate the product URL from menuItem data
-  const detailPageUrl = menuItem ? `/product-detail/${menuItem.menuId}/${menuItem.menuCatId}` : '#';
+  // Generate the product URL from menuItem data with safety checks
+  const detailPageUrl = menuItem?.menuId && menuItem?.menuCatId 
+    ? `/product-detail/${menuItem.menuId}/${menuItem.menuCatId}` 
+    : '#';
 
-  // Check if any portion of this menu exists in cart
-  const cartItemsForMenu = cartItems.filter(item => 
-    item.menuId === menuItem.menuId
-  );
+  // Check if any portion of this menu exists in cart with safety check
+  const cartItemsForMenu = menuItem?.menuId 
+    ? cartItems.filter(item => item.menuId === menuItem.menuId)
+    : [];
 
-  // Get the comment for this menu item
-  const menuComment = getCartItemComment(menuItem.menuId);
+  // Get the comment for this menu item with safety check
+  const menuComment = menuItem?.menuId ? getCartItemComment(menuItem.menuId) : '';
 
   const handleFavoriteToggle = async (e) => {
     e.preventDefault();
-    if (isLoading) return;
+    if (isLoading || !menuItem?.menuId) return;
 
     try {
       setIsLoading(true);
@@ -72,9 +74,7 @@ const VerticalMenuCard = ({
       const data = await response.json();
 
       if (response.ok) {
-        // Toggle favorite state locally
         setIsFavorite(!isFavorite);
-        
         if (onFavoriteClick) {
           onFavoriteClick(!isFavorite, menuItem.menuId);
         }
@@ -97,10 +97,12 @@ const VerticalMenuCard = ({
   const handleAddToCartClick = (e) => {
     e.preventDefault();
     
+    if (!menuItem) return;
+
     // Check if user is authenticated
     const authData = localStorage.getItem('auth');
     if (!authData || !user) {
-      setShowAuthOffcanvas(true); // Show auth modal if not logged in
+      setShowAuthOffcanvas(true);
       return;
     }
 
@@ -114,10 +116,12 @@ const VerticalMenuCard = ({
 
   // Handle quantity changes
   const handleQuantityChange = (increment) => {
+    if (!menuItem) return;
+
     // Check if user is authenticated
     const authData = localStorage.getItem('auth');
     if (!authData || !user) {
-      setShowAuthOffcanvas(true); // Show auth modal if not logged in
+      setShowAuthOffcanvas(true);
       return;
     }
 
@@ -183,7 +187,7 @@ const VerticalMenuCard = ({
               </button>
               
               <div className="d-flex align-items-center justify-content-center mx-2" style={{ flex: 1 }}>
-                {cartItemsForMenu.length > 0 ? (
+                {cartItemsForMenu.length > 0 && menuItem?.portions ? (
                   <div className="row g-0 w-100">
                     {menuItem.portions
                       .map(portion => {
@@ -248,7 +252,7 @@ VerticalMenuCard.propTypes = {
   onFavoriteClick: PropTypes.func,
   isFavorite: PropTypes.bool,
   discount: PropTypes.string,
-  menuItem: PropTypes.object.isRequired
+  menuItem: PropTypes.object
 };
 
 export default VerticalMenuCard;

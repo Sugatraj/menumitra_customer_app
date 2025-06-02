@@ -276,7 +276,7 @@ export const AddToCartModal = () => {
             { icon: '🥜', text: 'No nuts' }
           ].map((suggestion, index) => {
             const isSelected = comments[selectedPortion]?.includes(suggestion.text);
-            
+
             return (
               <div
                 key={index}

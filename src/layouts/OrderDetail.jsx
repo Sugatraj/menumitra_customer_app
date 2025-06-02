@@ -324,49 +324,49 @@ function OrderDetail() {
               <ul className={`summery-list mb-4 ${orderDetails.status.toLowerCase() === 'cancelled' ? 'text-muted' : ''}`}>
                 {orderDetails.items.map((item, index) => (
                   <li key={index}>
-                    <p className="order-name">
+                <p className="order-name">
                       {item.name} - ${item.price}
-                    </p>
+                </p>
                     <span className="order-quantity">x{item.quantity}</span>
-                  </li>
+              </li>
                 ))}
-                <li>
-                  <h6 className="mb-0 font-12">Order item Total</h6>
+              <li>
+                <h6 className="mb-0 font-12">Order item Total</h6>
                   <span className="font-12 font-w600 text-dark">
                     ${orderDetails.summary.itemTotal}
                   </span>
-                </li>
-                <li>
-                  <h6 className="mb-0 font-12">Order Delivery Charge</h6>
+              </li>
+              <li>
+                <h6 className="mb-0 font-12">Order Delivery Charge</h6>
                   <span className="font-12 font-w600 text-dark">
                     ${orderDetails.summary.deliveryCharge}
                   </span>
-                </li>
-                <li>
-                  <h6 className="mb-0 font-12">Split Order Tax</h6>
+              </li>
+              <li>
+                <h6 className="mb-0 font-12">Split Order Tax</h6>
                   <span className="font-12 font-w600 text-dark">
                     ${orderDetails.summary.tax}
                   </span>
-                </li>
-                <li>
-                  <h6 className="mb-0 font-12">Split Order Discount</h6>
+              </li>
+              <li>
+                <h6 className="mb-0 font-12">Split Order Discount</h6>
                   <span className="font-12 font-w600 text-dark">
                     ${orderDetails.summary.discount}
                   </span>
-                </li>
-                <li>
-                  <h6 className="mb-0 font-12">Split Order Wallet Discount</h6>
+              </li>
+              <li>
+                <h6 className="mb-0 font-12">Split Order Wallet Discount</h6>
                   <span className="font-12 font-w600 text-dark">
                     ${orderDetails.summary.walletDiscount}
                   </span>
-                </li>
-                <li>
+              </li>
+              <li>
                   <h6 className="mb-0 font-14 text-primary">AMOUNT TO COLLECT</h6>
                   <span className="font-14 font-w600 text-primary">
                     ${orderDetails.summary.totalAmount}
                   </span>
-                </li>
-              </ul>
+              </li>
+            </ul>
             </div>
 
             <div className="deliver-location mb-4">
@@ -405,7 +405,7 @@ function OrderDetail() {
 
             <div className="tracking-section">
               <h5 className={`title border-bottom pb-2 mb-2 font-w600 ${statusStyles.headerClass}`}>
-                Order Tracking
+              Order Tracking
                 <span 
                   className={`badge ms-2`} 
                   style={{ 
@@ -415,7 +415,7 @@ function OrderDetail() {
                 >
                   {orderDetails.status}
                 </span>
-              </h5>
+            </h5>
               <ul className={`dz-timeline style-2 mb-5 ${statusStyles.timelineClass}`}>
                 {orderDetails.tracking.map((step, index) => (
                   <li 
@@ -438,9 +438,9 @@ function OrderDetail() {
                       )}
                     </h6>
                     <p className="timeline-date">{step.time}</p>
-                  </li>
+              </li>
                 ))}
-              </ul>
+            </ul>
             </div>
 
             {/* User Information */}
