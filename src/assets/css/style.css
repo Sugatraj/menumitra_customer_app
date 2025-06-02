@@ -11433,7 +11433,7 @@ section {
       font-weight: 400;
       color: #000; }
       .sidebar .navbar-nav li > a:after {
-        content: "\f105";
+        content: "";
         font-family: "Font Awesome 6 Free";
         right: 0;
         position: absolute;
