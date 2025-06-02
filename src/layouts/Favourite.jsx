@@ -1,15 +1,97 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VerticalMenuCard from "../components/VerticalMenuCard";
+import { useAuth } from '../contexts/AuthContext';
+
+const API_BASE_URL = 'https://men4u.xyz/v2';
+const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_WzIoR2LV2Cgy33oxy6eEKQYSkaWr8AFU.jpg';
 
 function Favourite() {
+  const [favoriteMenus, setFavoriteMenus] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const authData = localStorage.getItem('auth');
+        const userData = authData ? JSON.parse(authData) : null;
+
+        if (!userData?.accessToken) {
+          setError('Please login to view favorites');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/user/get_favourite_list`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${userData.accessToken}`
+          },
+          body: JSON.stringify({
+            outlet_id: 1,
+            user_id: userData.userId
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.detail && data.detail.lists) {
+          // Flatten the nested structure into a single array of menu items
+          const allMenus = Object.values(data.detail.lists).flat();
+          setFavoriteMenus(allMenus);
+        } else {
+          setFavoriteMenus([]);
+        }
+      } catch (err) {
+        console.error('Error fetching favorites:', err);
+        setError('Failed to load favorite items');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="page-content">
+          <div className="container">
+            <div className="text-center p-5">Loading...</div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="page-content">
+          <div className="container">
+            <div className="alert alert-danger">{error}</div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
       <div className="page-content">
         <div className="content-inner pt-0">
-          <div className="container p-b30">
+          <div className="container p-b20">
             {/* Search */}
             <div>
               <div className="mb-3 input-group input-radius">
@@ -36,149 +118,45 @@ function Favourite() {
             </div>
             <div className="dashboard-area">
               <div className="title-bar">
-                <span className="title mb-0 font-18">Popular Deals</span>
+                <span className="title mb-0 font-18">Favorite Items</span>
               </div>
               <div className="row g-3 mb-3">
-                  <div className="col-6">
-                    <VerticalMenuCard
-                      // image="https://men4u.xyz/media/menu_images/puranpoli3.jpg"
-                      title="Fresh Grapes"
-                      currentPrice={10.9}
-                      reviewCount={243}
-                      // onAddToCart={() => handleAddToCart(productId)}
-                      // onFavoriteClick={() => handleFavoriteClick(productId)}
-                      isFavorite={false}
-                      discount="5%"
-                      productUrl="/product"
-                      // onQuantityChange={(newQuantity) =>
-                      //   handleQuantityChange(productId, newQuantity)
-                      // }
-                      quantity={1}
-                    />
-                  </div>
-                  {/* <div className="col-6">
-                    <div className="card-item style-1">
-                      <div className="dz-media">
-                        <img src="assets/images/food/food8.png" alt="image" />
-                        <a href="javascript:void(0);" className="r-btn">
-                          <div className="like-button">
-                            <i className="fa-regular fa-heart" />
-                          </div>
-                        </a>
-                        <div className="label">5% OFF</div>
-                      </div>
-                      <div className="dz-content">
-                        <h6 className="title mb-3">
-                          <a href="product.html">Fresh Grapes</a>
-                        </h6>
-                        <div className="dz-meta">
-                          <ul>
-                            <li className="price text-accent">$ 10.9</li>
-                            <li className="review">
-                              <span className="text-soft font-10">(243)</span>
-                              <i className="fa fa-star" />
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="mt-2">
-                          <a
-                            className="btn btn-primary add-btn light"
-                            href="javascript:void(0);"
-                          >
-                            Add to cart
-                          </a>
-                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                              <span className="input-group-btn input-group-prepend">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-down"
-                                  type="button"
-                                >
-                                  -
-                                </button>
-                              </span>
-                              <input
-                                className="stepper form-control"
-                                type="text"
-                                name="demo3"
-                                readOnly=""
-                              />
-                              <span className="input-group-btn input-group-append">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-up"
-                                  type="button"
-                                >
-                                  +
-                                </button>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                {favoriteMenus.length > 0 ? (
+                  favoriteMenus.map((menu) => (
+                    <div className="col-6" key={menu.menu_id}>
+                      <VerticalMenuCard
+                        image={menu.image || DEFAULT_IMAGE}
+                        title={menu.menu_name}
+                        currentPrice={menu.portions?.[0]?.price || 0}
+                        reviewCount={menu.rating ? parseInt(menu.rating) : null}
+                        isFavorite={true}
+                        discount={menu.offer > 0 ? `${menu.offer}%` : null}
+                        menuItem={{
+                          menuId: menu.menu_id,
+                          menuCatId: menu.menu_cat_id,
+                          menuName: menu.menu_name,
+                          menuFoodType: menu.menu_food_type,
+                          categoryName: menu.category_name,
+                          spicyIndex: menu.spicy_index,
+                          portions: menu.portions,
+                          rating: menu.rating,
+                          offer: menu.offer,
+                          isSpecial: menu.is_special,
+                          isFavourite: true,
+                          isActive: true,
+                          image: menu.image || DEFAULT_IMAGE
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-12">
+                    <div className="alert alert-info text-center">
+                      No favorite items found
                     </div>
                   </div>
-                  <div className="col-6">
-                    <div className="card-item style-1">
-                      <div className="dz-media">
-                        <img src="assets/images/food/food3.png" alt="image" />
-                        <a href="javascript:void(0);" className="r-btn">
-                          <div className="like-button active">
-                            <i className="fa-regular fa-heart" />
-                          </div>
-                        </a>
-                        <div className="label">5% OFF</div>
-                      </div>
-                      <div className="dz-content">
-                        <h6 className="title mb-3">
-                          <a href="product.html">Chicken Village</a>
-                        </h6>
-                        <div className="dz-meta">
-                          <ul>
-                            <li className="price text-accent">$ 10.9</li>
-                            <li className="review">
-                              <span className="text-soft font-10">(243)</span>
-                              <i className="fa fa-star" />
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="mt-2">
-                          <a
-                            className="btn btn-primary add-btn light"
-                            href="javascript:void(0);"
-                          >
-                            Add to cart
-                          </a>
-                          <div className="dz-stepper border-1 rounded-stepper stepper-fill">
-                            <div className="input-group bootstrap-touchspin bootstrap-touchspin-injected">
-                              <span className="input-group-btn input-group-prepend">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-down"
-                                  type="button"
-                                >
-                                  -
-                                </button>
-                              </span>
-                              <input
-                                className="stepper form-control"
-                                type="text"
-                                name="demo3"
-                                readOnly=""
-                              />
-                              <span className="input-group-btn input-group-append">
-                                <button
-                                  className="btn btn-primary bootstrap-touchspin-up"
-                                  type="button"
-                                >
-                                  +
-                                </button>
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
-                </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
