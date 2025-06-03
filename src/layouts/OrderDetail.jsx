@@ -174,7 +174,7 @@ function OrderDetail() {
               </ul>
             </div>
 
-            <h5 className="title border-bottom pb-2 mb-2 font-w600">
+            {/* <h5 className="title border-bottom pb-2 mb-2 font-w600">
               Order Tracking
             </h5>
             <ul className="dz-timeline style-2 mb-5">
@@ -198,7 +198,7 @@ function OrderDetail() {
                 <h6 className="timeline-tilte">Order Delivered</h6>
                 <p className="timeline-date">30 May 2025 12:19 PM</p>
               </li>
-            </ul>
+            </ul> */}
 
             <h5 className="title border-bottom pb-2 mb-2 font-w600">
               User Information
