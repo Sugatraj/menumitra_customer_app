@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function OrderDetail() {
   const { orderId } = useParams();
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const VegIcon = () => (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -20,6 +23,76 @@ function OrderDetail() {
     </svg>
   );
 
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        // Get auth data from localStorage
+        const auth = JSON.parse(localStorage.getItem("auth")) || {};
+        const accessToken = auth.accessToken;
+        const userId = auth.userId || "73"; // Get userId from localStorage
+
+        if (!accessToken) {
+          throw new Error("Authentication token not found");
+        }
+
+        const response = await fetch('https://men4u.xyz/v2/user/get_order_details', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ 
+            order_id: orderId,
+            user_id: parseInt(userId) // Add user_id to payload
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch order details");
+        }
+
+        const data = await response.json();
+        
+        if (data.detail) {
+          setOrderDetails(data.detail);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (error) {
+        console.error('Error fetching order details:', error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrderDetails();
+  }, [orderId]);
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <div className="page-content bottom-content">
+          <div className="container">Loading...</div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="page-content bottom-content">
+          <div className="container">Error: {error}</div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
@@ -27,53 +100,60 @@ function OrderDetail() {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="title border-bottom pb-1 font-w600">
-              Order #{orderId}
+              Order #{orderDetails.order_details.order_number}
             </h5>
             <span className="status-badge">
-              Cooking
+              {orderDetails.order_details.order_status}
             </span>
           </div>
           <div className="order-summery">
             <ul className="summery-list mb-4">
-              <li>
-                <p className="order-name">Testing Menu</p>
-                <div className="d-flex align-items-center">
-                  <span className="me-2">
-                    <NonVegIcon />
-                  </span>
-                  <span className="order-quantity">x2</span>
-                </div>
-              </li>
+              {orderDetails.menu_details.map((menu, index) => (
+                <li key={index}>
+                  <p className="order-name">{menu.menu_name}</p>
+                  <div className="d-flex align-items-center">
+                    <span className="me-2">
+                      {menu.menu_food_type.toLowerCase() === "veg" ? <VegIcon /> : <NonVegIcon />}
+                    </span>
+                    <span className="order-quantity">x{menu.quantity}</span>
+                  </div>
+                </li>
+              ))}
               <li>
                 <h6 className="mb-0 font-12">Bill Amount</h6>
-                <span className="font-12 font-w600 text-dark">₹150.00</span>
+                <span className="font-12 font-w600 text-dark">₹{orderDetails.order_details.total_bill_amount}</span>
               </li>
               <li>
-                <h6 className="mb-0 font-12">Service Charge (1%)</h6>
-                <span className="font-12 font-w600 text-dark">₹1.47</span>
+                <h6 className="mb-0 font-12">Service Charge ({orderDetails.order_details.service_charges_percent}%)</h6>
+                <span className="font-12 font-w600 text-dark">₹{orderDetails.order_details.service_charges_amount}</span>
               </li>
               <li>
-                <h6 className="mb-0 font-12">GST (1%)</h6>
-                <span className="font-12 font-w600 text-dark">₹1.48</span>
+                <h6 className="mb-0 font-12">GST ({orderDetails.order_details.gst_percent}%)</h6>
+                <span className="font-12 font-w600 text-dark">₹{orderDetails.order_details.gst_amount}</span>
               </li>
-              <li>
-                <h6 className="mb-0 font-12">Discount (4%)</h6>
-                <span className="font-12 font-w600 text-success">-₹3.00</span>
-              </li>
+              {orderDetails.order_details.discount_amount > 0 && (
+                <li>
+                  <h6 className="mb-0 font-12">Discount ({orderDetails.order_details.discount_percent}%)</h6>
+                  <span className="font-12 font-w600 text-success">-₹{orderDetails.order_details.discount_amount}</span>
+                </li>
+              )}
               <li>
                 <h6 className="mb-0 font-14 text-primary">FINAL AMOUNT</h6>
-                <span className="font-14 font-w600 text-primary">₹149.95</span>
+                <span className="font-14 font-w600 text-primary">₹{orderDetails.order_details.final_grand_total}</span>
               </li>
             </ul>
 
             <div className="deliver-location mb-4">
               <div className="d-flex align-items-center mb-3">
                 <span className="font-w600 flex-1">Deliver to</span>
-                <span className="font-w800">DINE-IN</span>
+                <span className="font-w800">{orderDetails.order_details.order_type}</span>
               </div>
-              <h6 className="address font-14">
-                Table: 219, 225 (Family)
-              </h6>
+              {orderDetails.order_details.table_number && (
+                <h6 className="address font-14">
+                  Table: {orderDetails.order_details.table_number.join(", ")}
+                  ({orderDetails.order_details.section_name})
+                </h6>
+              )}
             </div>
 
             <h5 className="title border-bottom pb-2 mb-2 font-w600">Basic Detail</h5>
@@ -81,15 +161,15 @@ function OrderDetail() {
               <ul>
                 <li>
                   <span>Order ID</span>
-                  <span className="text-dark">{orderId}</span>
+                  <span className="text-dark">{orderDetails.order_details.order_number}</span>
                 </li>
                 <li>
                   <span>Payment Method</span>
-                  <span className="text-dark">Not Paid</span>
+                  <span className="text-dark">{orderDetails.order_details.payment_method || "Not Paid"}</span>
                 </li>
                 <li>
                   <span>Delivery On</span>
-                  <span className="text-dark">30 May 2025 12:19 PM</span>
+                  <span className="text-dark">{`${orderDetails.order_details.date} ${orderDetails.order_details.time}`}</span>
                 </li>
               </ul>
             </div>
@@ -130,11 +210,11 @@ function OrderDetail() {
                     <div className="item-inner">
                       <div className="item-title-row">
                         <h6 className="item-title mb-1 sub-title">
-                          <a href="#">Heenann</a>
+                          <a href="#">{orderDetails.order_details.user_name}</a>
                         </h6>
                         <span className="info">
                           <i className="fa-solid me-1 fa-phone" />
-                          6264335759
+                          {orderDetails.order_details.user_mobile}
                         </span>
                       </div>
                     </div>
@@ -153,7 +233,7 @@ function OrderDetail() {
                     <div className="item-inner">
                       <div className="item-title-row">
                         <h6 className="item-title mb-1 sub-title">
-                          <a href="#">Bhavani Hotel</a>
+                          <a href="#">{orderDetails.order_details.outlet_name}</a>
                         </h6>
                       </div>
                     </div>
