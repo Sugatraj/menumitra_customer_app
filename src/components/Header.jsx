@@ -25,7 +25,9 @@ function Header() {
 
   // Function to check if banner should be hidden
   const shouldHideBanner = () => {
-    return location.pathname.includes('/all-outlets') || isProfileRoute();
+    return location.pathname.includes('/all-outlets') || 
+           location.pathname.includes('/outlet-details') || 
+           isProfileRoute();
   };
 
   useEffect(() => {

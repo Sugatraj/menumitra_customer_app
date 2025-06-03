@@ -5,37 +5,72 @@ import { useOutlet } from '../contexts/OutletContext';
 
 function OutletDetails() {
   const { outletInfo } = useOutlet();
-  const [restaurantDetails, setRestaurantDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [restaurantDetails, setRestaurantDetails] = useState(() => {
+    // Always initialize from cache if available
+    const cached = localStorage.getItem(`restaurant_details_${outletInfo?.outletId}`);
+    return cached ? JSON.parse(cached) : {
+      outlet_details: {
+        name: outletInfo?.outletName,
+        address: outletInfo?.outletAddress,
+        mobile: outletInfo?.outletMobile,
+        veg_nonveg: outletInfo?.vegNonveg,
+        upi_id: '',
+        image: null
+      },
+      count: {
+        total_menu: 0,
+        total_special_menu: 0,
+        total_offer_menu: 0,
+        total_category: 0,
+        total_tables: 0
+      }
+    };
+  });
   const [isProcessingUPI, setIsProcessingUPI] = useState(false);
   const [isProcessingPhonePe, setIsProcessingPhonePe] = useState(false);
   const [isProcessingGPay, setIsProcessingGPay] = useState(false);
-  const timeoutRef = useRef({ upi: null, phonepe: null, gpay: null });
+  const lastFetchRef = useRef(0);
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
-  useEffect(() => {
-    const fetchRestaurantDetails = async () => {
-      try {
-        const response = await fetch('https://men4u.xyz/v2/user/get_restaurant_details', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            outlet_id: outletInfo?.outletId
-          })
-        });
-        const data = await response.json();
-        setRestaurantDetails(data.detail);
-      } catch (error) {
-        console.error('Error fetching restaurant details:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (outletInfo?.outletId) {
-      fetchRestaurantDetails();
+  const fetchRestaurantDetails = async () => {
+    try {
+      const response = await fetch('https://men4u.xyz/v2/user/get_restaurant_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          outlet_id: outletInfo?.outletId
+        })
+      });
+      const data = await response.json();
+      
+      // Update cache and state
+      localStorage.setItem(
+        `restaurant_details_${outletInfo?.outletId}`,
+        JSON.stringify(data.detail)
+      );
+      setRestaurantDetails(data.detail);
+      lastFetchRef.current = Date.now();
+    } catch (error) {
+      console.error('Error fetching restaurant details:', error);
     }
+  };
+
+  // Initial fetch and periodic refresh
+  useEffect(() => {
+    if (!outletInfo?.outletId) return;
+
+    // Always fetch on mount
+    fetchRestaurantDetails();
+
+    // Set up periodic refresh
+    const intervalId = setInterval(fetchRestaurantDetails, CACHE_DURATION);
+
+    return () => {
+      clearInterval(intervalId);
+      lastFetchRef.current = 0;
+    };
   }, [outletInfo?.outletId]);
 
   const handleGenericUPI = () => {
@@ -87,18 +122,6 @@ function OutletDetails() {
       setIsProcessingGPay(false);
     }
   };
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="container py-4">
-          <div className="text-center">Loading...</div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
 
   return (
     <>
