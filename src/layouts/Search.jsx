@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/AuthContext"; // Assuming you have AuthCont
 import { useCart } from "../contexts/CartContext"; // Add this import
 import { useModal } from "../contexts/ModalContext"; // Add this import
 import { debounce } from 'lodash'; // Make sure to install lodash
+import { useOutlet } from '../contexts/OutletContext';
 
 function Search() {
   const [searchResults, setSearchResults] = useState([]);
@@ -19,7 +20,6 @@ function Search() {
   const [originalSearchResults, setOriginalSearchResults] = useState([]);
   
   // Get these from context/props
-  const outletId = 1; // This should come from your app context/state
   const { userId } = useAuth(); // Get user_id from auth context
 
   // Get cart context
@@ -27,6 +27,8 @@ function Search() {
 
   // Get modal context
   const { openModal } = useModal();
+
+  const { outletId } = useOutlet();
 
   const MAX_QUANTITY = 20;
 

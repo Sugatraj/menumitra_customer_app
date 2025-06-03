@@ -5,6 +5,7 @@ import { useCart } from "../contexts/CartContext";
 import axios from "axios";
 import { API_CONFIG } from "../constants/config";
 import { useNavigate } from "react-router-dom";
+import { useOutlet } from '../contexts/OutletContext';
 
 const FooterSummary = React.memo(function FooterSummary({ checkoutDetails }) {
   // Fallback to zeros if no data yet
@@ -89,6 +90,7 @@ function Checkout() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const MAX_QUANTITY = 20;
+  const { outletId } = useOutlet();
 
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -136,7 +138,7 @@ function Checkout() {
       const response = await axios.post(
         "https://men4u.xyz/v2/user/get_checkout_detail",
         {
-          outlet_id: "1",
+          outlet_id: outletId,
           order_items: orderItems,
         },
         {
@@ -213,7 +215,7 @@ function Checkout() {
       }));
 
       const payload = {
-        outlet_id: "1",
+        outlet_id: outletId,
         user_id: String(userId),
         section_id: "1",
         order_type: "parcel",

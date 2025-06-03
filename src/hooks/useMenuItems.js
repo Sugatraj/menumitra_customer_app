@@ -1,24 +1,29 @@
 import { useState, useEffect } from 'react';
+import { useOutlet } from '../contexts/OutletContext';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 const CACHE_KEY = 'menuItems_cache';
 const CACHE_EXPIRY = 1000 * 60 * 5; // 5 minutes
 
 export const useMenuItems = () => {
+  const { outletId } = useOutlet(); // Get outletId from context
   const [menuCategories, setMenuCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Update cache key to include outletId
+  const getCacheKey = () => `${CACHE_KEY}_${outletId}`;
+
   // Get cached data function
   const getCachedData = () => {
     try {
-      const cached = localStorage.getItem(CACHE_KEY);
+      const cached = localStorage.getItem(getCacheKey());
       if (!cached) return null;
 
       const { data, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp > CACHE_EXPIRY) {
-        localStorage.removeItem(CACHE_KEY);
+        localStorage.removeItem(getCacheKey());
         return null;
       }
       return data;
@@ -32,7 +37,7 @@ export const useMenuItems = () => {
   const setCacheData = (data) => {
     try {
       localStorage.setItem(
-        CACHE_KEY,
+        getCacheKey(),
         JSON.stringify({
           data,
           timestamp: Date.now(),
@@ -45,6 +50,8 @@ export const useMenuItems = () => {
 
   // Fetch data function
   const fetchMenusByCategory = async () => {
+    if (!outletId) return; // Don't fetch if no outletId
+
     try {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
@@ -57,7 +64,7 @@ export const useMenuItems = () => {
           'Authorization': `Bearer ${userData?.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1,
+          outlet_id: outletId, // Use outletId from context
           user_id: userData?.userId || null
         })
       });
@@ -90,11 +97,8 @@ export const useMenuItems = () => {
           image: menu.image
         })) || [];
 
-        // Update state
         setMenuCategories(categories);
         setMenuItems(menus);
-
-        // Cache the data
         setCacheData({ categories, menus });
       }
     } catch (error) {
@@ -106,6 +110,8 @@ export const useMenuItems = () => {
   };
 
   useEffect(() => {
+    if (!outletId) return;
+
     // Try to load cached data first
     const cachedData = getCachedData();
     if (cachedData) {
@@ -116,7 +122,7 @@ export const useMenuItems = () => {
 
     // Fetch fresh data
     fetchMenusByCategory();
-  }, []);
+  }, [outletId]); // Add outletId as dependency
 
   return {
     menuCategories,

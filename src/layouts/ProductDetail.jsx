@@ -8,18 +8,18 @@ import axios from 'axios';
 import fallbackImage from '../assets/images/food/food8.png';
 import { useCart } from '../contexts/CartContext';
 import { useModal } from '../contexts/ModalContext';
+import { useOutlet } from '../contexts/OutletContext';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/pagination';
-
-const OUTLET_ID = 1;
 
 function ProductDetail() {
   const { menuId, menuCatId } = useParams();
   const [menuDetails, setMenuDetails] = useState(null);
   const { openModal } = useModal();
   const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const { outletId } = useOutlet();
 
   useEffect(() => {
     const fetchMenuDetails = async () => {
@@ -28,10 +28,10 @@ function ProductDetail() {
         const user_id = auth.userId;
 
         const response = await axios.post('https://men4u.xyz/v2/user/get_menu_details', {
-          outlet_id: OUTLET_ID,
+          outlet_id: outletId,
           menu_id: Number(menuId),
           menu_cat_id: Number(menuCatId),
-          user_id: Number(user_id)
+          user_id: Number(user_id) || null
         });
 
         setMenuDetails(response.data.details);
@@ -41,7 +41,7 @@ function ProductDetail() {
     };
 
     fetchMenuDetails();
-  }, [menuId, menuCatId]);
+  }, [menuId, menuCatId, outletId]);
 
   // Check if item exists in cart with proper menuId comparison
   const cartItem = cartItems.find(item => 

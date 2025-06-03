@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import OrderAccordionItem from '../components/OrderAccordionItem';
+import { useOutlet } from '../contexts/OutletContext';
 
 function Orders() {
+  const { outletId } = useOutlet();
   const [ordersData, setOrdersData] = useState({
     paid: {},
     cancelled: {}
@@ -159,7 +161,6 @@ function Orders() {
       const auth = JSON.parse(localStorage.getItem('auth')) || {};
       const userId = auth.userId || '73';
       const accessToken = auth.accessToken;
-      const outletId = '1';
 
       if (!accessToken) {
         throw new Error('Authentication token not found');
@@ -173,7 +174,7 @@ function Orders() {
         },
         body: JSON.stringify({
           user_id: parseInt(userId),
-          outlet_id: parseInt(outletId)
+          outlet_id: outletId
         })
       });
 

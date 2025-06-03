@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
+import { useOutlet } from '../contexts/OutletContext';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VerticalMenuCard from '../components/VerticalMenuCard';
@@ -10,6 +11,7 @@ const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_Wz
 function CategoryFilteredMenuList() {
   const { categoryId } = useParams();
   const location = useLocation();
+  const { outletId } = useOutlet();
   const categoryName = location.state?.categoryName;
   const menuCount = location.state?.menuCount;
 
@@ -22,6 +24,8 @@ function CategoryFilteredMenuList() {
 
   useEffect(() => {
     const fetchMenusByCategory = async () => {
+      if (!outletId || !categoryId) return;
+
       try {
         const authData = localStorage.getItem('auth');
         const userData = authData ? JSON.parse(authData) : null;
@@ -34,8 +38,8 @@ function CategoryFilteredMenuList() {
             'Authorization': `Bearer ${userData?.accessToken}`
           },
           body: JSON.stringify({
-            outlet_id: 1,
-            user_id: userData?.userId
+            outlet_id: outletId,
+            user_id: userData?.userId || null
           })
         });
 
@@ -65,10 +69,8 @@ function CategoryFilteredMenuList() {
       }
     };
 
-    if (categoryId) {
-      fetchMenusByCategory();
-    }
-  }, [categoryId, categoryName, menuCount]);
+    fetchMenusByCategory();
+  }, [categoryId, categoryName, menuCount, outletId]);
 
   if (loading) {
     return (

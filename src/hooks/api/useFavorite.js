@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOutlet } from '../../contexts/OutletContext';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
@@ -7,6 +8,7 @@ export const useFavorite = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { user } = useAuth();
+  const { outletId } = useOutlet();
 
   const getFavorites = async () => {
     setLoading(true);
@@ -27,8 +29,8 @@ export const useFavorite = () => {
           'Authorization': `Bearer ${userData.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1,
-          user_id: userData.userId
+          outlet_id: outletId,
+          user_id: userData.userId || null
         })
       });
 
@@ -70,7 +72,7 @@ export const useFavorite = () => {
           'Authorization': `Bearer ${userData.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1,
+          outlet_id: outletId,
           user_id: userData.userId,
           menu_id: menuId
         })

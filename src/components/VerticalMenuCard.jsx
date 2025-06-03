@@ -5,6 +5,7 @@ import fallbackImage from '../assets/images/food/food8.png';
 import { useModal } from '../contexts/ModalContext';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useOutlet } from '../contexts/OutletContext';
 
 const VerticalMenuCard = ({
   image,
@@ -20,6 +21,7 @@ const VerticalMenuCard = ({
   const { openModal } = useModal();
   const { cartItems, updateQuantity, removeFromCart, getCartItemComment } = useCart();
   const { user, setShowAuthOffcanvas } = useAuth();
+  const { outletId } = useOutlet();
   const MAX_QUANTITY = 20;
 
   // Generate the product URL from menuItem data with safety checks
@@ -64,9 +66,9 @@ const VerticalMenuCard = ({
           'Authorization': `Bearer ${auth.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1,
+          outlet_id: outletId,
           menu_id: menuItem.menuId,
-          user_id: auth.userId
+          user_id: auth.userId || null
         })
       });
 

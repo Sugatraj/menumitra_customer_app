@@ -128,12 +128,12 @@ function Home() {
     }
   };
 
-  // Add this to the existing useEffect or create a new one
+  // Add this useEffect to call fetchSpecialMenuItems when outletId changes
   useEffect(() => {
     if (outletId) {
       fetchSpecialMenuItems();
     }
-  }, [outletId]); // Re-fetch when outlet ID changes
+  }, [outletId]); // Add outletId as dependency
 
   // Add this function to handle favorite updates
   const handleFavoriteUpdate = (menuId, isFavorite) => {

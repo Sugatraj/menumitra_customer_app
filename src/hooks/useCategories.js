@@ -1,10 +1,13 @@
 // src/hooks/useCategories.js
 import { useQuery } from '@tanstack/react-query';
 import { getApiUrl } from '../constants/config';
+import { useOutlet } from '../contexts/OutletContext';
 
 export const useCategories = () => {
+  const { outletId } = useOutlet(); // Get outletId from context
+
   return useQuery({
-    queryKey: ['categories'],
+    queryKey: ['categories', outletId], // Add outletId to queryKey
     queryFn: async () => {
       // Get auth data from localStorage
       const authData = localStorage.getItem('auth');
@@ -18,7 +21,7 @@ export const useCategories = () => {
           'Authorization': `Bearer ${userData?.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1,
+          outlet_id: outletId, // Use outletId from context
           user_id: userData?.userId || null  // Add user_id if available
         })
       });
@@ -42,5 +45,6 @@ export const useCategories = () => {
     },
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     cacheTime: 30 * 60 * 1000, // Cache for 30 minutes
+    enabled: !!outletId, // Only run query when outletId is available
   });
 };
