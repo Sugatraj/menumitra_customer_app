@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useModal } from '../contexts/ModalContext';
+import { useCart } from '../contexts/CartContext';
 
 function OutletInfoBanner() {
   const { openModal } = useModal();
-  const [orderType, setOrderType] = useState(() => {
-    const saved = localStorage.getItem('orderType');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const { orderSettings } = useCart();
+
+  // Map of order types to their icons
+  const orderTypeIcons = {
+    'counter': '🏪',
+    'drive-through': '🚗',
+    'delivery': '🛵',
+    'parcel': '📦'
+  };
+
+  // Map of order types to their display names
+  const orderTypeNames = {
+    'counter': 'Counter',
+    'drive-through': 'Drive Through',
+    'delivery': 'Delivery',
+    'parcel': 'Parcel'
+  };
 
   const handleOrderTypeClick = () => {
-    openModal('ORDER_TYPE', {
-      onSelect: (selectedType) => {
-        setOrderType({
-          type: selectedType.id,
-          title: selectedType.title,
-          selectedAt: new Date().toISOString()
-        });
-      }
-    });
+    openModal('ORDER_TYPE');
   };
 
   return (
@@ -50,27 +56,33 @@ function OutletInfoBanner() {
             style={{ textDecoration: 'none' }}
           >
             <div className="text-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="32"
-                height="32"
-                viewBox="0 0 15 24"
-                fill="currentColor"
-                className="me-2"
-              >
-                <path d="M12 2C8.1 2 5 5.1 5 9c0 4 7 13 7 13s7-9 7-13c0-3.9-3.1-7-7-7zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z" />
-              </svg>
+              {orderSettings.order_type ? (
+                <span style={{ fontSize: '24px' }}>
+                  {orderTypeIcons[orderSettings.order_type]}
+                </span>
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="32"
+                  height="32"
+                  viewBox="0 0 15 24"
+                  fill="currentColor"
+                  className="me-2"
+                >
+                  <path d="M12 2C8.1 2 5 5.1 5 9c0 4 7 13 7 13s7-9 7-13c0-3.9-3.1-7-7-7zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z" />
+                </svg>
+              )}
             </div>
-            <div className="d-flex flex-column align-items-start">
+            <div className="d-flex flex-column align-items-start ms-2">
               <span className="fw-bold text-dark">
-                {orderType ? orderType.title : 'Select Order Type'}
+                {orderSettings.order_type 
+                  ? orderTypeNames[orderSettings.order_type]
+                  : 'Select Order Type'
+                }
               </span>
               <small className="text-muted">
-                {orderType 
-                  ? new Date(orderType.selectedAt).toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit' 
-                    })
+                {orderSettings.order_type 
+                  ? 'Tap to change'
                   : 'Click to select'
                 }
               </small>

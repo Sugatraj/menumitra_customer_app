@@ -7,6 +7,29 @@ export const OrderTypeModal = () => {
   const { closeModal } = useModal();
   const { updateOrderSettings, orderSettings } = useCart();
 
+  const orderTypes = [
+    {
+      id: 'counter',
+      title: 'Counter',
+      icon: '🏪'
+    },
+    {
+      id: 'drive-through',
+      title: 'Drive Through',
+      icon: '🚗'
+    },
+    {
+      id: 'delivery',
+      title: 'Delivery',
+      icon: '🛵'
+    },
+    {
+      id: 'parcel',
+      title: 'Parcel',
+      icon: '📦'
+    }
+  ];
+
   const handleOrderTypeSelect = (type) => {
     updateOrderSettings({ order_type: type });
     closeModal();
@@ -17,31 +40,23 @@ export const OrderTypeModal = () => {
       title="Select Order Type" 
       onClose={closeModal}
     >
-      <div className="d-grid gap-2">
-        <button 
-          className={`btn ${orderSettings.order_type === 'counter' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => handleOrderTypeSelect('counter')}
-        >
-          Counter
-        </button>
-        <button 
-          className={`btn ${orderSettings.order_type === 'drive-through' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => handleOrderTypeSelect('drive-through')}
-        >
-          Drive Through
-        </button>
-        <button 
-          className={`btn ${orderSettings.order_type === 'delivery' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => handleOrderTypeSelect('delivery')}
-        >
-          Delivery
-        </button>
-        <button 
-          className={`btn ${orderSettings.order_type === 'parcel' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => handleOrderTypeSelect('parcel')}
-        >
-          Parcel
-        </button>
+      <div className="row g-3">
+        {orderTypes.map((type) => (
+          <div key={type.id} className="col-6">
+            <button 
+              className={`btn ${orderSettings.order_type === type.id ? 'btn-primary' : 'btn-outline-primary'} w-100 h-100 py-3 d-flex flex-column align-items-center justify-content-center`}
+              onClick={() => handleOrderTypeSelect(type.id)}
+              style={{
+                borderRadius: '12px',
+                minHeight: '100px',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <span className="mb-2" style={{ fontSize: '24px' }}>{type.icon}</span>
+              <span style={{ fontSize: '14px', fontWeight: '500' }}>{type.title}</span>
+            </button>
+          </div>
+        ))}
       </div>
     </BaseModal>
   );
