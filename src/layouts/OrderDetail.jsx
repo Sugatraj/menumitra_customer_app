@@ -6,6 +6,20 @@ import Footer from "../components/Footer";
 function OrderDetail() {
   const { orderId } = useParams();
 
+  const VegIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="12" height="12" rx="2" fill="white" stroke="#00B67A" strokeWidth="2"/>
+      <circle cx="8" cy="8" r="3" fill="#00B67A"/>
+    </svg>
+  );
+
+  const NonVegIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="12" height="12" rx="2" fill="white" stroke="#E74C3C" strokeWidth="2"/>
+      <circle cx="8" cy="8" r="3" fill="#E74C3C"/>
+    </svg>
+  );
+
   return (
     <>
       <Header />
@@ -24,7 +38,9 @@ function OrderDetail() {
               <li>
                 <p className="order-name">Testing Menu</p>
                 <div className="d-flex align-items-center">
-                  <span className="badge bg-light text-dark me-2">Nonveg</span>
+                  <span className="me-2">
+                    <NonVegIcon />
+                  </span>
                   <span className="order-quantity">x2</span>
                 </div>
               </li>
