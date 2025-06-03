@@ -75,7 +75,7 @@ const OrderAccordionItem = ({
               </div>
             </div>
             <button 
-              className="btn btn-sm ms-3"
+              className="btn btn-sm mx-3"
               style={{
                 backgroundColor: status.toLowerCase() === 'cancelled' ? '#FFEBEE' : '#E8F5E9',
                 color: status.toLowerCase() === 'cancelled' ? '#E74C3C' : '#00B67A',
