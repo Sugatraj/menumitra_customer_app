@@ -1,10 +1,12 @@
 import React from "react";
 import { useModal } from '../contexts/ModalContext';
 import { useCart } from '../contexts/CartContext';
+import { useOutlet } from '../contexts/OutletContext';
 
 function OutletInfoBanner() {
   const { openModal } = useModal();
   const { orderSettings } = useCart();
+  const { outletInfo } = useOutlet();
 
   // Map of order types to their icons
   const orderTypeIcons = {
@@ -43,8 +45,12 @@ function OutletInfoBanner() {
             </svg>
           </div>
           <div>
-            <h6 className="mb-0 text-dark fw-bold">DESHMUKH WADA</h6>
-            <small className="text-muted">Pune</small>
+            <h6 className="mb-0 text-dark fw-bold">
+              {outletInfo?.outletName || 'Select Outlet'}
+            </h6>
+            <small className="text-muted">
+              {outletInfo?.outletAddress || 'No address available'}
+            </small>
           </div>
         </div>
 
