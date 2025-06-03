@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import OrderAccordionItem from '../components/OrderAccordionItem';
-import { useOutlet } from '../contexts/OutletContext';
+import OrderAccordionItem from "../components/OrderAccordionItem";
+import { useOutlet } from "../contexts/OutletContext";
 
 function Orders() {
   const { outletId } = useOutlet();
   const [ordersData, setOrdersData] = useState({
     paid: {},
-    cancelled: {}
+    cancelled: {},
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,140 +16,140 @@ function Orders() {
   // Dummy order steps data
   const orderSteps = [
     {
-      title: 'Order Placed',
-      timestamp: 'January 19th, 12 : 02 AM',
-      completed: true
+      title: "Order Placed",
+      timestamp: "January 19th, 12 : 02 AM",
+      completed: true,
     },
     {
-      title: 'Order Confirmed',
-      timestamp: 'January 19th, 12 : 02 AM',
-      completed: true
+      title: "Order Confirmed",
+      timestamp: "January 19th, 12 : 02 AM",
+      completed: true,
     },
     {
-      title: 'Your Order On Delivery by Courir',
-      timestamp: 'January 19th, 12 : 02 AM',
-      completed: true
+      title: "Your Order On Delivery by Courir",
+      timestamp: "January 19th, 12 : 02 AM",
+      completed: true,
     },
     {
-      title: 'Order Delivered',
-      timestamp: 'January 19th, 12 : 02 AM',
-      completed: false
-    }
+      title: "Order Delivered",
+      timestamp: "January 19th, 12 : 02 AM",
+      completed: false,
+    },
   ];
 
   // Dummy orders data
   const dummyOrders = {
     ongoing: [
       {
-        id: '0012345',
+        id: "0012345",
         itemCount: 12,
-        status: 'On Delivery',
-        iconColor: '#FFA902',
-        iconBgClass: '',
+        status: "On Delivery",
+        iconColor: "#FFA902",
+        iconBgClass: "",
         isExpanded: true,
         orderSteps: [
           {
-            title: 'Order Created',
-            timestamp: 'Feb 8,2023-12:20pm',
-            completed: true
+            title: "Order Created",
+            timestamp: "Feb 8,2023-12:20pm",
+            completed: true,
           },
           {
-            title: 'Order Received',
-            timestamp: 'Feb 8,2023-12:25pm',
-            completed: true
+            title: "Order Received",
+            timestamp: "Feb 8,2023-12:25pm",
+            completed: true,
           },
           {
-            title: 'Order Confirmed',
-            timestamp: 'Feb 8,2023-12:30pm',
-            completed: true
+            title: "Order Confirmed",
+            timestamp: "Feb 8,2023-12:30pm",
+            completed: true,
           },
           {
-            title: 'Order Processed',
-            timestamp: 'Feb 8,2023-12:45pm',
-            completed: false
+            title: "Order Processed",
+            timestamp: "Feb 8,2023-12:45pm",
+            completed: false,
           },
           {
-            title: 'Order Delivered',
-            timestamp: 'Feb 8,2023-1:20pm',
-            completed: false
-          }
-        ]
-      }
+            title: "Order Delivered",
+            timestamp: "Feb 8,2023-1:20pm",
+            completed: false,
+          },
+        ],
+      },
     ],
     completed: [
       {
-        id: '0012346',
+        id: "0012346",
         itemCount: 8,
-        status: 'Completed',
-        iconColor: '#00B67A',
-        iconBgClass: 'bg-success',
+        status: "Completed",
+        iconColor: "#00B67A",
+        iconBgClass: "bg-success",
         isExpanded: false,
         orderSteps: [
           {
-            title: 'Order Created',
-            timestamp: 'Feb 8,2023-12:20pm',
-            completed: true
+            title: "Order Created",
+            timestamp: "Feb 8,2023-12:20pm",
+            completed: true,
           },
           {
-            title: 'Order Received',
-            timestamp: 'Feb 8,2023-12:25pm',
-            completed: true
+            title: "Order Received",
+            timestamp: "Feb 8,2023-12:25pm",
+            completed: true,
           },
           {
-            title: 'Order Confirmed',
-            timestamp: 'Feb 8,2023-12:30pm',
-            completed: true
+            title: "Order Confirmed",
+            timestamp: "Feb 8,2023-12:30pm",
+            completed: true,
           },
           {
-            title: 'Order Processed',
-            timestamp: 'Feb 8,2023-12:45pm',
-            completed: true
+            title: "Order Processed",
+            timestamp: "Feb 8,2023-12:45pm",
+            completed: true,
           },
           {
-            title: 'Order Delivered',
-            timestamp: 'Feb 8,2023-1:20pm',
-            completed: true
-          }
-        ]
-      }
+            title: "Order Delivered",
+            timestamp: "Feb 8,2023-1:20pm",
+            completed: true,
+          },
+        ],
+      },
     ],
     cancelled: [
       {
-        id: '0012347',
+        id: "0012347",
         itemCount: 15,
-        status: 'Cancelled',
-        iconColor: '#E74C3C',
-        iconBgClass: 'bg-danger',
+        status: "Cancelled",
+        iconColor: "#E74C3C",
+        iconBgClass: "bg-danger",
         isExpanded: false,
         orderSteps: [
           {
-            title: 'Order Created',
-            timestamp: 'Feb 8,2023-12:20pm',
-            completed: true
+            title: "Order Created",
+            timestamp: "Feb 8,2023-12:20pm",
+            completed: true,
           },
           {
-            title: 'Order Cancelled',
-            timestamp: 'Feb 8,2023-12:25pm',
-            completed: true
+            title: "Order Cancelled",
+            timestamp: "Feb 8,2023-12:25pm",
+            completed: true,
           },
           {
-            title: 'Order Confirmed',
-            timestamp: 'Feb 8,2023-12:30pm',
-            completed: false
+            title: "Order Confirmed",
+            timestamp: "Feb 8,2023-12:30pm",
+            completed: false,
           },
           {
-            title: 'Order Processed',
-            timestamp: 'Feb 8,2023-12:45pm',
-            completed: false
+            title: "Order Processed",
+            timestamp: "Feb 8,2023-12:45pm",
+            completed: false,
           },
           {
-            title: 'Order Delivered',
-            timestamp: 'Feb 8,2023-1:20pm',
-            completed: false
-          }
-        ]
-      }
-    ]
+            title: "Order Delivered",
+            timestamp: "Feb 8,2023-1:20pm",
+            completed: false,
+          },
+        ],
+      },
+    ],
   };
 
   useEffect(() => {
@@ -158,39 +158,42 @@ function Orders() {
 
   const fetchOrders = async () => {
     try {
-      const auth = JSON.parse(localStorage.getItem('auth')) || {};
-      const userId = auth.userId || '73';
+      const auth = JSON.parse(localStorage.getItem("auth")) || {};
+      const userId = auth.userId || "73";
       const accessToken = auth.accessToken;
 
       if (!accessToken) {
-        throw new Error('Authentication token not found');
+        throw new Error("Authentication token not found");
       }
 
-      const response = await fetch('https://men4u.xyz/v2/user/get_completed_and_cancel_order_list', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-          user_id: parseInt(userId),
-          outlet_id: outletId
-        })
-      });
+      const response = await fetch(
+        "https://men4u.xyz/v2/user/get_completed_and_cancel_order_list",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            user_id: parseInt(userId),
+            outlet_id: outletId,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch orders');
+        throw new Error("Failed to fetch orders");
       }
 
       const data = await response.json();
-      
+
       if (data.detail && data.detail.lists) {
         setOrdersData(data.detail.lists);
       }
-      
+
       setIsLoading(false);
     } catch (err) {
-      console.error('Error fetching orders:', err);
+      console.error("Error fetching orders:", err);
       setError(err.message);
       setIsLoading(false);
     }
@@ -199,69 +202,142 @@ function Orders() {
   return (
     <>
       <Header />
-  <div className="page-content">
+      <div className="page-content">
         {isLoading ? (
           <div>Loading orders...</div>
         ) : error ? (
           <div>Error: {error}</div>
         ) : (
-    <div className="container pb">
-      <div className="default-tab style-1">
-        <ul className="nav nav-tabs" id="myTab3" role="tablist">
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link active"
+          <div className="container pb">
+            <div className="default-tab style-1">
+              <ul
+                className="nav nav-tabs d-flex flex-nowrap overflow-auto"
+                id="myTab3"
+                role="tablist"
+              >
+                <li className="nav-item flex-shrink-0" role="presentation">
+                  <button
+                    className="nav-link active"
                     id="all-tab"
-              data-bs-toggle="tab"
+                    data-bs-toggle="tab"
                     data-bs-target="#all-tab-pane"
-              type="button"
-              role="tab"
+                    type="button"
+                    role="tab"
                     aria-controls="all-tab-pane"
-              aria-selected="true"
-            >
-              All
-            </button>
-          </li>
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link d-flex align-items-center"
+                    aria-selected="true"
+                  >
+                    All
+                  </button>
+                </li>
+                <li className="nav-item flex-shrink-0" role="presentation">
+                  <button
+                    className="nav-link d-flex align-items-center"
+                    id="ongoing-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#ongoing-tab-pane"
+                    type="button"
+                    role="tab"
+                    aria-controls="ongoing-tab-pane"
+                    aria-selected="false"
+                  >
+                    <svg
+                      className="me-2"
+                      width={16}
+                      height={16}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx={8}
+                        cy={8}
+                        r={7}
+                        fill="#FFA902"
+                        stroke="var(--bg-white)"
+                        strokeWidth={2}
+                      />
+                    </svg>
+                    Ongoing
+                  </button>
+                </li>
+                <li className="nav-item flex-shrink-0" role="presentation">
+                  <button
+                    className="nav-link d-flex align-items-center"
                     id="completed-tab"
-              data-bs-toggle="tab"
+                    data-bs-toggle="tab"
                     data-bs-target="#completed-tab-pane"
-              type="button"
-              role="tab"
+                    type="button"
+                    role="tab"
                     aria-controls="completed-tab-pane"
-              aria-selected="false"
-            >
-                    <svg className="me-2" width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx={8} cy={8} r={7} fill="#027335" stroke="(--bg-white)" strokeWidth={2} />
-              </svg>
+                    aria-selected="false"
+                  >
+                    <svg
+                      className="me-2"
+                      width={16}
+                      height={16}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx={8}
+                        cy={8}
+                        r={7}
+                        fill="#027335"
+                        stroke="var(--bg-white)"
+                        strokeWidth={2}
+                      />
+                    </svg>
                     Completed
-            </button>
-          </li>
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link d-flex align-items-center"
+                  </button>
+                </li>
+                <li className="nav-item flex-shrink-0" role="presentation">
+                  <button
+                    className="nav-link d-flex align-items-center"
                     id="cancelled-tab"
-              data-bs-toggle="tab"
+                    data-bs-toggle="tab"
                     data-bs-target="#cancelled-tab-pane"
-              type="button"
-              role="tab"
+                    type="button"
+                    role="tab"
                     aria-controls="cancelled-tab-pane"
-              aria-selected="false"
-            >
-                    <svg className="me-2" width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx={8} cy={8} r={7} fill="#FF0000" stroke="var(--bg-white)" strokeWidth={2} />
-              </svg>
+                    aria-selected="false"
+                  >
+                    <svg
+                      className="me-2"
+                      width={16}
+                      height={16}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        cx={8}
+                        cy={8}
+                        r={7}
+                        fill="#FF0000"
+                        stroke="var(--bg-white)"
+                        strokeWidth={2}
+                      />
+                    </svg>
                     Cancelled
-            </button>
-          </li>
-        </ul>
-        <div className="tab-content" id="myTabContent3">
+                  </button>
+                </li>
+              </ul>
+              <div className="tab-content" id="myTabContent3">
                 {/* All Orders Tab */}
-                <div className="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabIndex={0}>
-            <div className="accordion style-3" id="accordionExample">
-                    {[...dummyOrders.ongoing, ...dummyOrders.completed, ...dummyOrders.cancelled].map((order) => (
+                <div
+                  className="tab-pane fade show active"
+                  id="all-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="all-tab"
+                  tabIndex={0}
+                >
+                  <div className="accordion style-3" id="accordionExample">
+                    {[
+                      ...dummyOrders.ongoing,
+                      ...dummyOrders.completed,
+                      ...dummyOrders.cancelled,
+                    ].map((order) => (
                       <OrderAccordionItem
                         key={order.id}
                         orderId={order.id}
@@ -274,11 +350,42 @@ function Orders() {
                         parentId="accordionExample"
                       />
                     ))}
-                      </div>
-                      </div>
+                  </div>
+                </div>
+
+                {/* Ongoing Orders Tab */}
+                <div
+                  className="tab-pane fade"
+                  id="ongoing-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="ongoing-tab"
+                  tabIndex={0}
+                >
+                  <div className="accordion style-3" id="accordionExample4">
+                    {dummyOrders.ongoing.map((order) => (
+                      <OrderAccordionItem
+                        key={order.id}
+                        orderId={order.id}
+                        itemCount={order.itemCount}
+                        status={order.status}
+                        iconColor={order.iconColor}
+                        iconBgClass={order.iconBgClass}
+                        orderSteps={order.orderSteps}
+                        isExpanded={order.isExpanded}
+                        parentId="accordionExample4"
+                      />
+                    ))}
+                  </div>
+                </div>
 
                 {/* Completed Orders Tab */}
-                <div className="tab-pane fade" id="completed-tab-pane" role="tabpanel" aria-labelledby="completed-tab" tabIndex={0}>
+                <div
+                  className="tab-pane fade"
+                  id="completed-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="completed-tab"
+                  tabIndex={0}
+                >
                   <div className="accordion style-3" id="accordionExample3">
                     {dummyOrders.completed.map((order) => (
                       <OrderAccordionItem
@@ -293,12 +400,18 @@ function Orders() {
                         parentId="accordionExample3"
                       />
                     ))}
-                        </div>
-                        </div>
+                  </div>
+                </div>
 
                 {/* Cancelled Orders Tab */}
-                <div className="tab-pane fade" id="cancelled-tab-pane" role="tabpanel" aria-labelledby="cancelled-tab" tabIndex={0}>
-            <div className="accordion style-3" id="accordionExample2">
+                <div
+                  className="tab-pane fade"
+                  id="cancelled-tab-pane"
+                  role="tabpanel"
+                  aria-labelledby="cancelled-tab"
+                  tabIndex={0}
+                >
+                  <div className="accordion style-3" id="accordionExample2">
                     {dummyOrders.cancelled.map((order) => (
                       <OrderAccordionItem
                         key={order.id}
@@ -312,13 +425,13 @@ function Orders() {
                         parentId="accordionExample2"
                       />
                     ))}
-                      </div>
-                      </div>
-                    </div>
+                  </div>
                 </div>
-                        </div>
+              </div>
+            </div>
+          </div>
         )}
-                        </div>
+      </div>
       <Footer />
     </>
   );
