@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -17,6 +18,7 @@ const NonVegIcon = () => (
 );
 
 function AllOutlets() {
+  const navigate = useNavigate();
   const [outlets, setOutlets] = useState([]);
   const [filteredOutlets, setFilteredOutlets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +81,63 @@ function AllOutlets() {
       setError(err.message);
       setIsLoading(false);
     }
+  };
+
+  const extractIdsFromUrl = (url) => {
+    try {
+      // Check if URL exists and contains user_app
+      if (!url || !url.includes('user_app')) {
+        return null;
+      }
+
+      // Extract the path after user_app
+      const pathMatch = url.match(/user_app\/o(\d+)\/s(\d+)\/t(\d+)/);
+      
+      if (!pathMatch) {
+        return null;
+      }
+
+      return {
+        outletId: pathMatch[1],    // Extract 9001 from o9001
+        sectionId: pathMatch[2],   // Extract 17 from s17
+        tableId: pathMatch[3]      // Extract 7 from t7
+      };
+    } catch (error) {
+      console.error('Error parsing resto URL:', error);
+      return null;
+    }
+  };
+
+  const handleOutletClick = (outlet) => {
+    if (!outlet.resto_url) return;
+
+    const ids = extractIdsFromUrl(outlet.resto_url);
+    if (!ids) {
+      console.error('Invalid resto URL format:', outlet.resto_url);
+      return;
+    }
+
+    // Store both outlet_id and outlet_code (from URL) along with other details
+    localStorage.setItem('selectedOutlet', JSON.stringify({
+      // Original outlet ID from API
+      outlet_id: outlet.outlet_id,
+      // Outlet code from URL (the o9001 part)
+      outlet_code: ids.outletId,
+      // Section and table IDs
+      section_id: ids.sectionId,
+      table_id: ids.tableId,
+      // Outlet details
+      outlet_name: outlet.outlet_name,
+      outlet_address: outlet.address,
+      outlet_mobile: outlet.mobile,
+      veg_nonveg: outlet.veg_nonveg,
+      is_open: outlet.is_open,
+      is_outlet_filled: outlet.is_outlet_filled,
+      selectedAt: new Date().toISOString()
+    }));
+
+    // Navigate using the outlet_code from URL
+    navigate(`/o${ids.outletId}/s${ids.sectionId}/t${ids.tableId}`);
   };
 
   return (
@@ -193,14 +252,10 @@ function AllOutlets() {
                 <div 
                   key={outlet.outlet_id} 
                   className="card border-0 mb-2"
-                  onClick={() => {
-                    if (outlet.resto_url) {
-                      window.open(outlet.resto_url, '_blank', 'noopener,noreferrer');
-                    }
-                  }}
+                  onClick={() => handleOutletClick(outlet)}
                   style={{ 
                     cursor: outlet.resto_url ? 'pointer' : 'default',
-                  transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import CategorySwiper from "../components/CategorySwiper/CategorySwiper";
@@ -37,6 +37,8 @@ function Home() {
   const [specialMenuItems, setSpecialMenuItems] = useState([]);
   const navigate = useNavigate();
   const [favoriteMenuIds, setFavoriteMenuIds] = useState(new Set());
+  const { outletId, sectionId, tableId } = useParams();
+  const location = useLocation();
 
   const handleCategoryClick = (category) => {
     // Navigate to category-menu with the category ID
@@ -144,6 +146,31 @@ function Home() {
       return newIds;
     });
   };
+
+  useEffect(() => {
+    // Check if we have route parameters
+    if (outletId && sectionId && tableId) {
+      // Store the outlet information in localStorage
+      const outletInfo = {
+        outletId,
+        sectionId,
+        tableId,
+        selectedAt: new Date().toISOString()
+      };
+      localStorage.setItem('selectedOutlet', JSON.stringify(outletInfo));
+      
+      // You can now use these parameters to fetch outlet-specific data
+      console.log('Outlet Parameters:', { outletId, sectionId, tableId });
+    } else {
+      // Check if we have stored outlet info when on root path
+      const storedOutlet = localStorage.getItem('selectedOutlet');
+      if (storedOutlet && location.pathname === '/') {
+        const { outletId, sectionId, tableId } = JSON.parse(storedOutlet);
+        // Optionally: Redirect to the outlet-specific route
+        // navigate(`/o${outletId}/s${sectionId}/t${tableId}`);
+      }
+    }
+  }, [outletId, sectionId, tableId, location]);
 
   return (
     <>

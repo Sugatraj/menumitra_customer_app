@@ -44,7 +44,8 @@ function App() {
                 <Router basename={import.meta.env.BASE_URL}>
                   <SidebarProvider>
                     <Routes>
-                      <Route path="/" element={<Home />} />
+                      {/* <Route path="/" element={<Home />} /> */}
+                      <Route path="/o:outletId/s:sectionId/t:tableId" element={<Home />} />
                       <Route path="/all-outlets" element={<AllOutlets />} />
                       <Route path="/favourites" element={<Favourite />} />
                       <Route path="/checkout" element={<Checkout />} />
