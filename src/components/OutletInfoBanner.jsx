@@ -1,6 +1,25 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useModal } from '../contexts/ModalContext';
 
 function OutletInfoBanner() {
+  const { openModal } = useModal();
+  const [orderType, setOrderType] = useState(() => {
+    const saved = localStorage.getItem('orderType');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const handleOrderTypeClick = () => {
+    openModal('ORDER_TYPE', {
+      onSelect: (selectedType) => {
+        setOrderType({
+          type: selectedType.id,
+          title: selectedType.title,
+          selectedAt: new Date().toISOString()
+        });
+      }
+    });
+  };
+
   return (
     <div className="container py-2">
       <div className="d-flex align-items-center">
@@ -23,13 +42,12 @@ function OutletInfoBanner() {
           </div>
         </div>
 
-        {/* Right side - Info Icon */}
+        {/* Right side - Order Type Selection */}
         <div>
           <button
             className="btn btn-link p-0 d-flex align-items-center"
-            onClick={() => {
-              /* Handle table info click */
-            }}
+            onClick={handleOrderTypeClick}
+            style={{ textDecoration: 'none' }}
           >
             <div className="text-primary">
               <svg
@@ -40,13 +58,22 @@ function OutletInfoBanner() {
                 fill="currentColor"
                 className="me-2"
               >
-                {/* Simple Location Marker */}
                 <path d="M12 2C8.1 2 5 5.1 5 9c0 4 7 13 7 13s7-9 7-13c0-3.9-3.1-7-7-7zm0 4c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z" />
               </svg>
             </div>
             <div className="d-flex flex-column align-items-start">
-              <span className="fw-bold text-dark">Garden</span>
-              <small className="text-muted">Table No. 8</small>
+              <span className="fw-bold text-dark">
+                {orderType ? orderType.title : 'Select Order Type'}
+              </span>
+              <small className="text-muted">
+                {orderType 
+                  ? new Date(orderType.selectedAt).toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })
+                  : 'Click to select'
+                }
+              </small>
             </div>
           </button>
         </div>

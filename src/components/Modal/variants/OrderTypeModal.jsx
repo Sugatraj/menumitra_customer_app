@@ -19,16 +19,28 @@ export const OrderTypeModal = () => {
     >
       <div className="d-grid gap-2">
         <button 
-          className={`btn ${orderSettings.order_type === 'dine_in' ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => handleOrderTypeSelect('dine_in')}
+          className={`btn ${orderSettings.order_type === 'counter' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => handleOrderTypeSelect('counter')}
         >
-          Dine In
+          Counter
+        </button>
+        <button 
+          className={`btn ${orderSettings.order_type === 'drive-through' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => handleOrderTypeSelect('drive-through')}
+        >
+          Drive Through
+        </button>
+        <button 
+          className={`btn ${orderSettings.order_type === 'delivery' ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => handleOrderTypeSelect('delivery')}
+        >
+          Delivery
         </button>
         <button 
           className={`btn ${orderSettings.order_type === 'parcel' ? 'btn-primary' : 'btn-outline-primary'}`}
           onClick={() => handleOrderTypeSelect('parcel')}
         >
-          Take Away
+          Parcel
         </button>
       </div>
     </BaseModal>
