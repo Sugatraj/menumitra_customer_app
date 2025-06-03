@@ -120,19 +120,19 @@ function AllOutlets() {
     // Store both outlet_id and outlet_code (from URL) along with other details
     localStorage.setItem('selectedOutlet', JSON.stringify({
       // Original outlet ID from API
-      outlet_id: outlet.outlet_id,
+      outletId: outlet.outlet_id,
       // Outlet code from URL (the o9001 part)
-      outlet_code: ids.outletId,
+      outletCode: ids.outletId,
       // Section and table IDs
-      section_id: ids.sectionId,
-      table_id: ids.tableId,
+      sectionId: ids.sectionId,
+      tableId: ids.tableId,
       // Outlet details
-      outlet_name: outlet.outlet_name,
-      outlet_address: outlet.address,
-      outlet_mobile: outlet.mobile,
-      veg_nonveg: outlet.veg_nonveg,
-      is_open: outlet.is_open,
-      is_outlet_filled: outlet.is_outlet_filled,
+      outletName: outlet.outlet_name,
+      outletAddress: outlet.address,
+      outletMobile: outlet.mobile,
+      vegNonveg: outlet.veg_nonveg,
+      isOpen: outlet.is_open,
+      isOutletFilled: outlet.is_outlet_filled,
       selectedAt: new Date().toISOString()
     }));
 
