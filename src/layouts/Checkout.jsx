@@ -85,12 +85,12 @@ function Checkout() {
     getCartCount,
     clearCart,
   } = useCart();
+  const { outletId, sectionId } = useOutlet();
   const [checkoutDetails, setCheckoutDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const MAX_QUANTITY = 20;
-  const { outletId } = useOutlet();
 
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -196,7 +196,6 @@ function Checkout() {
       setLoading(true);
       setError(null);
 
-      // Get auth data from localStorage
       const auth = JSON.parse(localStorage.getItem("auth"));
       const accessToken = auth?.accessToken;
       const userId = auth?.userId;
@@ -206,7 +205,6 @@ function Checkout() {
         return;
       }
 
-      // Transform cart items to required format
       const orderItems = cartItems.map(item => ({
         menu_id: item.menuId,
         quantity: item.quantity,
@@ -215,9 +213,9 @@ function Checkout() {
       }));
 
       const payload = {
-        outlet_id: outletId,
+        outlet_id: String(outletId),
         user_id: String(userId),
-        section_id: "1",
+        section_id: String(sectionId),
         order_type: "parcel",
         order_items: orderItems,
         action: "create_order"

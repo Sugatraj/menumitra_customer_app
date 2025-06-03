@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { clearAppData } from '../utils/clearAppData';
+import { useOutlet } from './OutletContext';
 
 const CartContext = createContext();
 
@@ -14,6 +15,7 @@ export const useCart = () => {
 
 export const CartProvider = ({ children, onLogout }) => {
   const { user, setShowAuthOffcanvas } = useAuth();
+  const { outletId, sectionId } = useOutlet();
 
   // Initialize cart items from localStorage
   const [cartItems, setCartItems] = useState(() => {
@@ -25,13 +27,22 @@ export const CartProvider = ({ children, onLogout }) => {
   const [orderSettings, setOrderSettings] = useState(() => {
     const savedSettings = localStorage.getItem('orderSettings');
     return savedSettings ? JSON.parse(savedSettings) : {
-      outlet_id: "1",
-      section_id: "1",
+      outlet_id: outletId,
+      section_id: sectionId,
       order_type: "parcel", // default to parcel
       coupon: null,
       action: "create_order"
     };
   });
+
+  // Add useEffect to update settings when context values change
+  useEffect(() => {
+    setOrderSettings(prev => ({
+      ...prev,
+      outlet_id: outletId,
+      section_id: sectionId
+    }));
+  }, [outletId, sectionId]);
 
   // Save cart items to localStorage when updated
   useEffect(() => {
