@@ -193,7 +193,7 @@ function OutletDetails() {
             <div className="row g-3 mb-4">
               <div className="col-4">
                 <div className="card border h-100">
-                  <div className="card-body p-3 text-center">
+                  <div className="card-body p-3 d-flex flex-column align-items-center justify-content-center">
                     <h3 className="mb-1 fw-semibold">{restaurantDetails?.count?.total_menu}</h3>
                     <small className="text-muted">Menu Items</small>
                   </div>
@@ -201,7 +201,7 @@ function OutletDetails() {
               </div>
               <div className="col-4">
                 <div className="card border h-100">
-                  <div className="card-body p-3 text-center">
+                  <div className="card-body p-3 d-flex flex-column align-items-center justify-content-center">
                     <h3 className="mb-1 fw-semibold">{restaurantDetails?.count?.total_special_menu}</h3>
                     <small className="text-muted">Special Items</small>
                   </div>
@@ -209,7 +209,7 @@ function OutletDetails() {
               </div>
               <div className="col-4">
                 <div className="card border h-100">
-                  <div className="card-body p-3 text-center">
+                  <div className="card-body p-3 d-flex flex-column align-items-center justify-content-center">
                     <h3 className="mb-1 fw-semibold">{restaurantDetails?.count?.total_offer_menu}</h3>
                     <small className="text-muted">Offer Items</small>
                   </div>
@@ -217,7 +217,7 @@ function OutletDetails() {
               </div>
               <div className="col-6">
                 <div className="card border h-100">
-                  <div className="card-body p-3 text-center">
+                  <div className="card-body p-3 d-flex flex-column align-items-center justify-content-center">
                     <h3 className="mb-1 fw-semibold">{restaurantDetails?.count?.total_category}</h3>
                     <small className="text-muted">Categories</small>
                   </div>
@@ -225,7 +225,7 @@ function OutletDetails() {
               </div>
               <div className="col-6">
                 <div className="card border h-100">
-                  <div className="card-body p-3 text-center">
+                  <div className="card-body p-3 d-flex flex-column align-items-center justify-content-center">
                     <h3 className="mb-1 fw-semibold">{restaurantDetails?.count?.total_tables}</h3>
                     <small className="text-muted">Total Tables</small>
                   </div>
