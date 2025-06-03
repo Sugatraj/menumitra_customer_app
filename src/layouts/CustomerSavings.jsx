@@ -140,28 +140,35 @@ function CustomerSavings() {
 
           {/* Outlet Details */}
           {Object.entries(savingsData.outlet_wise_data).map(([key, outlet]) => (
-            <div key={key} className="card border-0 bg-light mb-4">
+            <div key={key} className="card mb-4" style={{ 
+              border: '1px solid #E5E7EB', 
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              backgroundColor: '#FFFFFF'
+            }}>
               <div className="card-body p-3">
-                <h6 className="mb-3">{outlet.outlet_name}</h6>
+                <h6 className="mb-4 fw-semibold">{outlet.outlet_name}</h6>
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="text-muted">Orders</span>
-                  <span className="badge bg-success rounded-pill">{outlet.order_count}</span>
+                  <span style={{ color: '#A1A5B7' }}>Orders</span>
+                  <span className="badge bg-success rounded-pill px-3">{outlet.order_count}</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="text-muted">Amount Spent</span>
-                  <span>₹{outlet.total_amount_spent}</span>
+                  <span style={{ color: '#A1A5B7' }}>Amount Spent</span>
+                  <span className="text-dark">₹{outlet.total_amount_spent}</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="text-muted">Regular Discount</span>
-                  <span className="text-success">₹{outlet.regular_discount}</span>
+                  <span style={{ color: '#A1A5B7' }}>Regular Discount</span>
+                  <span style={{ color: '#027335' }}>₹{outlet.regular_discount}</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <span className="text-muted">Special Discount</span>
-                  <span className="text-success">₹{outlet.special_discount}</span>
+                  <span style={{ color: '#A1A5B7' }}>Special Discount</span>
+                  <span style={{ color: '#027335' }}>₹{outlet.special_discount}</span>
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
-                  <span className="text-muted">Complementary Items</span>
-                  <span className="badge bg-secondary rounded-pill">{outlet.complementary_count}</span>
+                  <span style={{ color: '#A1A5B7' }}>Complementary Items</span>
+                  <span className="badge rounded-pill px-3" style={{ 
+                    backgroundColor: '#E8F3FF',
+                    color: '#3699FF'
+                  }}>{outlet.complementary_count}</span>
                 </div>
               </div>
             </div>
