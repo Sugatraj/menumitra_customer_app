@@ -114,11 +114,11 @@ function OrderDetail() {
                   <div className="d-flex align-items-center">
                     <span className="me-2">
                       {menu.menu_food_type.toLowerCase() === "veg" ? <VegIcon /> : <NonVegIcon />}
-                    </span>
+              </span>
                     <span className="order-quantity">x{menu.quantity}</span>
-                  </div>
-                </li>
-              ))}
+            </div>
+              </li>
+                ))}
               <li>
                 <h6 className="mb-0 font-12">Bill Amount</h6>
                 <span className="font-12 font-w600 text-dark">₹{orderDetails.order_details.total_bill_amount}</span>
@@ -135,7 +135,7 @@ function OrderDetail() {
                 <li>
                   <h6 className="mb-0 font-12">Discount ({orderDetails.order_details.discount_percent}%)</h6>
                   <span className="font-12 font-w600 text-success">-₹{orderDetails.order_details.discount_amount}</span>
-                </li>
+              </li>
               )}
               <li>
                 <h6 className="mb-0 font-14 text-primary">FINAL AMOUNT</h6>

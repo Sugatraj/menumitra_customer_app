@@ -24,7 +24,7 @@ import { useState, useCallback } from "react";
 import { clearAppData } from "./utils/clearAppData";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ThemeColorProvider } from "./contexts/ThemeColorContext";
-
+import CustomerSavings from "./layouts/CustomerSavings";
 const queryClient = new QueryClient();
 
 function App() {
@@ -71,6 +71,7 @@ function App() {
                           path="/product-detail/:menuId/:menuCatId"
                           element={<ProductDetail />}
                         />
+                        <Route path="/savings" element={<CustomerSavings />} />
                       </Routes>
                       <Sidebar />
                     </SidebarProvider>
