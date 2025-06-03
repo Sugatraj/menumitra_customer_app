@@ -25,6 +25,8 @@ import { clearAppData } from "./utils/clearAppData";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { ThemeColorProvider } from "./contexts/ThemeColorContext";
 import CustomerSavings from "./layouts/CustomerSavings";
+import OutletDetails from "./layouts/OutletDetails";
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -72,6 +74,7 @@ function App() {
                           element={<ProductDetail />}
                         />
                         <Route path="/savings" element={<CustomerSavings />} />
+                        <Route path="/outlet-details" element={<OutletDetails />} />
                       </Routes>
                       <Sidebar />
                     </SidebarProvider>
