@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { OutletProvider } from "./contexts/OutletContext";
 import Home from "./layouts/Home";
 import AllOutlets from "./layouts/AllOutlets";
 import AuthOffcanvas from "./components/Auth/AuthOffcanvas";
@@ -20,9 +21,9 @@ import { ModalProvider } from "./contexts/ModalContext";
 import ModalManager from "./components/Modal/ModalManager";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
-import { clearAppData } from './utils/clearAppData';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { ThemeColorProvider } from './contexts/ThemeColorContext';
+import { clearAppData } from "./utils/clearAppData";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeColorProvider } from "./contexts/ThemeColorContext";
 
 const queryClient = new QueryClient();
 
@@ -34,46 +35,60 @@ function App() {
   }, []);
 
   return (
-    <ThemeColorProvider>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <CartProvider onLogout={handleLogout}>
-              <ModalProvider>
-                <AuthOffcanvas />
-                <Router basename={import.meta.env.BASE_URL}>
-                  <SidebarProvider>
-                    <Routes>
-                      {/* <Route path="/" element={<Home />} /> */}
-                      <Route path="/o:outletId/s:sectionId/t:tableId" element={<Home />} />
-                      <Route path="/all-outlets" element={<AllOutlets />} />
-                      <Route path="/favourites" element={<Favourite />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/orders" element={<Orders />} />
-                      <Route path="/order-detail/:orderId" element={<OrderDetail />} />
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/edit-profile" element={<EditProfile />} />
-                      <Route path="/categories" element={<Categories />} />
-                      <Route path="/category-menu/:categoryId" element={<CategoryFilteredMenuList />} />
-                      <Route path="/search" element={<Search />} />
-                      <Route path="/product-detail/:menuId/:menuCatId" element={<ProductDetail />} />
-                    </Routes>
-                    <Sidebar />
-                  </SidebarProvider>
-                </Router>
-                <ModalManager />
-              </ModalProvider>
-            </CartProvider>
-          </AuthProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </ThemeColorProvider>
+    <OutletProvider>
+      <ThemeColorProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+              <CartProvider onLogout={handleLogout}>
+                <ModalProvider>
+                  <AuthOffcanvas />
+                  <Router basename={import.meta.env.BASE_URL}>
+                    <SidebarProvider>
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route
+                          path="/:outletCode/:sectionId/:tableId"
+                          element={<Home />}
+                        />
+                        <Route path="/all-outlets" element={<AllOutlets />} />
+                        <Route path="/favourites" element={<Favourite />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/orders" element={<Orders />} />
+                        <Route
+                          path="/order-detail/:orderId"
+                          element={<OrderDetail />}
+                        />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/edit-profile" element={<EditProfile />} />
+                        <Route path="/categories" element={<Categories />} />
+                        <Route
+                          path="/category-menu/:categoryId"
+                          element={<CategoryFilteredMenuList />}
+                        />
+                        <Route path="/search" element={<Search />} />
+                        <Route
+                          path="/product-detail/:menuId/:menuCatId"
+                          element={<ProductDetail />}
+                        />
+                      </Routes>
+                      <Sidebar />
+                    </SidebarProvider>
+                  </Router>
+                  <ModalManager />
+                </ModalProvider>
+              </CartProvider>
+            </AuthProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ThemeColorProvider>
+    </OutletProvider>
   );
 }
 
 // Add an event listener for storage changes
-window.addEventListener('storage', (e) => {
-  if (e.key === 'auth' && !e.newValue) {
+window.addEventListener("storage", (e) => {
+  if (e.key === "auth" && !e.newValue) {
     clearAppData();
   }
 });

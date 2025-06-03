@@ -26,6 +26,7 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import { Autoplay } from 'swiper/modules';
 import { useMenuItems } from '../hooks/useMenuItems';
+import { useOutlet } from '../contexts/OutletContext';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
@@ -39,6 +40,7 @@ function Home() {
   const [favoriteMenuIds, setFavoriteMenuIds] = useState(new Set());
   const { outletId, sectionId, tableId } = useParams();
   const location = useLocation();
+  const { outletName, isOpen } = useOutlet();
 
   const handleCategoryClick = (category) => {
     // Navigate to category-menu with the category ID
@@ -102,7 +104,7 @@ function Home() {
     try {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
-      const userId = userData?.userId || '1'; // Default to '1' if not found
+      const userId = userData?.userId || null ;
 
       const response = await fetch(`${API_BASE_URL}/user/get_special_menu_list`, {
         method: 'POST',
@@ -113,17 +115,14 @@ function Home() {
         },
         body: JSON.stringify({
           user_id: userId,
-          outlet_id: "1" // Hardcoded as requested
+          outlet_id: outletId // Now using the outlet ID from context
         })
       });
 
       const data = await response.json();
-      console.log('Special menu response:', data); // Add this log to debug
-
       if (data.detail && data.detail.special_menu_list) {
         setSpecialMenuItems(data.detail.special_menu_list);
       }
-
     } catch (error) {
       console.error('Error fetching special menu items:', error);
     }
@@ -131,8 +130,10 @@ function Home() {
 
   // Add this to the existing useEffect or create a new one
   useEffect(() => {
-    fetchSpecialMenuItems();
-  }, []); // Empty dependency array means this runs once when component mounts
+    if (outletId) {
+      fetchSpecialMenuItems();
+    }
+  }, [outletId]); // Re-fetch when outlet ID changes
 
   // Add this function to handle favorite updates
   const handleFavoriteUpdate = (menuId, isFavorite) => {
