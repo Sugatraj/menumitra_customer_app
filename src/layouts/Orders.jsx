@@ -4,6 +4,30 @@ import Footer from "../components/Footer";
 import OrderAccordionItem from "../components/OrderAccordionItem";
 import { useOutlet } from "../contexts/OutletContext";
 
+// Add this new component for no orders state
+const NoOrders = ({ message }) => (
+  <div className="text-center py-5">
+    <svg 
+      width="48" 
+      height="48" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className="mx-auto mb-3"
+    >
+      <path 
+        d="M20.929 1.628C20.8546 1.44247 20.7264 1.28347 20.5608 1.17153C20.3952 1.05959 20.1999 0.999847 20 1H4C3.80012 0.999847 3.60479 1.05959 3.43919 1.17153C3.2736 1.28347 3.14535 1.44247 3.071 1.628L1.071 6.628C1.02414 6.74643 1.00005 6.87264 1 7V22C1 22.2652 1.10536 22.5196 1.29289 22.7071C1.48043 22.8946 1.73478 23 2 23H22C22.2652 23 22.5196 22.8946 22.7071 22.7071C22.8946 22.5196 23 22.2652 23 22V7C23 6.87264 22.9759 6.74643 22.929 6.628L20.929 1.628ZM4.677 3H19.323L20.523 6H3.477L4.677 3ZM3 21V8H21V21H3Z" 
+        fill="#7D8FAB"
+      />
+      <path 
+        d="M10 17H6C5.73478 17 5.48043 17.1054 5.29289 17.2929C5.10536 17.4804 5 17.7348 5 18C5 18.2652 5.10536 18.5196 5.29289 18.7071C5.48043 18.8947 5.73478 19 6 19H10C10.2652 19 10.5196 18.8947 10.7071 18.7071C10.8946 18.5196 11 18.2652 11 18C11 17.7348 10.8946 17.4804 10.7071 17.2929C10.5196 17.1054 10.2652 17 10 17Z" 
+        fill="#7D8FAB"
+      />
+    </svg>
+    <p className="text-soft mb-0">{message}</p>
+  </div>
+);
+
 function Orders() {
   const { outletId } = useOutlet();
   const [ordersData, setOrdersData] = useState({
@@ -199,6 +223,66 @@ function Orders() {
     }
   };
 
+  // Define order steps template
+  const getOrderSteps = (datetime) => [
+    {
+      title: "Order Created",
+      timestamp: datetime,
+      completed: true,
+    },
+    {
+      title: "Order Received",
+      timestamp: datetime,
+      completed: true,
+    },
+    {
+      title: "Order Confirmed",
+      timestamp: datetime,
+      completed: true,
+    },
+    {
+      title: "Order Processed",
+      timestamp: datetime,
+      completed: true,
+    },
+    {
+      title: "Order Delivered",
+      timestamp: datetime,
+      completed: true,
+    }
+  ];
+
+  // Transform API data for OrderAccordionItem
+  const transformOrderData = (orders) => {
+    const transformedOrders = {
+      completed: [],
+      cancelled: []
+    };
+    
+    // Handle paid orders
+    if (orders.paid) {
+      Object.entries(orders.paid).forEach(([date, orderList]) => {
+        orderList.forEach(order => {
+          transformedOrders.completed.push({
+            id: order.order_number,
+            orderId: order.order_number,
+            itemCount: order.menu_count,
+            status: "Completed",
+            iconColor: "#00B67A",
+            iconBgClass: "bg-success",
+            orderSteps: getOrderSteps(order.datetime),
+            isExpanded: false,
+            parentId: "accordionExample3"
+          });
+        });
+      });
+    }
+
+    return transformedOrders;
+  };
+
+  const transformedOrders = transformOrderData(ordersData);
+
   return (
     <>
       <Header />
@@ -211,65 +295,20 @@ function Orders() {
           <div className="container pb">
             <div className="default-tab style-1">
               <ul
-                className="nav nav-tabs d-flex flex-nowrap overflow-auto"
+                className="nav nav-tabs d-flex flex-nowrap overflow-auto w-100"
                 id="myTab3"
                 role="tablist"
               >
-                <li className="nav-item flex-shrink-0" role="presentation">
+                <li className="nav-item flex-shrink-0 w-50" role="presentation">
                   <button
-                    className="nav-link active"
-                    id="all-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#all-tab-pane"
-                    type="button"
-                    role="tab"
-                    aria-controls="all-tab-pane"
-                    aria-selected="true"
-                  >
-                    All
-                  </button>
-                </li>
-                <li className="nav-item flex-shrink-0" role="presentation">
-                  <button
-                    className="nav-link d-flex align-items-center"
-                    id="ongoing-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#ongoing-tab-pane"
-                    type="button"
-                    role="tab"
-                    aria-controls="ongoing-tab-pane"
-                    aria-selected="false"
-                  >
-                    <svg
-                      className="me-2"
-                      width={16}
-                      height={16}
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx={8}
-                        cy={8}
-                        r={7}
-                        fill="#FFA902"
-                        stroke="var(--bg-white)"
-                        strokeWidth={2}
-                      />
-                    </svg>
-                    Ongoing
-                  </button>
-                </li>
-                <li className="nav-item flex-shrink-0" role="presentation">
-                  <button
-                    className="nav-link d-flex align-items-center"
+                    className="nav-link active w-100"
                     id="completed-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#completed-tab-pane"
                     type="button"
                     role="tab"
                     aria-controls="completed-tab-pane"
-                    aria-selected="false"
+                    aria-selected="true"
                   >
                     <svg
                       className="me-2"
@@ -291,9 +330,9 @@ function Orders() {
                     Completed
                   </button>
                 </li>
-                <li className="nav-item flex-shrink-0" role="presentation">
+                <li className="nav-item flex-shrink-0 w-50" role="presentation">
                   <button
-                    className="nav-link d-flex align-items-center"
+                    className="nav-link d-flex align-items-center justify-content-center w-100"
                     id="cancelled-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#cancelled-tab-pane"
@@ -324,82 +363,32 @@ function Orders() {
                 </li>
               </ul>
               <div className="tab-content" id="myTabContent3">
-                {/* All Orders Tab */}
-                <div
-                  className="tab-pane fade show active"
-                  id="all-tab-pane"
-                  role="tabpanel"
-                  aria-labelledby="all-tab"
-                  tabIndex={0}
-                >
-                  <div className="accordion style-3" id="accordionExample">
-                    {[
-                      ...dummyOrders.ongoing,
-                      ...dummyOrders.completed,
-                      ...dummyOrders.cancelled,
-                    ].map((order) => (
-                      <OrderAccordionItem
-                        key={order.id}
-                        orderId={order.id}
-                        itemCount={order.itemCount}
-                        status={order.status}
-                        iconColor={order.iconColor}
-                        iconBgClass={order.iconBgClass}
-                        orderSteps={order.orderSteps}
-                        isExpanded={order.isExpanded}
-                        parentId="accordionExample"
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Ongoing Orders Tab */}
-                <div
-                  className="tab-pane fade"
-                  id="ongoing-tab-pane"
-                  role="tabpanel"
-                  aria-labelledby="ongoing-tab"
-                  tabIndex={0}
-                >
-                  <div className="accordion style-3" id="accordionExample4">
-                    {dummyOrders.ongoing.map((order) => (
-                      <OrderAccordionItem
-                        key={order.id}
-                        orderId={order.id}
-                        itemCount={order.itemCount}
-                        status={order.status}
-                        iconColor={order.iconColor}
-                        iconBgClass={order.iconBgClass}
-                        orderSteps={order.orderSteps}
-                        isExpanded={order.isExpanded}
-                        parentId="accordionExample4"
-                      />
-                    ))}
-                  </div>
-                </div>
-
                 {/* Completed Orders Tab */}
                 <div
-                  className="tab-pane fade"
+                  className="tab-pane fade show active"
                   id="completed-tab-pane"
                   role="tabpanel"
                   aria-labelledby="completed-tab"
                   tabIndex={0}
                 >
                   <div className="accordion style-3" id="accordionExample3">
-                    {dummyOrders.completed.map((order) => (
-                      <OrderAccordionItem
-                        key={order.id}
-                        orderId={order.id}
-                        itemCount={order.itemCount}
-                        status={order.status}
-                        iconColor={order.iconColor}
-                        iconBgClass={order.iconBgClass}
-                        orderSteps={order.orderSteps}
-                        isExpanded={order.isExpanded}
-                        parentId="accordionExample3"
-                      />
-                    ))}
+                    {transformedOrders.completed.length > 0 ? (
+                      transformedOrders.completed.map((order) => (
+                        <OrderAccordionItem
+                          key={order.id}
+                          orderId={order.orderId}
+                          itemCount={order.itemCount}
+                          status={order.status}
+                          iconColor={order.iconColor}
+                          iconBgClass={order.iconBgClass}
+                          orderSteps={order.orderSteps}
+                          isExpanded={order.isExpanded}
+                          parentId={order.parentId}
+                        />
+                      ))
+                    ) : (
+                      <NoOrders message="No completed orders found" />
+                    )}
                   </div>
                 </div>
 
@@ -412,19 +401,23 @@ function Orders() {
                   tabIndex={0}
                 >
                   <div className="accordion style-3" id="accordionExample2">
-                    {dummyOrders.cancelled.map((order) => (
-                      <OrderAccordionItem
-                        key={order.id}
-                        orderId={order.id}
-                        itemCount={order.itemCount}
-                        status={order.status}
-                        iconColor={order.iconColor}
-                        iconBgClass={order.iconBgClass}
-                        orderSteps={order.orderSteps}
-                        isExpanded={order.isExpanded}
-                        parentId="accordionExample2"
-                      />
-                    ))}
+                    {transformedOrders.cancelled.length > 0 ? (
+                      transformedOrders.cancelled.map((order) => (
+                        <OrderAccordionItem
+                          key={order.id}
+                          orderId={order.orderId}
+                          itemCount={order.itemCount}
+                          status={order.status}
+                          iconColor={order.iconColor}
+                          iconBgClass={order.iconBgClass}
+                          orderSteps={order.orderSteps}
+                          isExpanded={order.isExpanded}
+                          parentId={order.parentId}
+                        />
+                      ))
+                    ) : (
+                      <NoOrders message="No cancelled orders found" />
+                    )}
                   </div>
                 </div>
               </div>
