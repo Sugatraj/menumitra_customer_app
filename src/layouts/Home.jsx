@@ -26,7 +26,7 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import { Autoplay } from 'swiper/modules';
 import { useMenuItems } from '../hooks/useMenuItems';
-import { useOutlet } from '../contexts/OutletContext';
+
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
@@ -40,7 +40,6 @@ function Home() {
   const [favoriteMenuIds, setFavoriteMenuIds] = useState(new Set());
   const { outletId, sectionId, tableId } = useParams();
   const location = useLocation();
-  const { outletName, isOpen } = useOutlet();
 
   const handleCategoryClick = (category) => {
     // Navigate to category-menu with the category ID
@@ -101,10 +100,15 @@ function Home() {
 
   // Add this function to fetch special menu items
   const fetchSpecialMenuItems = async () => {
+    console.log('🔄 Fetching special menu items...');
     try {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
-      const userId = userData?.userId || null ;
+      const userId = userData?.userId || null;
+
+      // Hardcoded outlet ID for outlet code 9001
+      const outletId = 1;
+      console.log('📦 Using outlet ID:', outletId);
 
       const response = await fetch(`${API_BASE_URL}/user/get_special_menu_list`, {
         method: 'POST',
@@ -115,18 +119,27 @@ function Home() {
         },
         body: JSON.stringify({
           user_id: userId,
-          outlet_id: outletId // Now using the outlet ID from context
+          outlet_id: outletId // Hardcoded outlet ID
         })
       });
 
       const data = await response.json();
+      console.log('✅ Special menu API Response:', data);
+
       if (data.detail && data.detail.special_menu_list) {
+        console.log('✨ Setting special menu items:', data.detail.special_menu_list);
         setSpecialMenuItems(data.detail.special_menu_list);
       }
     } catch (error) {
-      console.error('Error fetching special menu items:', error);
+      console.error('❌ Error fetching special menu items:', error);
     }
   };
+
+  // Use effect with no outlet dependency
+  useEffect(() => {
+    console.log('🏁 Home component mounted, fetching special menu...');
+    fetchSpecialMenuItems();
+  }, []); // Empty dependency array - will run once on mount
 
   // Add this useEffect to call fetchSpecialMenuItems when outletId changes
   useEffect(() => {
@@ -148,30 +161,9 @@ function Home() {
     });
   };
 
-  useEffect(() => {
-    // Check if we have route parameters
-    if (outletId && sectionId && tableId) {
-      // Store the outlet information in localStorage
-      const outletInfo = {
-        outletId,
-        sectionId,
-        tableId,
-        selectedAt: new Date().toISOString()
-      };
-      localStorage.setItem('selectedOutlet', JSON.stringify(outletInfo));
-      
-      // You can now use these parameters to fetch outlet-specific data
-      console.log('Outlet Parameters:', { outletId, sectionId, tableId });
-    } else {
-      // Check if we have stored outlet info when on root path
-      const storedOutlet = localStorage.getItem('selectedOutlet');
-      if (storedOutlet && location.pathname === '/') {
-        const { outletId, sectionId, tableId } = JSON.parse(storedOutlet);
-        // Optionally: Redirect to the outlet-specific route
-        // navigate(`/o${outletId}/s${sectionId}/t${tableId}`);
-      }
-    }
-  }, [outletId, sectionId, tableId, location]);
+  // useEffect(() => {
+  //   // updateUrlParams(location.pathname);
+  // }, [location.pathname]);
 
   return (
     <>

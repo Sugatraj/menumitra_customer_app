@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import { useOutlet } from '../contexts/OutletContext';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VerticalMenuCard from '../components/VerticalMenuCard';
@@ -11,7 +10,6 @@ const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_Wz
 function CategoryFilteredMenuList() {
   const { categoryId } = useParams();
   const location = useLocation();
-  const { outletId } = useOutlet();
   const categoryName = location.state?.categoryName;
   const menuCount = location.state?.menuCount;
 
@@ -24,11 +22,19 @@ function CategoryFilteredMenuList() {
 
   useEffect(() => {
     const fetchMenusByCategory = async () => {
-      if (!outletId || !categoryId) return;
+      if (!categoryId) {
+        console.log('⚠️ No category ID available');
+        return;
+      }
 
+      console.log('🔄 Fetching menus for category:', categoryId);
       try {
         const authData = localStorage.getItem('auth');
         const userData = authData ? JSON.parse(authData) : null;
+
+        // Hardcoded outlet ID for outlet code 9001
+        const outletId = "1";
+        console.log('📦 Using outlet ID:', outletId);
 
         const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {
           method: 'POST',
@@ -44,11 +50,14 @@ function CategoryFilteredMenuList() {
         });
 
         const data = await response.json();
+        console.log('✅ API Response:', data);
         
         if (data.detail) {
           const filteredMenus = data.detail.menus.filter(
             menu => menu.menu_cat_id.toString() === categoryId
           );
+
+          console.log('✨ Filtered menus:', filteredMenus);
 
           setCategoryData({
             category: {
@@ -62,7 +71,7 @@ function CategoryFilteredMenuList() {
           });
         }
       } catch (err) {
-        console.error('Error fetching menu data:', err);
+        console.error('❌ Error fetching menu data:', err);
         setError('Failed to load menu items');
       } finally {
         setLoading(false);
@@ -70,7 +79,7 @@ function CategoryFilteredMenuList() {
     };
 
     fetchMenusByCategory();
-  }, [categoryId, categoryName, menuCount, outletId]);
+  }, [categoryId, categoryName, menuCount]); // Removed outletId dependency
 
   if (loading) {
     return (
@@ -142,7 +151,6 @@ function CategoryFilteredMenuList() {
                     image: menu.image || DEFAULT_IMAGE
                   }}
                   onFavoriteClick={(isFavorite, menuId) => {
-                    // Update the local state when favorite status changes
                     setCategoryData(prevData => ({
                       ...prevData,
                       menus: prevData.menus.map(m => 

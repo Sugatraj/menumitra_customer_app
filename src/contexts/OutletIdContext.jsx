@@ -3,8 +3,6 @@ import axios from 'axios';
 
 const OutletIdContext = createContext();
 
-const STORAGE_KEY = 'menumitra_outlet_details';
-
 export const useOutletId = () => {
   const context = useContext(OutletIdContext);
   if (!context) {
@@ -14,39 +12,40 @@ export const useOutletId = () => {
 };
 
 export const OutletIdProvider = ({ children }) => {
-  const [outletDetails, setOutletDetails] = useState(() => {
-    try {
-      const storedData = localStorage.getItem(STORAGE_KEY);
-      return storedData ? JSON.parse(storedData) : null;
-    } catch (error) {
-      console.error('Error loading from localStorage:', error);
-      return null;
-    }
-  });
+  console.log('🏁 OutletIdProvider Mounting');
+  
+  const [outletDetails, setOutletDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hasInitialized, setHasInitialized] = useState(false);
 
-  const fetchOutletDetails = async (outletCode) => {
-    if (hasInitialized || outletDetails) {
+  const fetchOutletDetails = async () => {
+    // If we already have details, don't fetch again
+    if (outletDetails) {
+      console.log('📦 Already have outlet details, skipping fetch');
       return;
     }
 
+    console.log('🚀 Fetching outlet details for code: 9001');
+    
     try {
       setLoading(true);
       setError(null);
       
       const response = await axios.post('https://men4u.xyz/v2/user/get_restaurant_details_by_code', {
-        outlet_code: outletCode
+        outlet_code: "9001"  // Hardcoded outlet code
       });
+
+      console.log('✅ API Response received:', response.data);
 
       if (response.data?.data?.outlet_details) {
         const details = response.data.data.outlet_details;
         
-        // Format the data consistently with your existing structure
+        // Store only outlet_id in localStorage
+        localStorage.setItem('outletId', details.outlet_id);
+        
         const formattedDetails = {
           outletId: details.outlet_id,
-          outletCode: outletCode,
+          outletCode: "9001",
           outletName: details.name,
           isOpen: details.is_open,
           mobile: details.mobile,
@@ -65,17 +64,13 @@ export const OutletIdProvider = ({ children }) => {
           sectionName: details.section_name
         };
 
-        // Update state with formatted data
+        console.log('✨ Setting formatted details:', formattedDetails);
         setOutletDetails(formattedDetails);
-        
-        // Store in localStorage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(formattedDetails));
-        
-        setHasInitialized(true);
       } else {
         throw new Error('Invalid response format');
       }
     } catch (err) {
+      console.error('❌ API Error:', err);
       setError(err.message || 'Failed to fetch outlet details');
       setOutletDetails(null);
     } finally {
@@ -83,31 +78,29 @@ export const OutletIdProvider = ({ children }) => {
     }
   };
 
-  // Initial fetch on mount if no data exists
+  // Single effect to fetch on mount
   useEffect(() => {
-    if (!hasInitialized && !outletDetails) {
-      fetchOutletDetails('9001');
-    }
-  }, []);
-
-  const clearOutletDetails = () => {
-    setOutletDetails(null);
-    setError(null);
-    setHasInitialized(false);
-    localStorage.removeItem(STORAGE_KEY);
-  };
+    console.log('🔄 Initial mount effect running');
+    fetchOutletDetails();
+  }, []); // Empty dependency array ensures single call on mount
 
   const value = {
     outletDetails,
     loading,
     error,
-    fetchOutletDetails,
-    clearOutletDetails,
-    // Add these for direct access
     outletId: outletDetails?.outletId || null,
-    outletCode: outletDetails?.outletCode || null,
+    outletCode: "9001", // Always return hardcoded outlet code
     outletName: outletDetails?.outletName || null
   };
+
+  // Log state changes
+  useEffect(() => {
+    console.log('📊 Context State Updated:', {
+      hasData: !!outletDetails,
+      loading,
+      error
+    });
+  }, [outletDetails, loading, error]);
 
   return (
     <OutletIdContext.Provider value={value}>

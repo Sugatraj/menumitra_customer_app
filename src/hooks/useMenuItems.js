@@ -1,60 +1,22 @@
 import { useState, useEffect } from 'react';
-import { useOutlet } from '../contexts/OutletContext';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
-const CACHE_KEY = 'menuItems_cache';
-const CACHE_EXPIRY = 1000 * 60 * 5; // 5 minutes
 
 export const useMenuItems = () => {
-  const { outletId } = useOutlet(); // Get outletId from context
   const [menuCategories, setMenuCategories] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Update cache key to include outletId
-  const getCacheKey = () => `${CACHE_KEY}_${outletId}`;
-
-  // Get cached data function
-  const getCachedData = () => {
-    try {
-      const cached = localStorage.getItem(getCacheKey());
-      if (!cached) return null;
-
-      const { data, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp > CACHE_EXPIRY) {
-        localStorage.removeItem(getCacheKey());
-        return null;
-      }
-      return data;
-    } catch (error) {
-      console.error('Error reading cache:', error);
-      return null;
-    }
-  };
-
-  // Set cache data function
-  const setCacheData = (data) => {
-    try {
-      localStorage.setItem(
-        getCacheKey(),
-        JSON.stringify({
-          data,
-          timestamp: Date.now(),
-        })
-      );
-    } catch (error) {
-      console.error('Error setting cache:', error);
-    }
-  };
-
-  // Fetch data function
   const fetchMenusByCategory = async () => {
-    if (!outletId) return; // Don't fetch if no outletId
-
+    console.log('🔄 Fetching menu items...');
     try {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
+
+      // Hardcoded outlet ID for outlet code 9001
+      const outletId = "1";
+      console.log('📦 Using outlet ID:', outletId);
 
       const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {
         method: 'POST',
@@ -64,12 +26,13 @@ export const useMenuItems = () => {
           'Authorization': `Bearer ${userData?.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: outletId, // Use outletId from context
+          outlet_id: 1,
           user_id: userData?.userId || null
         })
       });
 
       const data = await response.json();
+      console.log('✅ Menu API Response:', data);
 
       if (data.detail) {
         // Update categories
@@ -84,7 +47,7 @@ export const useMenuItems = () => {
           menuId: menu.menu_id,
           menuName: menu.menu_name,
           menuFoodType: menu.menu_food_type,
-          outletId: menu.outlet_id,
+          outletId: 1,
           menuCatId: menu.menu_cat_id,
           categoryName: menu.category_name,
           spicyIndex: menu.spicy_index,
@@ -97,12 +60,14 @@ export const useMenuItems = () => {
           image: menu.image
         })) || [];
 
+        console.log('✨ Formatted categories:', categories);
+        console.log('✨ Formatted menu items:', menus);
+
         setMenuCategories(categories);
         setMenuItems(menus);
-        setCacheData({ categories, menus });
       }
     } catch (error) {
-      console.error('Error fetching menu data:', error);
+      console.error('❌ Error fetching menu data:', error);
       setError(error);
     } finally {
       setIsLoading(false);
@@ -110,19 +75,9 @@ export const useMenuItems = () => {
   };
 
   useEffect(() => {
-    if (!outletId) return;
-
-    // Try to load cached data first
-    const cachedData = getCachedData();
-    if (cachedData) {
-      setMenuCategories(cachedData.categories);
-      setMenuItems(cachedData.menus);
-      setIsLoading(false);
-    }
-
-    // Fetch fresh data
+    console.log('🏁 useMenuItems mounted, fetching data...');
     fetchMenusByCategory();
-  }, [outletId]); // Add outletId as dependency
+  }, []); // Only run once on mount
 
   return {
     menuCategories,

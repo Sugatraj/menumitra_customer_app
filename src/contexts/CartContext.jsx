@@ -27,7 +27,7 @@ export const CartProvider = ({ children, onLogout }) => {
   const [orderSettings, setOrderSettings] = useState(() => {
     const savedSettings = localStorage.getItem('orderSettings');
     return savedSettings ? JSON.parse(savedSettings) : {
-      outlet_id: outletId,
+      outlet_id: 1,
       section_id: sectionId,
       order_type: "parcel", // default to parcel
       coupon: null,
@@ -39,19 +39,19 @@ export const CartProvider = ({ children, onLogout }) => {
   useEffect(() => {
     setOrderSettings(prev => ({
       ...prev,
-      outlet_id: outletId,
+      outlet_id: 1,
       section_id: sectionId
     }));
   }, [outletId, sectionId]);
 
   // Save cart items to localStorage when updated
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    // localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
   // Save order settings to localStorage when updated
   useEffect(() => {
-    localStorage.setItem('orderSettings', JSON.stringify(orderSettings));
+    // localStorage.setItem('orderSettings', JSON.stringify(orderSettings));
   }, [orderSettings]);
 
   // Add item to cart with comment
@@ -110,7 +110,7 @@ export const CartProvider = ({ children, onLogout }) => {
   // Format cart for API
   const getFormattedOrderData = (userId) => {
     const orderData = {
-      outlet_id: orderSettings.outlet_id,
+      outlet_id: 1,
       user_id: userId,
       section_id: orderSettings.section_id,
       order_type: orderSettings.order_type,

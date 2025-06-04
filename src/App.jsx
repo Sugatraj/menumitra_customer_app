@@ -26,7 +26,7 @@ import { ThemeColorProvider } from "./contexts/ThemeColorContext";
 import CustomerSavings from "./layouts/CustomerSavings";
 import OutletDetails from "./layouts/OutletDetails";
 import axios from "axios";
-import { OutletIdProvider, useOutletId } from "./contexts/OutletIdContext";
+import { OutletIdProvider } from "./contexts/OutletIdContext";
 
 function App() {
   const [shouldClearCart, setShouldClearCart] = useState(false);
@@ -36,15 +36,15 @@ function App() {
   }, []);
 
   return (
-    <OutletIdProvider>
-      <OutletProvider>
-        <ThemeColorProvider>
-          <ThemeProvider>
-            <AuthProvider>
-              <CartProvider onLogout={handleLogout}>
-                <ModalProvider>
-                  <AuthOffcanvas />
-                  <Router basename={import.meta.env.BASE_URL}>
+    <Router basename={import.meta.env.BASE_URL}>
+      <OutletIdProvider>
+        <OutletProvider>
+          <ThemeColorProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <CartProvider onLogout={handleLogout}>
+                  <ModalProvider>
+                    <AuthOffcanvas />
                     <SidebarProvider>
                       <Routes>
                         <Route path="/" element={<Home />} />
@@ -77,15 +77,15 @@ function App() {
                       </Routes>
                       <Sidebar />
                     </SidebarProvider>
-                  </Router>
-                  <ModalManager />
-                </ModalProvider>
-              </CartProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </ThemeColorProvider>
-      </OutletProvider>
-    </OutletIdProvider>
+                    <ModalManager />
+                  </ModalProvider>
+                </CartProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </ThemeColorProvider>
+        </OutletProvider>
+      </OutletIdProvider>
+    </Router>
   );
 }
 

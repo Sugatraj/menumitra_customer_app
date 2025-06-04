@@ -29,7 +29,7 @@ export const useFavorite = () => {
           'Authorization': `Bearer ${userData.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: outletId,
+          outlet_id: 1,
           user_id: userData.userId || null
         })
       });
@@ -72,7 +72,7 @@ export const useFavorite = () => {
           'Authorization': `Bearer ${userData.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: outletId,
+          outlet_id: 1,
           user_id: userData.userId,
           menu_id: menuId
         })
