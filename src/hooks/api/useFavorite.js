@@ -7,17 +7,29 @@ const API_BASE_URL = 'https://men4u.xyz/v2';
 export const useFavorite = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { userId } = useAuth();
+  const { getUserId } = useAuth();
   const { outletId } = useOutlet();
+
+  // Helper function to get auth data
+  const getAuthData = () => {
+    try {
+      const authData = localStorage.getItem('auth');
+      return authData ? JSON.parse(authData) : null;
+    } catch (error) {
+      console.error('Error parsing auth data:', error);
+      return null;
+    }
+  };
 
   const getFavorites = async () => {
     setLoading(true);
     setError(null);
     try {
-      const authData = localStorage.getItem('auth');
-      const userData = authData ? JSON.parse(authData) : null;
+      const authData = getAuthData();
+      const accessToken = authData?.accessToken;
+      const userId = authData?.userId;
 
-      if (!userData?.accessToken) {
+      if (!accessToken || !userId) {
         throw new Error('Please login to view favorites');
       }
 
@@ -26,18 +38,17 @@ export const useFavorite = () => {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${userData.accessToken}`
+          'Authorization': `Bearer ${accessToken}`
         },
         body: JSON.stringify({
           outlet_id: outletId,
-          user_id: userId || null
+          user_id: userId
         })
       });
 
       const data = await response.json();
 
       if (data.detail && data.detail.lists) {
-        // Flatten the nested structure into a single array of menu items
         return Object.values(data.detail.lists).flat();
       }
       return [];
@@ -53,10 +64,11 @@ export const useFavorite = () => {
     setLoading(true);
     setError(null);
     try {
-      const authData = localStorage.getItem('auth');
-      const userData = authData ? JSON.parse(authData) : null;
+      const authData = getAuthData();
+      const accessToken = authData?.accessToken;
+      const userId = authData?.userId;
 
-      if (!userData?.accessToken) {
+      if (!accessToken || !userId) {
         throw new Error('Please login to manage favorites');
       }
 
@@ -69,11 +81,11 @@ export const useFavorite = () => {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${userData.accessToken}`
+          'Authorization': `Bearer ${accessToken}`
         },
         body: JSON.stringify({
           outlet_id: outletId,
-          user_id: userData.userId,
+          user_id: userId,
           menu_id: menuId
         })
       });
