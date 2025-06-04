@@ -10,7 +10,9 @@ const OrderAccordionItem = ({
   iconBgClass = '', // for bg-primary, bg-danger etc
   orderSteps,
   isExpanded = false,
-  parentId = 'accordionExample'
+  parentId = 'accordionExample',
+  showTimer = false,
+  remainingSeconds = 0
 }) => {
   const navigate = useNavigate();
 
@@ -64,8 +66,8 @@ const OrderAccordionItem = ({
         >
           <div className="d-flex align-items-center w-100">
             <div className="me-3">
-              {status === "On Delivery" ? (
-                <Timer />
+              {showTimer ? (
+                <Timer initialSeconds={remainingSeconds} />
               ) : (
                 <div className={`icon-box ${iconBgClass}`}>
                   <BoxIcon color={iconColor} />

@@ -302,49 +302,77 @@ function Orders() {
       const data = await response.json();
 
       if (data.detail && data.detail.orders) {
-        const transformedOngoingOrders = data.detail.orders.map(order => ({
-          id: order.order_number,
-          orderId: order.order_number,
-          itemCount: order.menu_count,
-          status: order.status === 'placed' ? 'Order Placed' : 
-                 order.status === 'cooking' ? 'Preparing' : 
-                 order.status.charAt(0).toUpperCase() + order.status.slice(1),
-          iconColor: "#FFA902",
-          iconBgClass: "bg-warning",
-          orderSteps: [
-            {
-              title: "Order Created",
-              timestamp: order.time,
-              completed: true,
-            },
-            {
-              title: "Order Received",
-              timestamp: order.time,
-              completed: order.status !== 'placed',
-            },
-            {
-              title: "Order Confirmed",
-              timestamp: order.time,
-              completed: order.status === 'cooking',
-            },
-            {
-              title: "Order Processed",
-              timestamp: order.time,
-              completed: false,
-            },
-            {
-              title: "Order Delivered",
-              timestamp: order.time,
-              completed: false,
-            }
-          ],
-          isExpanded: false,
-          parentId: "accordionExample1",
-          orderType: order.order_type,
-          outletName: order.outlet_name,
-          totalAmount: order.final_grand_total,
-          paymentMethod: order.payment_method || 'Not selected'
-        }));
+        const transformedOngoingOrders = data.detail.orders.map(order => {
+          // Parse order time
+          const [hours, minutes, seconds] = order.time.split(':');
+          const [timeValue, period] = order.time.split(' '); // Split "11:40:21 PM"
+          const orderTime = new Date();
+          
+          // Set the order time
+          if (period === 'PM' && hours !== '12') {
+            orderTime.setHours(parseInt(hours) + 12);
+          } else if (period === 'AM' && hours === '12') {
+            orderTime.setHours(0);
+          } else {
+            orderTime.setHours(parseInt(hours));
+          }
+          orderTime.setMinutes(parseInt(minutes));
+          orderTime.setSeconds(parseInt(seconds.split(' ')[0])); // Remove PM/AM
+
+          // Calculate time difference
+          const currentTime = new Date();
+          const timeDifferenceInSeconds = Math.floor((currentTime - orderTime) / 1000);
+          const remainingSeconds = Math.max(90 - timeDifferenceInSeconds, 0);
+          
+          // Show timer only if order is placed and within 90 seconds
+          const showTimer = order.status === 'placed' && remainingSeconds > 0;
+
+          return {
+            id: order.order_number,
+            orderId: order.order_number,
+            itemCount: order.menu_count,
+            status: order.status === 'placed' ? 'Order Placed' : 
+                   order.status === 'cooking' ? 'Preparing' : 
+                   order.status.charAt(0).toUpperCase() + order.status.slice(1),
+            iconColor: "#FFA902",
+            iconBgClass: "bg-warning",
+            orderSteps: [
+              {
+                title: "Order Created",
+                timestamp: order.time,
+                completed: true,
+              },
+              {
+                title: "Order Received",
+                timestamp: order.time,
+                completed: order.status !== 'placed',
+              },
+              {
+                title: "Order Confirmed",
+                timestamp: order.time,
+                completed: order.status === 'cooking',
+              },
+              {
+                title: "Order Processed",
+                timestamp: order.time,
+                completed: false,
+              },
+              {
+                title: "Order Delivered",
+                timestamp: order.time,
+                completed: false,
+              }
+            ],
+            isExpanded: false,
+            parentId: "accordionExample1",
+            orderType: order.order_type,
+            outletName: order.outlet_name,
+            totalAmount: order.final_grand_total,
+            paymentMethod: order.payment_method || 'Not selected',
+            showTimer,
+            remainingSeconds
+          };
+        });
 
         setOngoingOrders(transformedOngoingOrders);
       }
@@ -459,21 +487,29 @@ function Orders() {
               <div className="accordion style-3" id="accordionExample1">
                 {ongoingOrders.length > 0 ? (
                   ongoingOrders.map((order) => (
-                    <OrderAccordionItem
-                      key={order.id}
-                      orderId={order.orderId}
-                      itemCount={order.itemCount}
-                      status={order.status}
-                      iconColor={order.iconColor}
-                      iconBgClass={order.iconBgClass}
-                      orderSteps={order.orderSteps}
-                      isExpanded={order.isExpanded}
-                      parentId={order.parentId}
-                      orderType={order.orderType}
-                      outletName={order.outletName}
-                      totalAmount={order.totalAmount}
-                      paymentMethod={order.paymentMethod}
-                    />
+                    <div key={order.id} className="position-relative">
+                      {/* {order.showTimer && (
+                        <div className="position-absolute" style={{ right: '1rem', top: '1rem', zIndex: 1 }}>
+                          <Timer initialSeconds={order.remainingSeconds} />
+                        </div>
+                      )} */}
+                      <OrderAccordionItem
+                        orderId={order.orderId}
+                        itemCount={order.itemCount}
+                        status={order.status}
+                        iconColor={order.iconColor}
+                        iconBgClass={order.iconBgClass}
+                        orderSteps={order.orderSteps}
+                        isExpanded={order.isExpanded}
+                        parentId={order.parentId}
+                        orderType={order.orderType}
+                        outletName={order.outletName}
+                        totalAmount={order.totalAmount}
+                        paymentMethod={order.paymentMethod}
+                        showTimer={order.showTimer}
+                        remainingSeconds={order.remainingSeconds}
+                      />
+                    </div>
                   ))
                 ) : (
                   <NoOrders message="No ongoing orders" />
