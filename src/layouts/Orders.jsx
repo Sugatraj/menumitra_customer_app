@@ -369,7 +369,7 @@ function Orders() {
         orderList.forEach(order => {
           transformedOrders.completed.push({
             id: order.order_number,
-            orderId: order.order_number,
+            orderId: order.order_id,
             itemCount: order.menu_count,
             status: "Completed",
             iconColor: "#00B67A",
@@ -414,7 +414,7 @@ function Orders() {
         orderList.forEach(order => {
           transformedOrders.cancelled.push({
             id: order.order_number,
-            orderId: order.order_number,
+            orderId: order.order_id,
             itemCount: order.menu_count,
             status: "Cancelled",
             iconColor: "#E74C3C",

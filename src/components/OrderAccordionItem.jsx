@@ -60,6 +60,7 @@ const OrderAccordionItem = ({
           data-bs-target={`#${collapseId}`}
           aria-expanded={isExpanded}
           aria-controls={collapseId}
+          onClick={handleViewDetails}
         >
           <div className="d-flex align-items-center w-100">
             <div className="me-3">
