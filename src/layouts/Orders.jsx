@@ -176,6 +176,45 @@ function Orders() {
     ],
   };
 
+  // Add this new dummy ongoing order
+  const dummyOngoingOrder = {
+    id: "1209",
+    orderId: "1209",
+    itemCount: 1,
+    status: "On Delivery",
+    iconColor: "#FFA902",
+    iconBgClass: "bg-warning",
+    orderSteps: [
+      {
+        title: "Order Created",
+        timestamp: new Date().toLocaleString(),
+        completed: true,
+      },
+      {
+        title: "Order Received",
+        timestamp: new Date().toLocaleString(),
+        completed: true,
+      },
+      {
+        title: "Order Confirmed",
+        timestamp: new Date().toLocaleString(),
+        completed: true,
+      },
+      {
+        title: "Order Processed",
+        timestamp: new Date().toLocaleString(),
+        completed: false,
+      },
+      {
+        title: "Order Delivered",
+        timestamp: new Date().toLocaleString(),
+        completed: false,
+      }
+    ],
+    isExpanded: false,
+    parentId: "accordionExample1"
+  };
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -278,6 +317,45 @@ function Orders() {
       });
     }
 
+    // Add dummy cancelled order
+    transformedOrders.cancelled.push({
+      id: "1210",
+      orderId: "1210",
+      itemCount: 2,
+      status: "Cancelled",
+      iconColor: "#E74C3C",
+      iconBgClass: "bg-danger",
+      orderSteps: [
+        {
+          title: "Order Created",
+          timestamp: "Feb 15,2024-11:30am",
+          completed: true,
+        },
+        {
+          title: "Order Cancelled",
+          timestamp: "Feb 15,2024-11:35am",
+          completed: true,
+        },
+        {
+          title: "Order Confirmed",
+          timestamp: "Feb 15,2024-11:40am",
+          completed: false,
+        },
+        {
+          title: "Order Processed",
+          timestamp: "Feb 15,2024-11:45am",
+          completed: false,
+        },
+        {
+          title: "Order Delivered",
+          timestamp: "Feb 15,2024-12:00pm",
+          completed: false,
+        }
+      ],
+      isExpanded: false,
+      parentId: "accordionExample2"
+    });
+
     return transformedOrders;
   };
 
@@ -293,6 +371,24 @@ function Orders() {
           <div>Error: {error}</div>
         ) : (
           <div className="container pb">
+            {/* Add Ongoing Order Section */}
+            <div className="mb-4">
+              <h6 className="mb-3">Ongoing Order</h6>
+              <div className="accordion style-3" id="accordionExample1">
+                <OrderAccordionItem
+                  key={dummyOngoingOrder.id}
+                  orderId={dummyOngoingOrder.orderId}
+                  itemCount={dummyOngoingOrder.itemCount}
+                  status={dummyOngoingOrder.status}
+                  iconColor={dummyOngoingOrder.iconColor}
+                  iconBgClass={dummyOngoingOrder.iconBgClass}
+                  orderSteps={dummyOngoingOrder.orderSteps}
+                  isExpanded={dummyOngoingOrder.isExpanded}
+                  parentId={dummyOngoingOrder.parentId}
+                />
+              </div>
+            </div>
+
             <div className="default-tab style-1">
               <ul
                 className="nav nav-tabs d-flex flex-nowrap overflow-auto w-100"
