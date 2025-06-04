@@ -576,6 +576,135 @@ function Home() {
                         ))}
                       </Swiper>
                     </div>
+                  ) : isLoading ? (
+                    // Skeleton for Special Menu Swiper
+                    <div className="swiper-btn-center-lr">
+                      <Swiper
+                        spaceBetween={10}
+                        slidesPerView={1}
+                        className="special-menu-swiper"
+                        breakpoints={{
+                          320: { slidesPerView: 1.2 },
+                          576: { slidesPerView: 2.2 },
+                          768: { slidesPerView: 2.5 }
+                        }}
+                      >
+                        {[...Array(4)].map((_, index) => (
+                          <SwiperSlide key={`skeleton-${index}`}>
+                            <div className="px-2">
+                              <div 
+                                style={{ 
+                                  borderRadius: '16px',
+                                  overflow: 'hidden',
+                                  backgroundColor: '#fff',
+                                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                  display: 'flex',
+                                  height: '120px'
+                                }}
+                              >
+                                {/* Image Section */}
+                                <div style={{ 
+                                  width: '120px', 
+                                  position: 'relative',
+                                  flexShrink: 0
+                                }}>
+                                  <Skeleton
+                                    height="100%"
+                                    width="100%"
+                                    baseColor="#C8C8C8"
+                                    highlightColor="#E0E0E0"
+                                    style={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      left: 0,
+                                      borderRadius: '16px 0 0 16px'
+                                    }}
+                                  />
+                                  {/* Discount Badge */}
+                                  <div 
+                                    style={{
+                                      position: 'absolute',
+                                      top: '8px',
+                                      left: '8px',
+                                      zIndex: 1
+                                    }}
+                                  >
+                                    <Skeleton
+                                      height={20}
+                                      width={40}
+                                      baseColor="#C8C8C8"
+                                      highlightColor="#E0E0E0"
+                                      style={{ borderRadius: '10px' }}
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Content Section */}
+                                <div style={{ 
+                                  flex: 1, 
+                                  padding: '12px',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  justifyContent: 'space-between'
+                                }}>
+                                  {/* Top Section */}
+                                  <div>
+                                    {/* Title */}
+                                    <Skeleton
+                                      height={20}
+                                      width="80%"
+                                      baseColor="#C8C8C8"
+                                      highlightColor="#E0E0E0"
+                                      style={{ marginBottom: '8px' }}
+                                    />
+                                    
+                                    {/* Price */}
+                                    <div className="d-flex align-items-center" style={{ gap: '8px' }}>
+                                      <Skeleton
+                                        height={16}
+                                        width={60}
+                                        baseColor="#C8C8C8"
+                                        highlightColor="#E0E0E0"
+                                      />
+                                      <Skeleton
+                                        height={16}
+                                        width={40}
+                                        baseColor="#C8C8C8"
+                                        highlightColor="#E0E0E0"
+                                        style={{ opacity: 0.5 }}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Bottom Section */}
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    {/* Favorite Button */}
+                                    <Skeleton
+                                      circle
+                                      height={32}
+                                      width={32}
+                                      baseColor="#C8C8C8"
+                                      highlightColor="#E0E0E0"
+                                    />
+                                    
+                                    {/* Add/Remove Buttons */}
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                      <Skeleton
+                                        height={32}
+                                        width={80}
+                                        baseColor="#C8C8C8"
+                                        highlightColor="#E0E0E0"
+                                        style={{ borderRadius: '8px' }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
                   ) : (
                     <div className="text-center text-muted">
                       <p>No special menus available</p>
