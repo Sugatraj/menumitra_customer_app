@@ -263,35 +263,6 @@ function Orders() {
     }
   };
 
-  // Define order steps template
-  const getOrderSteps = (datetime) => [
-    {
-      title: "Order Created",
-      timestamp: datetime,
-      completed: true,
-    },
-    {
-      title: "Order Received",
-      timestamp: datetime,
-      completed: true,
-    },
-    {
-      title: "Order Confirmed",
-      timestamp: datetime,
-      completed: true,
-    },
-    {
-      title: "Order Processed",
-      timestamp: datetime,
-      completed: true,
-    },
-    {
-      title: "Order Delivered",
-      timestamp: datetime,
-      completed: true,
-    }
-  ];
-
   // Transform API data for OrderAccordionItem
   const transformOrderData = (orders) => {
     const transformedOrders = {
@@ -299,7 +270,7 @@ function Orders() {
       cancelled: []
     };
     
-    // Handle paid orders
+    // Handle paid/completed orders
     if (orders.paid) {
       Object.entries(orders.paid).forEach(([date, orderList]) => {
         orderList.forEach(order => {
@@ -310,7 +281,33 @@ function Orders() {
             status: "Completed",
             iconColor: "#00B67A",
             iconBgClass: "bg-success",
-            orderSteps: getOrderSteps(order.datetime),
+            orderSteps: [
+              {
+                title: "Order Created",
+                timestamp: order.datetime,
+                completed: true,
+              },
+              {
+                title: "Order Received",
+                timestamp: order.datetime,
+                completed: true,
+              },
+              {
+                title: "Order Confirmed",
+                timestamp: order.datetime,
+                completed: true,
+              },
+              {
+                title: "Order Processed",
+                timestamp: order.datetime,
+                completed: true,
+              },
+              {
+                title: "Order Delivered",
+                timestamp: order.datetime,
+                completed: true,
+              }
+            ],
             isExpanded: false,
             parentId: "accordionExample3"
           });
@@ -318,44 +315,50 @@ function Orders() {
       });
     }
 
-    // Add dummy cancelled order
-    transformedOrders.cancelled.push({
-      id: "1210",
-      orderId: "1210",
-      itemCount: 2,
-      status: "Cancelled",
-      iconColor: "#E74C3C",
-      iconBgClass: "bg-danger",
-      orderSteps: [
-        {
-          title: "Order Created",
-          timestamp: "Feb 15,2024-11:30am",
-          completed: true,
-        },
-        {
-          title: "Order Cancelled",
-          timestamp: "Feb 15,2024-11:35am",
-          completed: true,
-        },
-        {
-          title: "Order Confirmed",
-          timestamp: "Feb 15,2024-11:40am",
-          completed: false,
-        },
-        {
-          title: "Order Processed",
-          timestamp: "Feb 15,2024-11:45am",
-          completed: false,
-        },
-        {
-          title: "Order Delivered",
-          timestamp: "Feb 15,2024-12:00pm",
-          completed: false,
-        }
-      ],
-      isExpanded: false,
-      parentId: "accordionExample2"
-    });
+    // Handle cancelled orders
+    if (orders.cancelled) {
+      Object.entries(orders.cancelled).forEach(([date, orderList]) => {
+        orderList.forEach(order => {
+          transformedOrders.cancelled.push({
+            id: order.order_number,
+            orderId: order.order_number,
+            itemCount: order.menu_count,
+            status: "Cancelled",
+            iconColor: "#E74C3C",
+            iconBgClass: "bg-danger",
+            orderSteps: [
+              {
+                title: "Order Created",
+                timestamp: order.datetime,
+                completed: true,
+              },
+              {
+                title: "Order Cancelled",
+                timestamp: order.datetime,
+                completed: true,
+              },
+              {
+                title: "Order Confirmed",
+                timestamp: order.datetime,
+                completed: false,
+              },
+              {
+                title: "Order Processed",
+                timestamp: order.datetime,
+                completed: false,
+              },
+              {
+                title: "Order Delivered",
+                timestamp: order.datetime,
+                completed: false,
+              }
+            ],
+            isExpanded: false,
+            parentId: "accordionExample2"
+          });
+        });
+      });
+    }
 
     return transformedOrders;
   };
