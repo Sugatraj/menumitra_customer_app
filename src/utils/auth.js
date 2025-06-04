@@ -44,3 +44,21 @@ export const getUserId = () => {
   const authData = getAuthData();
   return authData?.userId;
 };
+
+export const getUserMobile = () => {
+  const authData = getAuthData();
+  return authData?.mobile;
+};
+
+export const getUserName = () => {
+  const authData = getAuthData();
+  return authData?.name;
+};
+
+export const getDeviceInfo = () => {
+  return {
+    fcm_token: "457896354789",
+    device_id: "8974561234",
+    device_model: "Laptop 122"
+  };
+};

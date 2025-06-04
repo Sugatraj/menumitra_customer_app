@@ -7,7 +7,7 @@ const API_BASE_URL = 'https://men4u.xyz/v2';
 export const useFavorite = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const { userId } = useAuth();
   const { outletId } = useOutlet();
 
   const getFavorites = async () => {
@@ -30,7 +30,7 @@ export const useFavorite = () => {
         },
         body: JSON.stringify({
           outlet_id: outletId,
-          user_id: userData.userId || null
+          user_id: userId || null
         })
       });
 

@@ -22,7 +22,6 @@ const AuthOffcanvas = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   useEffect(() => {
     if (currentStep === STEPS.OTP) {
@@ -247,22 +246,10 @@ const AuthOffcanvas = () => {
       const data = await response.json();
       
       if (response.ok) {
-        localStorage.setItem('auth', JSON.stringify({
-          userId: data.user_id,
-          name: data.name,
-          role: data.role,
-          mobile: phoneNumber,
-          accessToken: data.access_token,
-          expiresAt: data.expires_at
-        }));
-
         handleLoginSuccess({
-          id: data.user_id,
-          name: data.name,
-          role: data.role,
+          ...data,
           mobile: phoneNumber
         });
-
         handleClose();
       } else {
         setError(data.message || 'Invalid OTP. Please try again.');
@@ -502,6 +489,23 @@ const AuthOffcanvas = () => {
     </div>
   );
 
+  const renderResendOTP = () => {
+    if (currentStep !== STEPS.OTP) return null;
+    
+    return (
+      <div className="text-center mt-3">
+        <button
+          type="button"
+          className="btn btn-link text-decoration-none"
+          onClick={handleResendOTP}
+          disabled={isLoading}
+        >
+          Resend OTP
+        </button>
+      </div>
+    );
+  };
+
   const renderOTPStep = () => (
     <div className="px-1">
       <h6 className="title font-w600 mb-4">Verify OTP</h6>
@@ -569,6 +573,7 @@ const AuthOffcanvas = () => {
           </button>
         </div>
       </form>
+      {renderResendOTP()}
     </div>
   );
 

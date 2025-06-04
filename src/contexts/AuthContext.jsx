@@ -9,24 +9,40 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check localStorage for existing auth data on mount
-    const authData = localStorage.getItem('auth');
-    if (authData) {
-      const parsedData = JSON.parse(authData);
+    const auth = localStorage.getItem('auth');
+    if (auth) {
+      const parsedAuth = JSON.parse(auth);
       setUser({
-        id: parsedData.userId,
-        name: parsedData.name,
-        role: parsedData.role,
-        mobile: parsedData.mobile
+        id: parsedAuth.userId,
+        name: parsedAuth.name,
+        role: parsedAuth.role,
+        mobile: parsedAuth.mobile,
+        accessToken: parsedAuth.accessToken,
+        expiresAt: parsedAuth.expiresAt
       });
     }
   }, []);
 
   const handleLoginSuccess = (userData) => {
-    setUser({
-      id: userData.id,
+    // Store auth data in localStorage
+    const auth = {
+      userId: userData.user_id,
       name: userData.name,
       role: userData.role,
-      mobile: userData.mobile
+      mobile: userData.mobile,
+      accessToken: userData.access_token,
+      expiresAt: userData.expires_at
+    };
+    
+    localStorage.setItem('auth', JSON.stringify(auth));
+    
+    setUser({
+      id: userData.user_id,
+      name: userData.name,
+      role: userData.role,
+      mobile: userData.mobile,
+      accessToken: userData.access_token,
+      expiresAt: userData.expires_at
     });
   };
 

@@ -19,7 +19,7 @@ function Categories() {
         const authData = localStorage.getItem('auth');
         const userData = authData ? JSON.parse(authData) : null;
 
-        // Hardcoded outlet ID for outlet code 9001
+
         
         console.log('📦 Using outlet ID:', outletId);
 
