@@ -1,12 +1,13 @@
 // src/hooks/useCategories.js
 import { useState, useEffect } from 'react';
 import { getApiUrl } from '../constants/config';
+import { useOutlet } from '../contexts/OutletContext';
 
 export const useCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { outletId } = useOutlet();
   useEffect(() => {
     const fetchCategories = async () => {
       console.log('🔄 Fetching categories...');
@@ -14,9 +15,6 @@ export const useCategories = () => {
         setLoading(true);
         const authData = localStorage.getItem('auth');
         const userData = authData ? JSON.parse(authData) : null;
-
-        // Get outlet ID directly from localStorage
-        const outletId = "1"; // Since we know outlet_code 9001 maps to ID 1
 
         console.log('📦 Using outlet ID:', outletId);
 

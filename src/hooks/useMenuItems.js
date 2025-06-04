@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useOutlet } from '../contexts/OutletContext';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
@@ -7,15 +8,13 @@ export const useMenuItems = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { outletId } = useOutlet();
 
   const fetchMenusByCategory = async () => {
     console.log('🔄 Fetching menu items...');
     try {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
-
-      // Hardcoded outlet ID for outlet code 9001
-      const outletId = "1";
       console.log('📦 Using outlet ID:', outletId);
 
       const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {
