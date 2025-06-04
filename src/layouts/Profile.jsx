@@ -119,6 +119,36 @@ function Profile() {
                   Search Menu
                 </Link>
               </li>
+              <li>
+                <Link to="/savings">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="me-2"
+                    style={{
+                      minWidth: "20px",
+                      color: "var(--primary)",
+                      opacity: "0.7",
+                    }}
+                  >
+                    <path
+                      d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M14.5 8.5H9.5C8.67 8.5 8 9.17 8 10V14C8 14.83 8.67 15.5 9.5 15.5H14.5C15.33 15.5 16 14.83 16 14V10C16 9.17 15.33 8.5 14.5 8.5ZM14 14H10V10H14V14Z"
+                      stroke="white"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Savings
+                </Link>
+              </li>
               {/* <li>
                 <a href="review.html">
                   <i className="fa-solid fa-star" />
