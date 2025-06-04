@@ -1,13 +1,13 @@
 import React from "react";
 import { useModal } from '../contexts/ModalContext';
 import { useCart } from '../contexts/CartContext';
-import { useOutlet } from '../contexts/OutletContext';
+import { useOutletId } from '../contexts/OutletIdContext';
 import { useNavigate } from 'react-router-dom';
 
 function OutletInfoBanner() {
   const { openModal } = useModal();
   const { orderSettings } = useCart();
-  const { outletName, address } = useOutlet();
+  const { outletDetails } = useOutletId();
   const navigate = useNavigate();
 
   // Map of order types to their icons
@@ -57,10 +57,15 @@ function OutletInfoBanner() {
             className="outlet-info"
           >
             <h6 className="mb-0 text-dark fw-bold">
-              {outletName || '-'}
+              {outletDetails?.outletName || '-'}
             </h6>
             <small className="text-muted">
-              {address ? address.split(',').map(part => part.trim().charAt(0).toUpperCase() + part.trim().slice(1).toLowerCase()).join(', ') : 'No address available'}
+              {outletDetails?.address 
+                ? outletDetails.address
+                    .split(',')
+                    .map(part => part.trim().charAt(0).toUpperCase() + part.trim().slice(1).toLowerCase())
+                    .join(', ') 
+                : 'No address available'}
             </small>
           </div>
         </div>
