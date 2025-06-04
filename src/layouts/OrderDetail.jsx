@@ -2,6 +2,131 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useOutlet } from "../contexts/OutletContext"
+
+const OrderRating = ({ orderId }) => {
+  const { outletId } = useOutlet();
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async () => {
+    if (rating === 0) return;
+    
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      const auth = JSON.parse(localStorage.getItem("auth")) || {};
+      const accessToken = auth.accessToken;
+      const userId = auth.userId || "73";
+
+      const response = await fetch('https://men4u.xyz/v2/user/rating_to_order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+          outlet_id: outletId.toString(),
+          user_id: userId,
+          order_id: orderId,
+          rating: rating.toString()
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.detail === "rating updated") {
+        setIsSubmitted(true);
+      } else {
+        throw new Error(data.detail || 'Failed to submit rating');
+      }
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      setError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isSubmitted) {
+    return (
+      <div className="rating-section bg-light rounded-4 p-3 mb-4">
+        <div className="text-center">
+          <div className="text-success mb-2">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" fill="#00B67A"/>
+            </svg>
+          </div>
+          <h6 className="text-success mb-0">Thank you for rating this order!</h6>
+          <div className="d-flex justify-content-center mt-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <svg
+                key={star}
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill={star <= rating ? "#FFA902" : "#D1D1D1"}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/>
+              </svg>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rating-section bg-light rounded-4 p-3 mb-4">
+      <div className="text-center">
+        <h6 className="title font-w600 mb-3">How was your order?</h6>
+        <div className="stars d-flex justify-content-center gap-2 mb-3">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              className={`btn btn-link p-0 m-0`}
+              onMouseEnter={() => setHover(star)}
+              onMouseLeave={() => setHover(0)}
+              onClick={() => setRating(star)}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill={star <= (hover || rating) ? "#FFA902" : "#D1D1D1"}
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z"/>
+              </svg>
+            </button>
+          ))}
+        </div>
+        {error && (
+          <div className="alert alert-danger py-2 mb-3">{error}</div>
+        )}
+        <button
+          className="btn btn-primary px-4"
+          onClick={handleSubmit}
+          disabled={rating === 0 || isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Submitting...
+            </>
+          ) : (
+            'Submit Rating'
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 function OrderDetail() {
   const { orderId } = useParams();
@@ -106,6 +231,7 @@ function OrderDetail() {
               {orderDetails.order_details.order_status}
             </span>
           </div>
+
           <div className="order-summery">
             <ul className="summery-list mb-4">
               {orderDetails.menu_details.map((menu, index) => (
@@ -114,11 +240,11 @@ function OrderDetail() {
                   <div className="d-flex align-items-center">
                     <span className="me-2">
                       {menu.menu_food_type.toLowerCase() === "veg" ? <VegIcon /> : <NonVegIcon />}
-              </span>
+                    </span>
                     <span className="order-quantity">x{menu.quantity}</span>
-            </div>
-              </li>
-                ))}
+                  </div>
+                </li>
+              ))}
               <li>
                 <h6 className="mb-0 font-12">Bill Amount</h6>
                 <span className="font-12 font-w600 text-dark">₹{orderDetails.order_details.total_bill_amount}</span>
@@ -135,7 +261,7 @@ function OrderDetail() {
                 <li>
                   <h6 className="mb-0 font-12">Discount ({orderDetails.order_details.discount_percent}%)</h6>
                   <span className="font-12 font-w600 text-success">-₹{orderDetails.order_details.discount_amount}</span>
-              </li>
+                </li>
               )}
               <li>
                 <h6 className="mb-0 font-14 text-primary">FINAL AMOUNT</h6>
@@ -242,6 +368,10 @@ function OrderDetail() {
               </ul>
             </div>
           </div>
+
+          
+          <OrderRating orderId={orderDetails.order_details.order_id} />
+
         </div>
       </div>
       <Footer />
