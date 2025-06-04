@@ -191,6 +191,38 @@ function Checkout() {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
+  const checkExistingOrder = async (userId, outletId) => {
+    try {
+      const auth = JSON.parse(localStorage.getItem("auth"));
+      const accessToken = auth?.accessToken;
+
+      const response = await axios.post(
+        "https://men4u.xyz/v2/user/check_order_exist",
+        {
+          user_id: userId,
+          outlet_id: outletId
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data?.detail) {
+        console.log("Existing order found:", response.data.detail);
+        return response.data.detail;
+      }
+      return null;
+    } catch (error) {
+      // If no order exists, API might return an error - this is expected
+      console.log("No existing order found");
+      return null;
+    }
+  };
+
   const handleCheckout = async () => {
     try {
       setLoading(true);
@@ -205,6 +237,16 @@ function Checkout() {
         return;
       }
 
+      // First check for existing order
+      const existingOrder = await checkExistingOrder(userId, outletId);
+      
+      if (existingOrder) {
+        // If there's an existing order, show error and prevent new order
+        setError(`You have an ongoing order #${existingOrder.order_number} (${existingOrder.order_status}). Please wait for it to complete.`);
+        return;
+      }
+
+      // If no existing order, proceed with creating new order
       const orderItems = cartItems.map(item => ({
         menu_id: item.menuId,
         quantity: item.quantity,
@@ -238,11 +280,6 @@ function Checkout() {
         // Clear both context and localStorage
         clearCart();
         localStorage.removeItem('cart');
-
-        // Show success message (optional)
-        // toast.success('Order placed successfully!');
-
-        // Navigate to success page with order details
         navigate(`/`);
       }
 
