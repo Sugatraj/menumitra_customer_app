@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 function OutletInfoBanner() {
   const { openModal } = useModal();
   const { orderSettings } = useCart();
-  const { outletInfo } = useOutlet();
+  const { outletName, address } = useOutlet();
   const navigate = useNavigate();
 
   // Map of order types to their icons
@@ -57,10 +57,10 @@ function OutletInfoBanner() {
             className="outlet-info"
           >
             <h6 className="mb-0 text-dark fw-bold">
-              {outletInfo?.outletName || 'Select Outlet'}
+              {outletName || '-'}
             </h6>
             <small className="text-muted">
-              {outletInfo?.outletAddress || 'No address available'}
+              {address ? address.split(',').map(part => part.trim().charAt(0).toUpperCase() + part.trim().slice(1).toLowerCase()).join(', ') : 'No address available'}
             </small>
           </div>
         </div>
