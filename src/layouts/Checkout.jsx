@@ -6,6 +6,7 @@ import axios from "axios";
 import { API_CONFIG } from "../constants/config";
 import { useNavigate } from "react-router-dom";
 import { useOutlet } from '../contexts/OutletContext';
+import OrderExistsModal from '../components/Modal/variants/OrderExistsModal';
 
 const FooterSummary = React.memo(function FooterSummary({ checkoutDetails }) {
   // Fallback to zeros if no data yet
@@ -91,6 +92,10 @@ function Checkout() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const MAX_QUANTITY = 20;
+  const [existingOrderModal, setExistingOrderModal] = useState({
+    isOpen: false,
+    orderDetails: null
+  });
 
   // Calculate subtotal
   const subtotal = getCartTotal();
@@ -241,12 +246,35 @@ function Checkout() {
       const existingOrder = await checkExistingOrder(userId, outletId);
       
       if (existingOrder) {
-        // If there's an existing order, show error and prevent new order
-        setError(`You have an ongoing order #${existingOrder.order_number} (${existingOrder.order_status}). Please wait for it to complete.`);
+        // Show modal instead of error
+        setExistingOrderModal({
+          isOpen: true,
+          orderDetails: existingOrder
+        });
         return;
       }
 
-      // If no existing order, proceed with creating new order
+      // Proceed with creating new order
+      await createOrder();
+
+    } catch (err) {
+      console.error("Checkout error:", err);
+      if (err.response?.status === 401) {
+        setError("Session expired. Please login again.");
+      } else {
+        setError("Failed to create order. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createOrder = async () => {
+    try {
+      const auth = JSON.parse(localStorage.getItem("auth"));
+      const accessToken = auth?.accessToken;
+      const userId = auth?.userId;
+
       const orderItems = cartItems.map(item => ({
         menu_id: item.menuId,
         quantity: item.quantity,
@@ -275,27 +303,38 @@ function Checkout() {
         }
       );
 
-      // Handle successful order creation
       if (response.data?.order_id) {
-        // Clear both context and localStorage
         clearCart();
         localStorage.removeItem('cart');
         navigate(`/`);
       }
-
-    } catch (err) {
-      console.error("Checkout error:", err);
-      if (err.response) {
-        console.error("API error response:", err.response);
-      }
-      if (err.response?.status === 401) {
-        setError("Session expired. Please login again.");
-      } else {
-        setError("Failed to create order. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      throw error; // Re-throw to be caught by handleCheckout
     }
+  };
+
+  // Add handlers for modal actions
+  const handleModalClose = () => {
+    setExistingOrderModal({
+      isOpen: false,
+      orderDetails: null
+    });
+  };
+
+  const handleCancelExisting = async () => {
+    // TODO: Add API call to cancel existing order
+    // After cancellation is successful:
+    await createOrder();
+    handleModalClose();
+  };
+
+  const handleAddToExisting = async () => {
+    // TODO: Add API call to add items to existing order
+    // After addition is successful:
+    clearCart();
+    localStorage.removeItem('cart');
+    navigate(`/`);
+    handleModalClose();
   };
 
   return (
@@ -453,6 +492,15 @@ function Checkout() {
           </div>
         )}
       </div>
+      
+      <OrderExistsModal
+        isOpen={existingOrderModal.isOpen}
+        onClose={handleModalClose}
+        orderNumber={existingOrderModal.orderDetails?.order_number}
+        onCancelExisting={handleCancelExisting}
+        onAddToExisting={handleAddToExisting}
+      />
+      
       <Footer />
     </>
   );
