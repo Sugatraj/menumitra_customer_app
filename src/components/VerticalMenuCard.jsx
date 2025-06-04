@@ -66,7 +66,7 @@ const VerticalMenuCard = ({
           'Authorization': `Bearer ${auth.accessToken}`
         },
         body: JSON.stringify({
-          outlet_id: 1,
+          outlet_id: outletId,
           menu_id: menuItem.menuId,
           user_id: auth.userId || null
         })

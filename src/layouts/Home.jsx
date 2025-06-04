@@ -109,7 +109,7 @@ function Home() {
         },
         body: JSON.stringify({
           user_id: userId,
-          outlet_id: outletId // Hardcoded outlet ID
+          outlet_id: outletId
         })
       });
 

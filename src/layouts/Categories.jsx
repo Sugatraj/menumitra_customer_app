@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { useOutlet } from '../contexts/OutletContext';
 
 const API_BASE_URL = "https://men4u.xyz/v2";
 const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_WzIoR2LV2Cgy33oxy6eEKQYSkaWr8AFU.jpg';
@@ -10,7 +11,7 @@ function Categories() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [imageErrors, setImageErrors] = useState({});
-
+  const { outletId } = useOutlet();
   useEffect(() => {
     const fetchCategories = async () => {
       console.log('🔄 Fetching categories...');
@@ -19,7 +20,7 @@ function Categories() {
         const userData = authData ? JSON.parse(authData) : null;
 
         // Hardcoded outlet ID for outlet code 9001
-        const outletId = "1";
+        
         console.log('📦 Using outlet ID:', outletId);
 
         const response = await fetch(`${API_BASE_URL}/user/get_category_list_with_image`, {
@@ -30,7 +31,7 @@ function Categories() {
             'Authorization': `Bearer ${userData?.accessToken}`
           },
           body: JSON.stringify({
-            outlet_id: 1
+            outlet_id: outletId
           })
         });
 

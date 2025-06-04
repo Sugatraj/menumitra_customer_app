@@ -3,6 +3,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import VerticalMenuCard from '../components/VerticalMenuCard';
+import { useOutlet } from '../contexts/OutletContext';
 
 const API_BASE_URL = "https://men4u.xyz/v2";
 const DEFAULT_IMAGE = 'https://as2.ftcdn.net/jpg/02/79/12/03/1000_F_279120368_WzIoR2LV2Cgy33oxy6eEKQYSkaWr8AFU.jpg';
@@ -12,6 +13,7 @@ function CategoryFilteredMenuList() {
   const location = useLocation();
   const categoryName = location.state?.categoryName;
   const menuCount = location.state?.menuCount;
+  const { outletId } = useOutlet();
 
   const [categoryData, setCategoryData] = useState({
     category: null,
@@ -32,8 +34,6 @@ function CategoryFilteredMenuList() {
         const authData = localStorage.getItem('auth');
         const userData = authData ? JSON.parse(authData) : null;
 
-        // Hardcoded outlet ID for outlet code 9001
-        const outletId = "1";
         console.log('📦 Using outlet ID:', outletId);
 
         const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {

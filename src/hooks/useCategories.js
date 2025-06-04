@@ -26,7 +26,7 @@ export const useCategories = () => {
             'Authorization': `Bearer ${userData?.accessToken}`
           },
           body: JSON.stringify({
-            outlet_id: 1,
+            outlet_id: outletId,
             user_id: userData?.userId || null
           })
         });

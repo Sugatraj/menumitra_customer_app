@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import { useOutlet } from '../contexts/OutletContext';
 
 function OutletDetails() {
-  const { outletInfo } = useOutlet();
+  const { outletInfo, outletId } = useOutlet();
   const [restaurantDetails, setRestaurantDetails] = useState(() => {
     // Always initialize from cache if available
     const cached = localStorage.getItem(`restaurant_details_${outletInfo?.outletId}`);
@@ -40,16 +40,11 @@ function OutletDetails() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          outlet_id: outletInfo?.outletId
+          outlet_id: outletId
         })
       });
       const data = await response.json();
       
-      // Update cache and state
-      localStorage.setItem(
-        `restaurant_details_${outletInfo?.outletId}`,
-        JSON.stringify(data.detail)
-      );
       setRestaurantDetails(data.detail);
       lastFetchRef.current = Date.now();
     } catch (error) {

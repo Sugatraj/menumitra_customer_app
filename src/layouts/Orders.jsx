@@ -7,6 +7,7 @@ import Timer from '../components/Timer';
 
 // Add this new component for no orders state
 const NoOrders = ({ message }) => (
+  
   <div className="text-center py-5">
     <svg 
       width="48" 
@@ -240,7 +241,7 @@ function Orders() {
           },
           body: JSON.stringify({
             user_id: parseInt(userId),
-            outlet_id: 1,
+            outlet_id: outletId,
           }),
         }
       );
