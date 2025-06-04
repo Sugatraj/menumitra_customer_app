@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { OutletProvider, useOutlet } from "./contexts/OutletContext";
+import { OutletProvider } from "./contexts/OutletContext";
 import Home from "./layouts/Home";
 import AllOutlets from "./layouts/AllOutlets";
 import AuthOffcanvas from "./components/Auth/AuthOffcanvas";
@@ -26,7 +26,6 @@ import { ThemeColorProvider } from "./contexts/ThemeColorContext";
 import CustomerSavings from "./layouts/CustomerSavings";
 import OutletDetails from "./layouts/OutletDetails";
 import axios from "axios";
-import { OutletIdProvider } from "./contexts/OutletIdContext";
 
 function App() {
   const [shouldClearCart, setShouldClearCart] = useState(false);
@@ -37,54 +36,55 @@ function App() {
 
   return (
     <Router basename={import.meta.env.BASE_URL}>
-      <OutletIdProvider>
-        <OutletProvider>
-          <ThemeColorProvider>
-            <ThemeProvider>
-              <AuthProvider>
-                <CartProvider onLogout={handleLogout}>
-                  <ModalProvider>
-                    <AuthOffcanvas />
-                    <SidebarProvider>
-                      <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route
-                          path="/:outletCode/:sectionId/:tableId"
-                          element={<Home />}
-                        />
-                        <Route path="/all-outlets" element={<AllOutlets />} />
-                        <Route path="/favourites" element={<Favourite />} />
-                        <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/orders" element={<Orders />} />
-                        <Route
-                          path="/order-detail/:orderId"
-                          element={<OrderDetail />}
-                        />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/edit-profile" element={<EditProfile />} />
-                        <Route path="/categories" element={<Categories />} />
-                        <Route
-                          path="/category-menu/:categoryId"
-                          element={<CategoryFilteredMenuList />}
-                        />
-                        <Route path="/search" element={<Search />} />
-                        <Route
-                          path="/product-detail/:menuId/:menuCatId"
-                          element={<ProductDetail />}
-                        />
-                        <Route path="/savings" element={<CustomerSavings />} />
-                        <Route path="/outlet-details" element={<OutletDetails />} />
-                      </Routes>
-                      <Sidebar />
-                    </SidebarProvider>
-                    <ModalManager />
-                  </ModalProvider>
-                </CartProvider>
-              </AuthProvider>
-            </ThemeProvider>
-          </ThemeColorProvider>
-        </OutletProvider>
-      </OutletIdProvider>
+      <OutletProvider>
+        <ThemeColorProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <CartProvider onLogout={handleLogout}>
+                <ModalProvider>
+                  <AuthOffcanvas />
+                  <SidebarProvider>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route
+                        path="/:outletCode/:sectionId/:tableId"
+                        element={<Home />}
+                      />
+                      <Route path="/all-outlets" element={<AllOutlets />} />
+                      <Route path="/favourites" element={<Favourite />} />
+                      <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/orders" element={<Orders />} />
+                      <Route
+                        path="/order-detail/:orderId"
+                        element={<OrderDetail />}
+                      />
+                      <Route path="/profile" element={<Profile />} />
+                      <Route path="/edit-profile" element={<EditProfile />} />
+                      <Route path="/categories" element={<Categories />} />
+                      <Route
+                        path="/category-menu/:categoryId"
+                        element={<CategoryFilteredMenuList />}
+                      />
+                      <Route path="/search" element={<Search />} />
+                      <Route
+                        path="/product-detail/:menuId/:menuCatId"
+                        element={<ProductDetail />}
+                      />
+                      <Route path="/savings" element={<CustomerSavings />} />
+                      <Route
+                        path="/outlet-details"
+                        element={<OutletDetails />}
+                      />
+                    </Routes>
+                    <Sidebar />
+                  </SidebarProvider>
+                  <ModalManager />
+                </ModalProvider>
+              </CartProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ThemeColorProvider>
+      </OutletProvider>
     </Router>
   );
 }

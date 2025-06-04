@@ -60,8 +60,8 @@ export const useMenuItems = () => {
           image: menu.image
         })) || [];
 
-        console.log('✨ Formatted categories:', categories);
-        console.log('✨ Formatted menu items:', menus);
+        // console.log('✨ Formatted categories:', categories);
+        // console.log('✨ Formatted menu items:', menus);
 
         setMenuCategories(categories);
         setMenuItems(menus);

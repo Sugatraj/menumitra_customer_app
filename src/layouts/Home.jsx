@@ -115,7 +115,7 @@ function Home() {
       });
 
       const data = await response.json();
-      console.log('✅ Special menu API Response:', data);
+      // console.log('✅ Special menu API Response:', data);
 
       if (data.detail && data.detail.special_menu_list) {
         console.log('✨ Setting special menu items:', data.detail.special_menu_list);

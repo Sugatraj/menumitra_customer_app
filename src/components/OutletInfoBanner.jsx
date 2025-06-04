@@ -1,13 +1,18 @@
 import React from "react";
 import { useModal } from '../contexts/ModalContext';
 import { useCart } from '../contexts/CartContext';
-import { useOutletId } from '../contexts/OutletIdContext';
+import { useOutlet } from '../contexts/OutletContext';
 import { useNavigate } from 'react-router-dom';
 
 function OutletInfoBanner() {
   const { openModal } = useModal();
   const { orderSettings } = useCart();
-  const { outletDetails } = useOutletId();
+  const { 
+    outletName,
+    address,
+    outletCode,
+    fetchOutletDetailsByCode 
+  } = useOutlet();
   const navigate = useNavigate();
 
   // Map of order types to their icons
@@ -34,6 +39,13 @@ function OutletInfoBanner() {
     navigate('/outlet-details');
   };
 
+  // If we have an outlet code but no outlet details, fetch them
+  React.useEffect(() => {
+    if (outletCode && !outletName) {
+      fetchOutletDetailsByCode(outletCode);
+    }
+  }, [outletCode, outletName, fetchOutletDetailsByCode]);
+
   return (
     <div className="container py-2">
       <div className="d-flex align-items-center">
@@ -57,11 +69,11 @@ function OutletInfoBanner() {
             className="outlet-info"
           >
             <h6 className="mb-0 text-dark fw-bold">
-              {outletDetails?.outletName || '-'}
+              {outletName || '-'}
             </h6>
             <small className="text-muted">
-              {outletDetails?.address 
-                ? outletDetails.address
+              {address 
+                ? address
                     .split(',')
                     .map(part => part.trim().charAt(0).toUpperCase() + part.trim().slice(1).toLowerCase())
                     .join(', ') 
