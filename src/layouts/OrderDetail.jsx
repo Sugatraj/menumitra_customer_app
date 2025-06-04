@@ -4,12 +4,12 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useOutlet } from "../contexts/OutletContext"
 
-const OrderRating = ({ orderId }) => {
+const OrderRating = ({ orderId, initialRating }) => {
   const { outletId } = useOutlet();
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(initialRating || 0);
   const [hover, setHover] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(!!initialRating);
   const [error, setError] = useState(null);
 
   const handleSubmit = async () => {
@@ -56,18 +56,13 @@ const OrderRating = ({ orderId }) => {
     return (
       <div className="rating-section bg-light rounded-4 p-3 mb-4">
         <div className="text-center">
-          <div className="text-success mb-2">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" fill="#00B67A"/>
-            </svg>
-          </div>
-          <h6 className="text-success mb-0">Thank you for rating this order!</h6>
+          <h6 className="title font-w600 mb-3">Your Rating</h6>
           <div className="d-flex justify-content-center mt-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <svg
                 key={star}
-                width="24"
-                height="24"
+                width="32"
+                height="32"
                 viewBox="0 0 24 24"
                 fill={star <= rating ? "#FFA902" : "#D1D1D1"}
                 xmlns="http://www.w3.org/2000/svg"
@@ -76,6 +71,7 @@ const OrderRating = ({ orderId }) => {
               </svg>
             ))}
           </div>
+          <p className="text-soft mt-2 mb-0">You've already rated this order</p>
         </div>
       </div>
     );
@@ -370,7 +366,13 @@ function OrderDetail() {
           </div>
 
           
-          <OrderRating orderId={orderDetails.order_details.order_id} />
+          <OrderRating 
+            orderId={orderDetails.order_details.order_id}
+            initialRating={orderDetails.order_details.rating ? 
+              parseInt(orderDetails.order_details.rating) : 
+              undefined
+            }
+          />
 
         </div>
       </div>
