@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Timer from './Timer';
 
 const OrderAccordionItem = ({
   orderId,
@@ -52,44 +53,30 @@ const OrderAccordionItem = ({
   return (
     <div className="accordion-item">
       <div className="accordion-header" id={headingId}>
-        <a
-          href="#"
-          className={`accordion-button ${!isExpanded ? 'collapsed' : ''}`}
+        <button
+          className={`accordion-button ${isExpanded ? '' : 'collapsed'}`}
+          type="button"
           data-bs-toggle="collapse"
           data-bs-target={`#${collapseId}`}
           aria-expanded={isExpanded}
           aria-controls={collapseId}
-          onClick={handleAccordionToggle} // Handle accordion toggle
         >
-          <div className="d-flex align-items-center justify-content-between w-100">
-            <div className="d-flex align-items-center">
-              <div className={`icon-box ${iconBgClass} me-3`}>
-                <BoxIcon color={iconColor} />
-              </div>
-              <div>
-                <h6 className="sub-title">Order ID #{orderId}</h6>
-                <ul className="item-status d-flex align-items-center">
-                  <li className="me-2 text-soft">{itemCount} Items</li>
-                  <li className="text-soft">{status}</li>
-                </ul>
-              </div>
+          <div className="d-flex align-items-center w-100">
+            <div className="me-3">
+              {status === "On Delivery" ? (
+                <Timer />
+              ) : (
+                <div className={`icon-box ${iconBgClass}`}>
+                  <BoxIcon color={iconColor} />
+                </div>
+              )}
             </div>
-            <button 
-              className="btn btn-sm mx-3"
-              style={{
-                backgroundColor: status.toLowerCase() === 'cancelled' ? '#FFEBEE' : '#E8F5E9',
-                color: status.toLowerCase() === 'cancelled' ? '#E74C3C' : '#00B67A',
-                border: `1px solid ${status.toLowerCase() === 'cancelled' ? '#E74C3C' : '#00B67A'}`,
-                padding: '4px 12px',
-                fontSize: '12px',
-                fontWeight: '600'
-              }}
-              onClick={handleViewDetails} // Only navigate on button click
-            >
-              View Details
-            </button>
+            <div className="flex-grow-1">
+              <h6 className="mb-0">Order ID #{orderId}</h6>
+              <span className="text-soft">{itemCount} Items {status}</span>
+            </div>
           </div>
-        </a>
+        </button>
       </div>
       <div
         id={collapseId}

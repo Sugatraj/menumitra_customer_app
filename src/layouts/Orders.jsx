@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import OrderAccordionItem from "../components/OrderAccordionItem";
 import { useOutlet } from "../contexts/OutletContext";
+import Timer from '../components/Timer';
 
 // Add this new component for no orders state
 const NoOrders = ({ message }) => (
