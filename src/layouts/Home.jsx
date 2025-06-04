@@ -369,20 +369,115 @@ function Home() {
                   <span className="title mb-0 font-18">Popular Menus</span>
                 </div>
                 <div className="row g-3 mb-3">
-                  {menuItems.map((menuItem) => (
-                    <div className="col-6" key={menuItem.menuId}>
-                      <VerticalMenuCard
-                        image={menuItem.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
-                        title={menuItem.menuName}
-                        currentPrice={menuItem.portions?.[0]?.price ?? 0}
-                        reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
-                        isFavorite={favoriteMenuIds.has(menuItem.menuId) || menuItem.isFavourite === 1}
-                        discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
-                        menuItem={menuItem}
-                        onFavoriteUpdate={handleFavoriteUpdate}
-                      />
-                    </div>
-                  ))}
+                  {isLoading ? (
+                    // Skeleton for VerticalMenuCards
+                    [...Array(6)].map((_, index) => (
+                      <div className="col-6" key={`skeleton-${index}`}>
+                        <div 
+                          style={{ 
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            backgroundColor: '#fff',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                          }}
+                        >
+                          {/* Image Skeleton */}
+                          <div style={{ position: 'relative', paddingTop: '75%' }}>
+                            <Skeleton
+                              height="100%"
+                              width="100%"
+                              baseColor="#C8C8C8"
+                              highlightColor="#E0E0E0"
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                borderRadius: '16px 16px 0 0'
+                              }}
+                            />
+                            {/* Discount Badge Skeleton */}
+                            <div 
+                              style={{
+                                position: 'absolute',
+                                top: '10px',
+                                left: '10px',
+                                zIndex: 1
+                              }}
+                            >
+                              <Skeleton
+                                height={24}
+                                width={45}
+                                baseColor="#C8C8C8"
+                                highlightColor="#E0E0E0"
+                                style={{ borderRadius: '12px' }}
+                              />
+                            </div>
+                            {/* Favorite Button Skeleton */}
+                            <div 
+                              style={{
+                                position: 'absolute',
+                                top: '10px',
+                                right: '10px',
+                                zIndex: 1
+                              }}
+                            >
+                              <Skeleton
+                                circle
+                                height={32}
+                                width={32}
+                                baseColor="#C8C8C8"
+                                highlightColor="#E0E0E0"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Content Section */}
+                          <div style={{ padding: '12px' }}>
+                            {/* Title Skeleton */}
+                            <Skeleton
+                              height={20}
+                              width="80%"
+                              baseColor="#C8C8C8"
+                              highlightColor="#E0E0E0"
+                              style={{ marginBottom: '8px' }}
+                            />
+                            
+                            {/* Price and Rating Row */}
+                            <div className="d-flex justify-content-between align-items-center">
+                              <Skeleton
+                                height={18}
+                                width={60}
+                                baseColor="#C8C8C8"
+                                highlightColor="#E0E0E0"
+                              />
+                              <Skeleton
+                                height={18}
+                                width={40}
+                                baseColor="#C8C8C8"
+                                highlightColor="#E0E0E0"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    // Actual VerticalMenuCards
+                    menuItems.map((menuItem) => (
+                      <div className="col-6" key={menuItem.menuId}>
+                        <VerticalMenuCard
+                          image={menuItem.image || "https://cdn.vox-cdn.com/thumbor/aNM9cSJCkTc4-RK1avHURrKBOjU=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/20059022/shutterstock_1435374326.jpg"}
+                          title={menuItem.menuName}
+                          currentPrice={menuItem.portions?.[0]?.price ?? 0}
+                          reviewCount={menuItem.rating ? parseInt(menuItem.rating) : null}
+                          isFavorite={favoriteMenuIds.has(menuItem.menuId) || menuItem.isFavourite === 1}
+                          discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
+                          menuItem={menuItem}
+                          onFavoriteUpdate={handleFavoriteUpdate}
+                        />
+                      </div>
+                    ))
+                  )}
                 </div>
 
                 {/* Show loading skeleton only when no cached data is available */}
