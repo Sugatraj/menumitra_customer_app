@@ -17,6 +17,7 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 import { Autoplay } from 'swiper/modules';
 import { useMenuItems } from '../hooks/useMenuItems';
+import { useOutlet } from '../contexts/OutletContext';
 
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
@@ -29,8 +30,9 @@ function Home() {
   const [specialMenuItems, setSpecialMenuItems] = useState([]);
   const navigate = useNavigate();
   const [favoriteMenuIds, setFavoriteMenuIds] = useState(new Set());
-  const { outletId, sectionId, tableId } = useParams();
   const location = useLocation();
+
+  const { outletId } = useOutlet();
 
   const handleCategoryClick = (category) => {
     // Navigate to category-menu with the category ID
@@ -96,9 +98,6 @@ function Home() {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
       const userId = userData?.userId || null;
-
-      // Hardcoded outlet ID for outlet code 9001
-      const outletId = 1;
       console.log('📦 Using outlet ID:', outletId);
 
       const response = await fetch(`${API_BASE_URL}/user/get_special_menu_list`, {
