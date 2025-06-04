@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import OrderAccordionItem from "../components/OrderAccordionItem";
 import { useOutlet } from "../contexts/OutletContext";
 import Timer from '../components/Timer';
+import CancelOrderModal from '../components/Modal/variants/CancelOrderModal';
 
 // Add this new component for no orders state
 const NoOrders = ({ message }) => (
@@ -43,6 +44,8 @@ function Orders() {
     ongoing: null,
     history: null
   });
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   // Dummy order steps data
   const orderSteps = [
@@ -471,10 +474,32 @@ function Orders() {
 
   const transformedOrders = transformOrderData(ordersData);
 
-  // Inside the transformedOngoingOrders map function, add a handleCancelOrder function
+  // Update the handleCancelOrder function
   const handleCancelOrder = (orderId) => {
-    // For now, just console log since we don't have the API integration yet
-    console.log(`Cancelling order: ${orderId}`);
+    setSelectedOrderId(orderId);
+    setShowCancelModal(true);
+  };
+
+  // Add this new function to handle the actual cancellation
+  const handleConfirmCancel = async (orderId, reason) => {
+    try {
+      const auth = JSON.parse(localStorage.getItem("auth")) || {};
+      const userId = auth.userId;
+      const accessToken = auth.accessToken;
+
+      if (!accessToken) {
+        throw new Error("Authentication token not found");
+      }
+
+      // Add your API call here
+      console.log(`Cancelling order ${orderId} with reason: ${reason}`);
+      
+      // Refresh the orders list after successful cancellation
+      await fetchOngoingOrders();
+    } catch (err) {
+      console.error("Error cancelling order:", err);
+      // Handle error (show toast or alert)
+    }
   };
 
   return (
@@ -700,6 +725,12 @@ function Orders() {
           </div>
         </div>
       </div>
+      <CancelOrderModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleConfirmCancel}
+        orderId={selectedOrderId}
+      />
       <Footer />
     </>
   );
