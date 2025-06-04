@@ -3,9 +3,11 @@ import React from 'react';
 function OrderExistsModal({ 
   isOpen, 
   onClose, 
-  orderNumber, 
+  orderNumber,
+  orderStatus,
   onCancelExisting, 
-  onAddToExisting 
+  onAddToExisting,
+  isLoading // Add loading prop
 }) {
   if (!isOpen) return null;
 
@@ -20,6 +22,7 @@ function OrderExistsModal({
               className="btn-close position-absolute top-0 end-0 m-3" 
               onClick={onClose}
               aria-label="Close"
+              disabled={isLoading}
             ></button>
             
             <h5 className="mb-4">Existing Order Found</h5>
@@ -34,8 +37,16 @@ function OrderExistsModal({
                   backgroundColor: '#FF3B30',
                 }}
                 onClick={onCancelExisting}
+                disabled={isLoading}
               >
-                Cancel Existing & Create New Order
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Processing...
+                  </>
+                ) : (
+                  'Cancel Existing & Create New Order'
+                )}
               </button>
               
               <button 
@@ -44,13 +55,22 @@ function OrderExistsModal({
                   backgroundColor: '#007AFF',
                 }}
                 onClick={onAddToExisting}
+                disabled={isLoading}
               >
-                Add To Existing Order (#{orderNumber})
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Processing...
+                  </>
+                ) : (
+                  `Add To Existing Order (#${orderNumber})`
+                )}
               </button>
 
               <button 
                 className="btn btn-light text-black"
                 onClick={onClose}
+                disabled={isLoading}
               >
                 Close
               </button>

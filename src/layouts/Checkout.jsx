@@ -322,19 +322,115 @@ function Checkout() {
   };
 
   const handleCancelExisting = async () => {
-    // TODO: Add API call to cancel existing order
-    // After cancellation is successful:
-    await createOrder();
-    handleModalClose();
+    try {
+      setLoading(true);
+      const auth = JSON.parse(localStorage.getItem("auth"));
+      const accessToken = auth?.accessToken;
+      const userId = auth?.userId;
+
+      if (!accessToken || !userId) {
+        setError("Authentication required");
+        return;
+      }
+
+      // Transform cart items to required format
+      const orderItems = cartItems.map(item => ({
+        menu_id: item.menuId.toString(),
+        quantity: item.quantity,
+        portion_name: item.portionName.toLowerCase(),
+        comment: item.comment || ""
+      }));
+
+      // Call API to cancel existing order and create new one
+      const response = await axios.post(
+        "https://men4u.xyz/v2/user/complete_or_cancel_existing_order_create_new_order",
+        {
+          order_number: existingOrderModal.orderDetails.order_number,
+          user_id: userId,
+          order_status: "cancelled",
+          outlet_id: outletId.toString(),
+          section_id: sectionId.toString(),
+          order_type: "parcel",
+          order_items: orderItems
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data?.order_id) {
+        // Clear cart and navigate on success
+        clearCart();
+        localStorage.removeItem('cart');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      setError("Failed to cancel existing order and create new one");
+    } finally {
+      setLoading(false);
+      handleModalClose();
+    }
   };
 
   const handleAddToExisting = async () => {
-    // TODO: Add API call to add items to existing order
-    // After addition is successful:
-    clearCart();
-    localStorage.removeItem('cart');
-    navigate(`/`);
-    handleModalClose();
+    try {
+      setLoading(true);
+      const auth = JSON.parse(localStorage.getItem("auth"));
+      const accessToken = auth?.accessToken;
+      const userId = auth?.userId;
+
+      if (!accessToken || !userId) {
+        setError("Authentication required");
+        return;
+      }
+
+      // Transform cart items to required format
+      const orderItems = cartItems.map(item => ({
+        menu_id: item.menuId.toString(),
+        quantity: item.quantity,
+        portion_name: item.portionName.toLowerCase(),
+        comment: item.comment || ""
+      }));
+
+      // Call API to complete existing order and create new one
+      const response = await axios.post(
+        "https://men4u.xyz/v2/user/complete_or_cancel_existing_order_create_new_order",
+        {
+          order_number: existingOrderModal.orderDetails.order_number,
+          user_id: userId,
+          order_status: "completed",
+          outlet_id: outletId.toString(),
+          section_id: sectionId.toString(),
+          order_type: "parcel",
+          order_items: orderItems
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data?.order_id) {
+        // Clear cart and navigate on success
+        clearCart();
+        localStorage.removeItem('cart');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error("Error adding to existing order:", error);
+      setError("Failed to add to existing order");
+    } finally {
+      setLoading(false);
+      handleModalClose();
+    }
   };
 
   return (
@@ -499,6 +595,7 @@ function Checkout() {
         orderNumber={existingOrderModal.orderDetails?.order_number}
         onCancelExisting={handleCancelExisting}
         onAddToExisting={handleAddToExisting}
+        isLoading={loading}
       />
       
       <Footer />
