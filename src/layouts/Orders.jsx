@@ -36,8 +36,13 @@ function Orders() {
     paid: {},
     cancelled: {},
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [ongoingOrders, setOngoingOrders] = useState([]);
+  const [isLoadingOngoing, setIsLoadingOngoing] = useState(true);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [error, setError] = useState({
+    ongoing: null,
+    history: null
+  });
 
   // Dummy order steps data
   const orderSteps = [
@@ -218,10 +223,12 @@ function Orders() {
   };
 
   useEffect(() => {
-    fetchOrders();
+    // Call both APIs independently
+    fetchOngoingOrders();
+    fetchCompletedOrders();
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchCompletedOrders = async () => {
     try {
       const auth = JSON.parse(localStorage.getItem("auth")) || {};
       const userId = auth.userId || "73";
@@ -247,7 +254,7 @@ function Orders() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch orders");
+        throw new Error("Failed to fetch order history");
       }
 
       const data = await response.json();
@@ -255,12 +262,97 @@ function Orders() {
       if (data.detail && data.detail.lists) {
         setOrdersData(data.detail.lists);
       }
-
-      setIsLoading(false);
     } catch (err) {
-      console.error("Error fetching orders:", err);
-      setError(err.message);
-      setIsLoading(false);
+      console.error("Error fetching order history:", err);
+      setError(prev => ({ ...prev, history: err.message }));
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const fetchOngoingOrders = async () => {
+    try {
+      const auth = JSON.parse(localStorage.getItem("auth")) || {};
+      const userId = auth.userId || "73";
+      const accessToken = auth.accessToken;
+
+      if (!accessToken) {
+        throw new Error("Authentication token not found");
+      }
+
+      const response = await fetch(
+        "https://men4u.xyz/v2/user/get_ongoing_or_placed_order",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            user_id: parseInt(userId),
+            outlet_id: outletId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch ongoing orders");
+      }
+
+      const data = await response.json();
+
+      if (data.detail && data.detail.orders) {
+        const transformedOngoingOrders = data.detail.orders.map(order => ({
+          id: order.order_number,
+          orderId: order.order_number,
+          itemCount: order.menu_count,
+          status: order.status === 'placed' ? 'Order Placed' : 
+                 order.status === 'cooking' ? 'Preparing' : 
+                 order.status.charAt(0).toUpperCase() + order.status.slice(1),
+          iconColor: "#FFA902",
+          iconBgClass: "bg-warning",
+          orderSteps: [
+            {
+              title: "Order Created",
+              timestamp: order.time,
+              completed: true,
+            },
+            {
+              title: "Order Received",
+              timestamp: order.time,
+              completed: order.status !== 'placed',
+            },
+            {
+              title: "Order Confirmed",
+              timestamp: order.time,
+              completed: order.status === 'cooking',
+            },
+            {
+              title: "Order Processed",
+              timestamp: order.time,
+              completed: false,
+            },
+            {
+              title: "Order Delivered",
+              timestamp: order.time,
+              completed: false,
+            }
+          ],
+          isExpanded: false,
+          parentId: "accordionExample1",
+          orderType: order.order_type,
+          outletName: order.outlet_name,
+          totalAmount: order.final_grand_total,
+          paymentMethod: order.payment_method || 'Not selected'
+        }));
+
+        setOngoingOrders(transformedOngoingOrders);
+      }
+    } catch (err) {
+      console.error("Error fetching ongoing orders:", err);
+      setError(prev => ({ ...prev, ongoing: err.message }));
+    } finally {
+      setIsLoadingOngoing(false);
     }
   };
 
@@ -370,161 +462,181 @@ function Orders() {
     <>
       <Header />
       <div className="page-content">
-        {isLoading ? (
-          <div>Loading orders...</div>
-        ) : error ? (
-          <div>Error: {error}</div>
-        ) : (
-          <div className="container pb">
-            {/* Add Ongoing Order Section */}
-            <div className="mb-4">
-              <h6 className="mb-3">Ongoing Order</h6>
+        <div className="container pb">
+          {/* Ongoing Orders Section */}
+          <div className="mb-4">
+            <h6 className="mb-3">Ongoing Orders</h6>
+            {isLoadingOngoing ? (
+              <div className="text-center py-4">Loading ongoing orders...</div>
+            ) : error.ongoing ? (
+              <div className="alert alert-danger">{error.ongoing}</div>
+            ) : (
               <div className="accordion style-3" id="accordionExample1">
-                <OrderAccordionItem
-                  key={dummyOngoingOrder.id}
-                  orderId={dummyOngoingOrder.orderId}
-                  itemCount={dummyOngoingOrder.itemCount}
-                  status={dummyOngoingOrder.status}
-                  iconColor={dummyOngoingOrder.iconColor}
-                  iconBgClass={dummyOngoingOrder.iconBgClass}
-                  orderSteps={dummyOngoingOrder.orderSteps}
-                  isExpanded={dummyOngoingOrder.isExpanded}
-                  parentId={dummyOngoingOrder.parentId}
-                />
+                {ongoingOrders.length > 0 ? (
+                  ongoingOrders.map((order) => (
+                    <OrderAccordionItem
+                      key={order.id}
+                      orderId={order.orderId}
+                      itemCount={order.itemCount}
+                      status={order.status}
+                      iconColor={order.iconColor}
+                      iconBgClass={order.iconBgClass}
+                      orderSteps={order.orderSteps}
+                      isExpanded={order.isExpanded}
+                      parentId={order.parentId}
+                      orderType={order.orderType}
+                      outletName={order.outletName}
+                      totalAmount={order.totalAmount}
+                      paymentMethod={order.paymentMethod}
+                    />
+                  ))
+                ) : (
+                  <NoOrders message="No ongoing orders" />
+                )}
               </div>
-            </div>
+            )}
+          </div>
 
-            <div className="default-tab style-1">
-              <ul
-                className="nav nav-tabs d-flex flex-nowrap overflow-auto w-100"
-                id="myTab3"
-                role="tablist"
-              >
-                <li className="nav-item flex-shrink-0 w-50" role="presentation">
-                  <button
-                    className="nav-link active w-100"
-                    id="completed-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#completed-tab-pane"
-                    type="button"
-                    role="tab"
-                    aria-controls="completed-tab-pane"
-                    aria-selected="true"
-                  >
-                    <svg
-                      className="me-2"
-                      width={16}
-                      height={16}
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx={8}
-                        cy={8}
-                        r={7}
-                        fill="#027335"
-                        stroke="var(--bg-white)"
-                        strokeWidth={2}
-                      />
-                    </svg>
-                    Completed
-                  </button>
-                </li>
-                <li className="nav-item flex-shrink-0 w-50" role="presentation">
-                  <button
-                    className="nav-link d-flex align-items-center justify-content-center w-100"
-                    id="cancelled-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#cancelled-tab-pane"
-                    type="button"
-                    role="tab"
-                    aria-controls="cancelled-tab-pane"
-                    aria-selected="false"
-                  >
-                    <svg
-                      className="me-2"
-                      width={16}
-                      height={16}
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx={8}
-                        cy={8}
-                        r={7}
-                        fill="#FF0000"
-                        stroke="var(--bg-white)"
-                        strokeWidth={2}
-                      />
-                    </svg>
-                    Cancelled
-                  </button>
-                </li>
-              </ul>
-              <div className="tab-content" id="myTabContent3">
-                {/* Completed Orders Tab */}
-                <div
-                  className="tab-pane fade show active"
-                  id="completed-tab-pane"
-                  role="tabpanel"
-                  aria-labelledby="completed-tab"
-                  tabIndex={0}
+          <div className="default-tab style-1">
+            <ul
+              className="nav nav-tabs d-flex flex-nowrap overflow-auto w-100"
+              id="myTab3"
+              role="tablist"
+            >
+              <li className="nav-item flex-shrink-0 w-50" role="presentation">
+                <button
+                  className="nav-link active w-100"
+                  id="completed-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#completed-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="completed-tab-pane"
+                  aria-selected="true"
                 >
-                  <div className="accordion style-3" id="accordionExample3">
-                    {transformedOrders.completed.length > 0 ? (
-                      transformedOrders.completed.map((order) => (
-                        <OrderAccordionItem
-                          key={order.id}
-                          orderId={order.orderId}
-                          itemCount={order.itemCount}
-                          status={order.status}
-                          iconColor={order.iconColor}
-                          iconBgClass={order.iconBgClass}
-                          orderSteps={order.orderSteps}
-                          isExpanded={order.isExpanded}
-                          parentId={order.parentId}
-                        />
-                      ))
-                    ) : (
-                      <NoOrders message="No completed orders found" />
-                    )}
-                  </div>
+                  <svg
+                    className="me-2"
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx={8}
+                      cy={8}
+                      r={7}
+                      fill="#027335"
+                      stroke="var(--bg-white)"
+                      strokeWidth={2}
+                    />
+                  </svg>
+                  Completed
+                </button>
+              </li>
+              <li className="nav-item flex-shrink-0 w-50" role="presentation">
+                <button
+                  className="nav-link d-flex align-items-center justify-content-center w-100"
+                  id="cancelled-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#cancelled-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="cancelled-tab-pane"
+                  aria-selected="false"
+                >
+                  <svg
+                    className="me-2"
+                    width={16}
+                    height={16}
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx={8}
+                      cy={8}
+                      r={7}
+                      fill="#FF0000"
+                      stroke="var(--bg-white)"
+                      strokeWidth={2}
+                    />
+                  </svg>
+                  Cancelled
+                </button>
+              </li>
+            </ul>
+            <div className="tab-content" id="myTabContent3">
+              {isLoadingHistory ? (
+                <div className="text-center py-4">Loading order history...</div>
+              ) : error.history ? (
+                <div className="alert alert-danger mb-0">
+                  Unable to load order history. Please try again later.
                 </div>
+              ) : (
+                <>
+                  {/* Completed Orders Tab */}
+                  <div
+                    className="tab-pane fade show active"
+                    id="completed-tab-pane"
+                    role="tabpanel"
+                    aria-labelledby="completed-tab"
+                    tabIndex={0}
+                  >
+                    <div className="accordion style-3" id="accordionExample3">
+                      {transformedOrders.completed.length > 0 ? (
+                        transformedOrders.completed.map((order) => (
+                          <OrderAccordionItem
+                            key={order.id}
+                            orderId={order.orderId}
+                            itemCount={order.itemCount}
+                            status={order.status}
+                            iconColor={order.iconColor}
+                            iconBgClass={order.iconBgClass}
+                            orderSteps={order.orderSteps}
+                            isExpanded={order.isExpanded}
+                            parentId={order.parentId}
+                          />
+                        ))
+                      ) : (
+                        <NoOrders message="No completed orders found" />
+                      )}
+                    </div>
+                  </div>
 
-                {/* Cancelled Orders Tab */}
-                <div
-                  className="tab-pane fade"
-                  id="cancelled-tab-pane"
-                  role="tabpanel"
-                  aria-labelledby="cancelled-tab"
-                  tabIndex={0}
-                >
-                  <div className="accordion style-3" id="accordionExample2">
-                    {transformedOrders.cancelled.length > 0 ? (
-                      transformedOrders.cancelled.map((order) => (
-                        <OrderAccordionItem
-                          key={order.id}
-                          orderId={order.orderId}
-                          itemCount={order.itemCount}
-                          status={order.status}
-                          iconColor={order.iconColor}
-                          iconBgClass={order.iconBgClass}
-                          orderSteps={order.orderSteps}
-                          isExpanded={order.isExpanded}
-                          parentId={order.parentId}
-                        />
-                      ))
-                    ) : (
-                      <NoOrders message="No cancelled orders found" />
-                    )}
+                  {/* Cancelled Orders Tab */}
+                  <div
+                    className="tab-pane fade"
+                    id="cancelled-tab-pane"
+                    role="tabpanel"
+                    aria-labelledby="cancelled-tab"
+                    tabIndex={0}
+                  >
+                    <div className="accordion style-3" id="accordionExample2">
+                      {transformedOrders.cancelled.length > 0 ? (
+                        transformedOrders.cancelled.map((order) => (
+                          <OrderAccordionItem
+                            key={order.id}
+                            orderId={order.orderId}
+                            itemCount={order.itemCount}
+                            status={order.status}
+                            iconColor={order.iconColor}
+                            iconBgClass={order.iconBgClass}
+                            orderSteps={order.orderSteps}
+                            isExpanded={order.isExpanded}
+                            parentId={order.parentId}
+                          />
+                        ))
+                      ) : (
+                        <NoOrders message="No cancelled orders found" />
+                      )}
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
       <Footer />
     </>
