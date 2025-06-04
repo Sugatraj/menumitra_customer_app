@@ -44,13 +44,27 @@ export const OutletProvider = ({ children }) => {
       outletInfo, 
       updateOutletInfo, 
       clearOutletInfo,
-      // Convenience getters
+      // Convenience getters for all outlet details
       outletId: outletInfo?.outletId,
       outletCode: outletInfo?.outletCode,
       sectionId: outletInfo?.sectionId,
       tableId: outletInfo?.tableId,
       outletName: outletInfo?.outletName,
-      isOpen: outletInfo?.isOpen
+      isOpen: outletInfo?.isOpen,
+      mobile: outletInfo?.mobile,
+      fssaiNumber: outletInfo?.fssaiNumber,
+      gstNumber: outletInfo?.gstNumber,
+      address: outletInfo?.address,
+      ownerId: outletInfo?.ownerId,
+      outletType: outletInfo?.outletType,
+      outletVegNonveg: outletInfo?.outletVegNonveg,
+      whatsapp: outletInfo?.whatsapp,
+      facebook: outletInfo?.facebook,
+      instagram: outletInfo?.instagram,
+      website: outletInfo?.website,
+      googleReview: outletInfo?.googleReview,
+      googleBusinessLink: outletInfo?.googleBusinessLink,
+      sectionName: outletInfo?.sectionName
     }}>
       {children}
     </OutletContext.Provider>
