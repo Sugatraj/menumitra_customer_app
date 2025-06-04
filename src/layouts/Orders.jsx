@@ -8,7 +8,7 @@ import Timer from '../components/Timer';
 // Add this new component for no orders state
 const NoOrders = ({ message }) => (
   
-  <div className="text-center py-5 my-5">
+  <div className="text-center py-5">
     <svg 
       width="48" 
       height="48" 
@@ -429,21 +429,6 @@ function Orders() {
                 title: "Order Cancelled",
                 timestamp: order.datetime,
                 completed: true,
-              },
-              {
-                title: "Order Confirmed",
-                timestamp: order.datetime,
-                completed: false,
-              },
-              {
-                title: "Order Processed",
-                timestamp: order.datetime,
-                completed: false,
-              },
-              {
-                title: "Order Delivered",
-                timestamp: order.datetime,
-                completed: false,
               }
             ],
             isExpanded: false,
