@@ -118,7 +118,7 @@ function Search() {
 
     try {
       const payload = {
-        outlet_id: outletId,
+        outlet_id: 1,
         keyword: searchTerm.trim(),
       };
 

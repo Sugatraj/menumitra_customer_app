@@ -240,7 +240,7 @@ function Orders() {
           },
           body: JSON.stringify({
             user_id: parseInt(userId),
-            outlet_id: outletId,
+            outlet_id: 1,
           }),
         }
       );
