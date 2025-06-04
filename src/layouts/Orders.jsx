@@ -8,7 +8,7 @@ import Timer from '../components/Timer';
 // Add this new component for no orders state
 const NoOrders = ({ message }) => (
   
-  <div className="text-center py-5">
+  <div className="text-center py-5 my-5">
     <svg 
       width="48" 
       height="48" 
@@ -569,10 +569,6 @@ function Orders() {
             <div className="tab-content" id="myTabContent3">
               {isLoadingHistory ? (
                 <div className="text-center py-4">Loading order history...</div>
-              ) : error.history ? (
-                <div className="alert alert-danger mb-0">
-                  Unable to load order history. Please try again later.
-                </div>
               ) : (
                 <>
                   {/* Completed Orders Tab */}
@@ -584,7 +580,9 @@ function Orders() {
                     tabIndex={0}
                   >
                     <div className="accordion style-3" id="accordionExample3">
-                      {transformedOrders.completed.length > 0 ? (
+                      {error.history ? (
+                        <NoOrders message="No completed orders" />
+                      ) : transformedOrders.completed.length > 0 ? (
                         transformedOrders.completed.map((order) => (
                           <OrderAccordionItem
                             key={order.id}
@@ -599,7 +597,7 @@ function Orders() {
                           />
                         ))
                       ) : (
-                        <NoOrders message="No completed orders found" />
+                        <NoOrders message="No completed orders" />
                       )}
                     </div>
                   </div>
@@ -613,7 +611,9 @@ function Orders() {
                     tabIndex={0}
                   >
                     <div className="accordion style-3" id="accordionExample2">
-                      {transformedOrders.cancelled.length > 0 ? (
+                      {error.history ? (
+                        <NoOrders message="No cancelled orders" />
+                      ) : transformedOrders.cancelled.length > 0 ? (
                         transformedOrders.cancelled.map((order) => (
                           <OrderAccordionItem
                             key={order.id}
@@ -628,7 +628,7 @@ function Orders() {
                           />
                         ))
                       ) : (
-                        <NoOrders message="No cancelled orders found" />
+                        <NoOrders message="No cancelled orders" />
                       )}
                     </div>
                   </div>
