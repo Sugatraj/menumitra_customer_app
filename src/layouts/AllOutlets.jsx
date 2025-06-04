@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { parseRestoUrl } from '../utils/urlParser';
 
 const VegIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,61 +84,19 @@ function AllOutlets() {
     }
   };
 
-  const extractIdsFromUrl = (url) => {
-    try {
-      // Check if URL exists and contains user_app
-      if (!url || !url.includes('user_app')) {
-        return null;
-      }
-
-      // Extract the path after user_app
-      const pathMatch = url.match(/user_app\/o(\d+)\/s(\d+)\/t(\d+)/);
-      
-      if (!pathMatch) {
-        return null;
-      }
-
-      return {
-        outletId: pathMatch[1],    // Extract 9001 from o9001
-        sectionId: pathMatch[2],   // Extract 17 from s17
-        tableId: pathMatch[3]      // Extract 7 from t7
-      };
-    } catch (error) {
-      console.error('Error parsing resto URL:', error);
-      return null;
-    }
-  };
-
-  const handleOutletClick = (outlet) => {
-    if (!outlet.resto_url) return;
-
-    const ids = extractIdsFromUrl(outlet.resto_url);
-    if (!ids) {
-      console.error('Invalid resto URL format:', outlet.resto_url);
+  const handleRestoUrl = (url) => {
+    const parsed = parseRestoUrl(url);
+    
+    if (!parsed.isValid) {
+      console.error('Invalid resto URL format:', url);
+      // Show error message to user
       return;
     }
 
-    // Store both outlet_id and outlet_code (from URL) along with other details
-    localStorage.setItem('selectedOutlet', JSON.stringify({
-      // Original outlet ID from API
-      outletId: outlet.outlet_id,
-      // Outlet code from URL (the o9001 part)
-      outletCode: ids.outletId,
-      // Section and table IDs
-      sectionId: ids.sectionId,
-      tableId: ids.tableId,
-      // Outlet details
-      outletName: outlet.outlet_name,
-      outletAddress: outlet.address,
-      outletMobile: outlet.mobile,
-      vegNonveg: outlet.veg_nonveg,
-      isOpen: outlet.is_open,
-      isOutletFilled: outlet.is_outlet_filled,
-      selectedAt: new Date().toISOString()
-    }));
-
-    // Navigate using the outlet_code from URL
-    navigate(`/o${ids.outletId}/s${ids.sectionId}/t${ids.tableId}`);
+    const { outletCode, sectionId, tableId } = parsed;
+    
+    // Navigate using path params to match the route declaration
+    navigate(`/${outletCode}/${sectionId}/${tableId}`);
   };
 
   return (
@@ -252,7 +211,7 @@ function AllOutlets() {
                 <div 
                   key={outlet.outlet_id} 
                   className="card border-0 mb-2"
-                  onClick={() => handleOutletClick(outlet)}
+                  onClick={() => handleRestoUrl(outlet.resto_url)}
                   style={{ 
                     cursor: outlet.resto_url ? 'pointer' : 'default',
                     transition: 'all 0.3s ease'
