@@ -471,6 +471,12 @@ function Orders() {
 
   const transformedOrders = transformOrderData(ordersData);
 
+  // Inside the transformedOngoingOrders map function, add a handleCancelOrder function
+  const handleCancelOrder = (orderId) => {
+    // For now, just console log since we don't have the API integration yet
+    console.log(`Cancelling order: ${orderId}`);
+  };
+
   return (
     <>
       <Header />
@@ -487,28 +493,67 @@ function Orders() {
               <div className="accordion style-3" id="accordionExample1">
                 {ongoingOrders.length > 0 ? (
                   ongoingOrders.map((order) => (
-                    <div key={order.id} className="position-relative">
-                      {/* {order.showTimer && (
-                        <div className="position-absolute" style={{ right: '1rem', top: '1rem', zIndex: 1 }}>
-                          <Timer initialSeconds={order.remainingSeconds} />
+                    <div key={order.id} className="accordion-item">
+                      <div className="accordion-header">
+                        <div className="accordion-button collapsed" 
+                          data-bs-toggle="collapse"
+                          data-bs-target={`#collapse${order.orderId}`}
+                        >
+                          <div className="d-flex align-items-center justify-content-between w-100">
+                            {/* Left side with icon and order details */}
+                            <div className="d-flex align-items-center">
+                              <span className={`icon-box ${order.iconBgClass}`}>
+                                <i className="fa-solid fa-bag-shopping" style={{ color: order.iconColor }}></i>
+                              </span>
+                              <div className="ms-3">
+                                <h6 className="mb-0">Order #{order.orderId}</h6>
+                                <span className="text-soft">{order.itemCount} Items {order.status}</span>
+                              </div>
+                            </div>
+
+                            {/* Right side with cancel button */}
+                            <div className="d-flex align-items-center gap-3">
+                              <button 
+                                className="btn btn-danger btn-sm me-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCancelOrder(order.orderId);
+                                }}
+                                style={{
+                                  borderRadius: '8px',
+                                  padding: '6px 12px',
+                                  fontSize: '13px',
+                                  backgroundColor: '#B87D6A',
+                                  border: 'none'
+                                }}
+                              >
+                                Cancel Order
+                              </button>
+                              {/* The collapse arrow will be automatically placed here by Bootstrap */}
+                            </div>
+                          </div>
                         </div>
-                      )} */}
-                      <OrderAccordionItem
-                        orderId={order.orderId}
-                        itemCount={order.itemCount}
-                        status={order.status}
-                        iconColor={order.iconColor}
-                        iconBgClass={order.iconBgClass}
-                        orderSteps={order.orderSteps}
-                        isExpanded={order.isExpanded}
-                        parentId={order.parentId}
-                        orderType={order.orderType}
-                        outletName={order.outletName}
-                        totalAmount={order.totalAmount}
-                        paymentMethod={order.paymentMethod}
-                        showTimer={order.showTimer}
-                        remainingSeconds={order.remainingSeconds}
-                      />
+                      </div>
+                      <div id={`collapse${order.orderId}`} className="accordion-collapse collapse" data-bs-parent="#accordionExample1">
+                        <div className="accordion-body">
+                          <OrderAccordionItem
+                            orderId={order.orderId}
+                            itemCount={order.itemCount}
+                            status={order.status}
+                            iconColor={order.iconColor}
+                            iconBgClass={order.iconBgClass}
+                            orderSteps={order.orderSteps}
+                            isExpanded={order.isExpanded}
+                            parentId={order.parentId}
+                            orderType={order.orderType}
+                            outletName={order.outletName}
+                            totalAmount={order.totalAmount}
+                            paymentMethod={order.paymentMethod}
+                            showTimer={order.showTimer}
+                            remainingSeconds={order.remainingSeconds}
+                          />
+                        </div>
+                      </div>
                     </div>
                   ))
                 ) : (
