@@ -514,17 +514,13 @@ function Orders() {
                             {/* Right side with cancel button */}
                             <div className="d-flex align-items-center gap-3">
                               <button 
-                                className="btn btn-danger btn-sm me-2"
+                                className="btn btn-sm me-2 text-white"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleCancelOrder(order.orderId);
                                 }}
                                 style={{
-                                  borderRadius: '8px',
-                                  padding: '6px 12px',
-                                  fontSize: '13px',
-                                  backgroundColor: '#B87D6A',
-                                  border: 'none'
+                                  backgroundColor: '#FF0000',
                                 }}
                               >
                                 Cancel Order
