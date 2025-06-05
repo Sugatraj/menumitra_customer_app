@@ -602,7 +602,7 @@ function Home() {
                                 currentPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price : 0}
                                 originalPrice={menuItem.portions && menuItem.portions[0] ? menuItem.portions[0].price + (menuItem.portions[0].price * menuItem.offer / 100) : 0}
                                 discount={menuItem.offer > 0 ? `${menuItem.offer}%` : null}
-                                onAddToCart={() => handleAddToCart(menuItem.menu_id)}
+                                menuItem={menuItem}
                                 onFavoriteClick={() => handleFavoriteClick(menuItem.menu_id)}
                                 isFavorite={menuItem.is_favourite === 1}
                                 productUrl="#"

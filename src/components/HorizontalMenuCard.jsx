@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import fallbackImage from '../assets/images/food/small/6.png';
+import { useModal } from '../contexts/ModalContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const HorizontalMenuCard = ({
   image,
@@ -8,7 +10,7 @@ const HorizontalMenuCard = ({
   currentPrice = 5.0,
   originalPrice = 8.9,
   discount = '10%Off',
-  onAddToCart = () => {},
+  menuItem = {},
   onFavoriteClick = () => {},
   isFavorite = false,
   productUrl = '#',
@@ -17,6 +19,22 @@ const HorizontalMenuCard = ({
   onIncrement,
   onDecrement
 }) => {
+  const { openModal } = useModal();
+  const { user, setShowAuthOffcanvas } = useAuth();
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    
+    if (!menuItem) return;
+
+    if (!user) {
+      setShowAuthOffcanvas(true);
+      return;
+    }
+
+    openModal('addToCart', menuItem);
+  };
+
   return (
     <div className="card product-card position-relative border shadow-sm hover-shadow">
       <div className="d-flex align-items-center p-3">
@@ -91,10 +109,7 @@ const HorizontalMenuCard = ({
         <a 
           href={productUrl}
           className="position-absolute end-0 top-50 translate-middle-y me-3 btn btn-success rounded-3 p-2 cart-btn"
-          onClick={(e) => {
-            e.preventDefault();
-            onAddToCart();
-          }}
+          onClick={handleAddToCart}
         >
           <svg 
             width="24" 
@@ -126,7 +141,7 @@ HorizontalMenuCard.propTypes = {
   currentPrice: PropTypes.number,
   originalPrice: PropTypes.number,
   discount: PropTypes.string,
-  onAddToCart: PropTypes.func,
+  menuItem: PropTypes.object,
   onFavoriteClick: PropTypes.func,
   isFavorite: PropTypes.bool,
   productUrl: PropTypes.string,
