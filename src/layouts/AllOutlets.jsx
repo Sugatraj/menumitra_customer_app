@@ -95,8 +95,8 @@ function AllOutlets() {
 
     const { outletCode, sectionId, tableId } = parsed;
     
-    // Navigate using path params to match the route declaration
-    navigate(`/${outletCode}/${sectionId}/${tableId}`);
+    // Navigate using the expected path format for Home.jsx
+    navigate(`/o${outletCode}/s${sectionId}/t${tableId}`);
   };
 
   return (
