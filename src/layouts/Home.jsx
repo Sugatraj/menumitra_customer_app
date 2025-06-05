@@ -24,6 +24,24 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
 
+// Helper to extract outlet params from the path
+function extractOutletParamsFromPath(pathname) {
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length < 3) return null;
+  const [o, s, t] = segments.slice(-3);
+  const oMatch = o.match(/^o(\d+)$/);
+  const sMatch = s.match(/^s(\d+)$/);
+  const tMatch = t.match(/^t(\d+)$/);
+  if (oMatch && sMatch && tMatch) {
+    return {
+      outletCode: oMatch[1],
+      sectionId: sMatch[1],
+      tableId: tMatch[1],
+    };
+  }
+  return null;
+}
+
 function Home() {
   const { menuCategories, menuItems, isLoading } = useMenuItems();
   const { user } = useAuth();
@@ -153,6 +171,17 @@ function Home() {
     });
   };
 
+  const outletParams = extractOutletParamsFromPath(location.pathname);
+
+  useEffect(() => {
+    if (outletParams) {
+      console.log("Extracted outlet params:", outletParams);
+      // You can use outletParams.outletCode, etc. for your API calls here
+      // Optionally, update context or localStorage if needed
+    } else {
+      console.log("No outlet params found in path:", location.pathname);
+    }
+  }, [location.pathname]);
 
   return (
     <>

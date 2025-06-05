@@ -3,8 +3,8 @@ import axios from 'axios';
 
 const OutletContext = createContext();
 
-// Add regex pattern to extract codes
-const URL_PATTERN = /^o(\d+)\/s(\d+)\/t(\d+)$/;
+// Update the regex pattern to match the exact format with prefixes
+const URL_PATTERN = /^\/o(\d+)\/s(\d+)\/t(\d+)$/;
 
 export const useOutlet = () => {
   const context = useContext(OutletContext);
@@ -32,25 +32,46 @@ export const OutletProvider = ({ children }) => {
     return null;
   };
 
+  function extractOutletParamsFromPath(pathname) {
+    // Split and filter out empty segments
+    const segments = pathname.split('/').filter(Boolean);
+    // We expect the last three segments to be o<outletCode>, s<sectionId>, t<tableId>
+    if (segments.length < 3) return null;
+    const [o, s, t] = segments.slice(-3);
+
+    const oMatch = o.match(/^o(\d+)$/);
+    const sMatch = s.match(/^s(\d+)$/);
+    const tMatch = t.match(/^t(\d+)$/);
+
+    if (oMatch && sMatch && tMatch) {
+      return {
+        outletCode: oMatch[1],
+        sectionId: sMatch[1],
+        tableId: tMatch[1],
+      };
+    }
+    return null;
+  }
+
   useEffect(() => {
+    const fullPath = window.location.pathname;
+    console.log('Full path:', fullPath);
+    const segments = fullPath.split('/').filter(Boolean);
+    console.log('Segments:', segments);
     const initializeOutlet = async () => {
-      // Get full pathname and check for our pattern
-      const fullPath = window.location.pathname;
-      const match = fullPath.match(/\/o(\d+)\/s(\d+)\/t(\d+)$/);
-      
-      if (match) {
-        // URL has the pattern, extract codes
-        const [, outletCode, sectionId, tableId] = match;
-        console.log('URL Pattern found:', { outletCode, sectionId, tableId });
-        
-        // Store these values immediately
+      const params = extractOutletParamsFromPath(fullPath);
+
+      if (params) {
+        const { outletCode, sectionId, tableId } = params;
+        console.log('Extracted from URL:', params);
+
         localStorage.setItem('outletCode', outletCode);
         localStorage.setItem('sectionId', sectionId);
         localStorage.setItem('tableId', tableId);
-        
-        // Always fetch fresh data when URL pattern is present
+
         await fetchOutletDetailsByCode(outletCode);
       } else {
+        console.log('No outlet params found in path:', fullPath);
         // No URL pattern, try localStorage
         const storedOutletCode = localStorage.getItem('outletCode');
         const storedOutlet = localStorage.getItem('selectedOutlet');
@@ -66,9 +87,7 @@ export const OutletProvider = ({ children }) => {
       }
     };
 
-    initializeOutlet().catch(error => {
-      console.error('Failed to initialize outlet:', error);
-    });
+    initializeOutlet().catch(console.error);
   }, []); // Run only on mount
 
   const fetchOutletDetailsByCode = async (outletCode) => {

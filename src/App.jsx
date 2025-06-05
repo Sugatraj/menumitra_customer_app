@@ -34,6 +34,8 @@ function App() {
     setShouldClearCart(true);
   }, []);
 
+  console.log("Router basename:", import.meta.env.BASE_URL);
+
   return (
     <Router basename={import.meta.env.BASE_URL}>
       <OutletProvider>
@@ -45,11 +47,7 @@ function App() {
                   <AuthOffcanvas />
                   <SidebarProvider>
                     <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route
-                        path="/:outletCode/:sectionId/:tableId"
-                        element={<Home />}
-                      />
+                      <Route path="*" element={<Home />} />
                       <Route path="/all-outlets" element={<AllOutlets />} />
                       <Route path="/favourites" element={<Favourite />} />
                       <Route path="/checkout" element={<Checkout />} />
