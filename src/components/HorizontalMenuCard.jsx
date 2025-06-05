@@ -108,41 +108,13 @@ const HorizontalMenuCard = ({
         </div>
 
         {/* Cart Button - Show different states based on cart */}
-        {!cartItemsForMenu.length ? (
-          <a 
-            href={productUrl}
-            className="position-absolute end-0 top-50 translate-middle-y me-3 btn btn-success rounded-3 p-2 cart-btn"
-            onClick={handleAddToCart}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g clipPath="url(#clip0_361_436)">
-                <path d="M18.1776 17.8443C16.6362 17.8428 15.3855 19.0912 15.3839 20.6326C15.3824 22.1739 16.6308 23.4247 18.1722 23.4262C19.7136 23.4277 20.9643 22.1794 20.9659 20.638V20.6353C20.9644 19.0955 19.7173 17.8473 18.1776 17.8443Z" fill="white"/>
-                <path d="M23.1278 4.47972C23.061 4.46679 22.9932 4.46022 22.9251 4.46011H5.93181L5.66267 2.65957C5.49499 1.4638 4.47216 0.574121 3.26466 0.573753H1.07655C0.481978 0.573753 0 1.05573 0 1.6503C0 2.24488 0.481978 2.72686 1.07655 2.72686H3.26734C3.40423 2.72586 3.52008 2.82778 3.53648 2.96372L5.19436 14.3267C5.42166 15.7706 6.66363 16.8358 8.12528 16.8404H19.3241C20.7313 16.8423 21.9454 15.8533 22.2281 14.4747L23.9802 5.7412C24.0931 5.15745 23.7115 4.59268 23.1278 4.47972Z" fill="white"/>
-                <path d="M11.3405 20.5158C11.2749 19.0196 10.0401 17.8418 8.54246 17.847C7.00233 17.9092 5.80425 19.2082 5.86648 20.7484C5.9262 22.2262 7.12833 23.4007 8.60707 23.4262H8.67435C10.2143 23.3587 11.4079 22.0557 11.3405 20.5158Z" fill="white"/>
-              </g>
-              <defs>
-                <clipPath id="clip0_361_436">
-                  <rect width="24" height="24" fill="white"/>
-                </clipPath>
-              </defs>
-            </svg>
-          </a>
-        ) : (
-          // Show quantity badge when item is in cart
-          <div className="position-absolute end-0 top-50 translate-middle-y me-3">
-            <button 
-              className="btn btn-success rounded-3 p-2"
-              onClick={handleAddToCart}
-            >
-              <div className="d-flex align-items-center">
-                <span className="me-2">{cartItemsForMenu.reduce((sum, item) => sum + item.quantity, 0)}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
-            </button>
-          </div>
-        )}
+        <a 
+          href={productUrl}
+          className="position-absolute end-0 top-50 translate-middle-y me-3 btn btn-success rounded-3 p-2"
+          onClick={handleAddToCart}
+        >
+          <i className="fa fa-shopping-cart text-white"></i>
+        </a>
       </div>
     </div>
   );
