@@ -124,6 +124,12 @@ function Home() {
       const userId = userData?.userId || null;
       console.log('📦 Using outlet ID:', outletId);
 
+      // Add a guard clause
+      if (!outletId) {
+        console.log('❌ No outletId available, skipping special menu fetch');
+        return;
+      }
+
       const response = await fetch(`${API_BASE_URL}/user/get_special_menu_list`, {
         method: 'POST',
         headers: {
@@ -138,7 +144,6 @@ function Home() {
       });
 
       const data = await response.json();
-      // console.log('✅ Special menu API Response:', data);
 
       if (data.detail && data.detail.special_menu_list) {
         console.log('✨ Setting special menu items:', data.detail.special_menu_list);
@@ -149,18 +154,15 @@ function Home() {
     }
   };
 
-  // Use effect with no outlet dependency
+  // Instead, only use the effect that depends on outletId
   useEffect(() => {
-    console.log('🏁 Home component mounted, fetching special menu...');
-    fetchSpecialMenuItems();
-  }, []); // Empty dependency array - will run once on mount
-
-  // Add this useEffect to call fetchSpecialMenuItems when outletId changes
-  useEffect(() => {
-    if (outletId) {
+    if (outletId) {  // Only fetch if we have an outletId
+      console.log('🏁 OutletId available, fetching special menu items...');
       fetchSpecialMenuItems();
+    } else {
+      console.log('⏳ Waiting for outletId before fetching special menu items...');
     }
-  }, [outletId]); // Add outletId as dependency
+  }, [outletId]); // Depend on outletId
 
   // Add this function to handle favorite updates
   const handleFavoriteUpdate = (menuId, isFavorite) => {
