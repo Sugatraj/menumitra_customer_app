@@ -32,6 +32,7 @@ export const OrderTypeModal = () => {
 
   const handleOrderTypeSelect = (type) => {
     updateOrderSettings({ order_type: type });
+    localStorage.setItem('orderSettings', JSON.stringify({ ...orderSettings, order_type: type }));
     closeModal('orderType');
   };
 

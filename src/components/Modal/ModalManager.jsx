@@ -16,7 +16,11 @@ const ModalManager = () => {
 
   const SpecificModal = MODAL_COMPONENTS[modals.orderType];
 
-  return SpecificModal ? <SpecificModal /> : null;
+  return (
+    <>
+      {modals.orderType && <OrderTypeModal />}
+    </>
+  );
 };
 
 export default ModalManager;
