@@ -18,13 +18,12 @@ const HorizontalMenuCard = ({
 }) => {
   const { openModal } = useModal();
   const { user, setShowAuthOffcanvas } = useAuth();
-  const { cartItems, getCartItemComment } = useCart();
+  const { cartItems } = useCart();
 
+  // Check if any portion of this menu exists in cart
   const cartItemsForMenu = menuItem?.menuId 
     ? cartItems.filter(item => item.menuId === menuItem.menuId)
     : [];
-
-  const menuComment = menuItem?.menuId ? getCartItemComment(menuItem.menuId) : '';
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -71,7 +70,6 @@ const HorizontalMenuCard = ({
 
         {/* Right side - Content */}
         <div className="ms-3 flex-grow-1 pe-5">
-          {/* Title */}
           <h5 className="mb-2">
             <a href={productUrl} className="text-dark text-decoration-none">
               {title}
@@ -79,29 +77,32 @@ const HorizontalMenuCard = ({
           </h5>
 
           {/* Price Section */}
-          <div className="dz-meta mb-3">
-            <ul>
-              <li className="price text-accent">₹{currentPrice}</li>
-              {originalPrice && (
-                <del className="text-muted">
-                  <h6 className="mb-0">₹{originalPrice}</h6>
-                </del>
-              )}
-            </ul>
+          <div className="d-flex align-items-center mb-2">
+            <h6 className="mb-0 me-2">₹{currentPrice}</h6>
+            {originalPrice && (
+              <del className="text-muted">
+                <h6 className="mb-0">₹{originalPrice}</h6>
+              </del>
+            )}
           </div>
 
           {/* Discount */}
           {discount && (
             <div className="d-flex align-items-center">
+              <svg
+                className="me-2"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.6666 0.000106812H9.12485C8.75825 0.000106812 8.24587 0.212488 7.98685 0.471314L0.389089 8.06903C-0.129696 8.58723 -0.129696 9.43684 0.389089 9.95441L6.04624 15.6114C6.56385 16.1296 7.41263 16.1296 7.93103 15.6108L15.5288 8.01423C15.7876 7.75544 16 7.24224 16 6.87642V1.3335C16 0.600298 15.3998 0.000106812 14.6666 0.000106812ZM11.9998 5.33347C11.2634 5.33347 10.6664 4.73585 10.6664 4.00008C10.6664 3.26309 11.2634 2.66669 11.9998 2.66669C12.7362 2.66669 13.3334 3.26309 13.3334 4.00008C13.3334 4.73585 12.7362 5.33347 11.9998 5.33347Z"
+                  fill="#C29C1D"
+                />
+              </svg>
               <span className="text-warning small">Disc. {discount}</span>
-            </div>
-          )}
-
-          {/* Show comment if exists */}
-          {menuComment && (
-            <div className="text-muted small mt-1" style={{ fontSize: '12px' }}>
-              <i className="fas fa-comment-alt me-1"></i>
-              {menuComment}
             </div>
           )}
         </div>
@@ -127,20 +128,19 @@ const HorizontalMenuCard = ({
             </svg>
           </a>
         ) : (
+          // Show quantity badge when item is in cart
           <div className="position-absolute end-0 top-50 translate-middle-y me-3">
-            <div className="d-flex align-items-center">
-              {menuItem?.portions && cartItemsForMenu.map((cartItem, index) => (
-                <div 
-                  key={cartItem.portionId}
-                  className={`text-center ${index > 0 ? 'ms-2' : ''}`}
-                >
-                  <div className="fw-bold">{cartItem.quantity}</div>
-                  <div className="text-muted small">
-                    {cartItem.portionName?.charAt(0).toUpperCase()}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <button 
+              className="btn btn-success rounded-3 p-2"
+              onClick={handleAddToCart}
+            >
+              <div className="d-flex align-items-center">
+                <span className="me-2">{cartItemsForMenu.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
+            </button>
           </div>
         )}
       </div>
