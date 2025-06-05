@@ -4,26 +4,36 @@ const ModalContext = createContext();
 
 export const ModalProvider = ({ children }) => {
   const [modals, setModals] = useState({
-    orderType: false
+    orderType: false,
+    addToCart: false
   });
+  const [modalConfig, setModalConfig] = useState({});
 
-  const openModal = (modalId) => {
+  const openModal = (modalId, data = null) => {
     setModals(prev => ({
       ...prev,
       [modalId]: true
     }));
+    if (data) {
+      setModalConfig({ data });
+    }
   };
 
-  const closeModal = (modalId) => {
-    setModals(prev => ({
-      ...prev,
-      [modalId]: false
-    }));
+  const closeModal = () => {
+    setModals(prev => {
+      const newState = {};
+      Object.keys(prev).forEach(key => {
+        newState[key] = false;
+      });
+      return newState;
+    });
+    setModalConfig({});
   };
 
   return (
     <ModalContext.Provider value={{
       modals,
+      modalConfig,
       openModal,
       closeModal
     }}>

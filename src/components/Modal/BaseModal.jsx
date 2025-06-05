@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useModal } from '../../contexts/ModalContext';
 
 const BaseModal = ({ 
-  id,
   isOpen,
   title, 
   children, 

@@ -77,7 +77,7 @@ export const AddToCartModal = () => {
   useEffect(() => {
     const authData = localStorage.getItem('auth');
     if (!authData || !user) {
-      closeModal(); // Close the cart modal
+      closeModal('addToCart'); // Close the cart modal
       setShowAuthOffcanvas(true); // Show auth modal
       return;
     }
@@ -87,7 +87,7 @@ export const AddToCartModal = () => {
     // Check if user is authenticated
     const authData = localStorage.getItem('auth');
     if (!authData || !user) {
-      closeModal(); // Close the cart modal
+      closeModal('addToCart'); // Close the cart modal
       setShowAuthOffcanvas(true); // Show auth modal
       return;
     }
@@ -154,7 +154,7 @@ export const AddToCartModal = () => {
     // Check if user is authenticated
     const authData = localStorage.getItem('auth');
     if (!authData || !user) {
-      closeModal(); // Close the cart modal
+      closeModal('addToCart'); // Close the cart modal
       setShowAuthOffcanvas(true); // Show auth modal
       return;
     }
@@ -178,7 +178,7 @@ export const AddToCartModal = () => {
         );
       }
     });
-    closeModal();
+    closeModal('addToCart');
   };
 
   // Add a function to check if any portion has quantity > 0
@@ -188,6 +188,7 @@ export const AddToCartModal = () => {
 
   return (
     <BaseModal 
+      isOpen={true}
       title={modalTitle} 
       onClose={closeModal}
     >

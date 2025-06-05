@@ -99,13 +99,12 @@ const VerticalMenuCard = ({
     if (!menuItem) return;
 
     // Check if user is authenticated
-    const authData = localStorage.getItem('auth');
-    if (!authData || !user) {
+    if (!user) {
       setShowAuthOffcanvas(true);
       return;
     }
 
-    openModal('ADD_TO_CART', menuItem);
+    openModal('addToCart', menuItem);
   };
 
   // Get total quantity across all portions
@@ -124,7 +123,7 @@ const VerticalMenuCard = ({
       return;
     }
 
-    openModal('ADD_TO_CART', menuItem);
+    openModal('addToCart', menuItem);
   };
 
   return (
