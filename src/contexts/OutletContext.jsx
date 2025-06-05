@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
+import { useLocation } from "react-router-dom";
 
 const OutletContext = createContext();
 
 // Update the regex pattern to match the exact format with prefixes
 const URL_PATTERN = /^\/o(\d+)\/s(\d+)\/t(\d+)$/;
+
+// Regex: matches /o123, /o456, etc. (no /s or /t after)
+const outletOnlyPattern = /^\/o\d+$/;
 
 export const useOutlet = () => {
   const context = useContext(OutletContext);
@@ -19,6 +23,12 @@ export const OutletProvider = ({ children }) => {
     const stored = localStorage.getItem('selectedOutlet');
     return stored ? JSON.parse(stored) : null;
   });
+
+  const [outletId, setOutletId] = useState(null);
+  const [outletDetails, setOutletDetails] = useState(null);
+  const [isOutletOnlyUrl, setIsOutletOnlyUrl] = useState(false);
+
+  const location = useLocation();
 
   const parseOutletUrl = (url) => {
     const matches = url.match(URL_PATTERN);
@@ -90,6 +100,17 @@ export const OutletProvider = ({ children }) => {
     initializeOutlet().catch(console.error);
   }, []); // Run only on mount
 
+  // Updated pattern to handle basename
+  useEffect(() => {
+    // This regex pattern will:
+    // 1. Optionally match /menumitra_customer_app
+    // 2. Then match /o followed by numbers
+    // 3. Match end of path or trailing slash
+    const outletOnlyPattern = /^(\/menumitra_customer_app)?\/o\d+\/?$/;
+    
+    setIsOutletOnlyUrl(outletOnlyPattern.test(location.pathname));
+  }, [location.pathname]);
+
   const fetchOutletDetailsByCode = async (outletCode) => {
     try {
       const response = await axios.post('https://men4u.xyz/v2/user/get_restaurant_details_by_code', {
@@ -125,6 +146,8 @@ export const OutletProvider = ({ children }) => {
         // Store complete outlet info in localStorage
         localStorage.setItem('selectedOutlet', JSON.stringify(formattedOutletInfo));
         setOutletInfo(formattedOutletInfo);
+        setOutletId(details.outlet_id);
+        setOutletDetails(formattedOutletInfo);
         return formattedOutletInfo;
       }
     } catch (error) {
@@ -142,6 +165,8 @@ export const OutletProvider = ({ children }) => {
     };
     localStorage.setItem('selectedOutlet', JSON.stringify(updatedInfo));
     setOutletInfo(updatedInfo);
+    setOutletId(updatedInfo.outletId);
+    setOutletDetails(updatedInfo);
   };
 
   const clearOutletInfo = () => {
@@ -150,6 +175,8 @@ export const OutletProvider = ({ children }) => {
     localStorage.removeItem('sectionId');
     localStorage.removeItem('tableId');
     setOutletInfo(null);
+    setOutletId(null);
+    setOutletDetails(null);
   };
 
   // Memoize the context value to prevent unnecessary re-renders
@@ -159,7 +186,11 @@ export const OutletProvider = ({ children }) => {
     clearOutletInfo,
     fetchOutletDetailsByCode,
     // Convenience getters with null checks
-    outletId: outletInfo?.outletId,
+    outletId,
+    outletDetails,
+    setOutletId,
+    setOutletDetails,
+    isOutletOnlyUrl,
     outletCode: outletInfo?.outletCode,
     sectionId: outletInfo?.sectionId,
     tableId: outletInfo?.tableId,
@@ -179,7 +210,7 @@ export const OutletProvider = ({ children }) => {
     googleReview: outletInfo?.googleReview,
     googleBusinessLink: outletInfo?.googleBusinessLink,
     sectionName: outletInfo?.sectionName
-  }), [outletInfo]);
+  }), [outletInfo, outletId, outletDetails, isOutletOnlyUrl]);
 
   return (
     <OutletContext.Provider value={contextValue}>

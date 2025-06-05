@@ -20,6 +20,9 @@ import { useMenuItems } from '../hooks/useMenuItems';
 import { useOutlet } from '../contexts/OutletContext';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { OrderTypeModal } from '../components/Modal/variants/OrderTypeModal';
+import { useModal } from '../contexts/ModalContext';
+import OutletInfoBanner from "../components/OutletInfoBanner";
 
 
 const API_BASE_URL = 'https://men4u.xyz/v2';
@@ -46,13 +49,14 @@ function Home() {
   const { menuCategories, menuItems, isLoading } = useMenuItems();
   const { user } = useAuth();
   const [greeting, setGreeting] = useState('');
-  const { cartItems, updateQuantity, addToCart } = useCart();
+  const { cartItems, updateQuantity, addToCart, orderSettings } = useCart();
   const [specialMenuItems, setSpecialMenuItems] = useState([]);
   const navigate = useNavigate();
   const [favoriteMenuIds, setFavoriteMenuIds] = useState(new Set());
   const location = useLocation();
 
-  const { outletId } = useOutlet();
+  const { outletId, isOutletOnlyUrl } = useOutlet();
+  const { openModal, closeModal } = useModal();
 
   const handleCategoryClick = (category) => {
     // Navigate to category-menu with the category ID
@@ -183,11 +187,16 @@ function Home() {
     }
   }, [location.pathname]);
 
+  // Only show modal on outlet-only URL if no order type is set
+  useEffect(() => {
+    if (isOutletOnlyUrl && !orderSettings.order_type) {
+      openModal('orderType');
+    }
+  }, [isOutletOnlyUrl, orderSettings.order_type]);
+
   return (
     <>
       <div className="page-wraper">
-
-
         <Header />
         <div className="author-notification">
           <div className="container inner-wrapper">
@@ -773,6 +782,8 @@ function Home() {
         </div>
         <div className="offcanvas-backdrop pwa-backdrop fade" />
         {/* PWA Offcanvas End */}
+        {/* Show OrderTypeModal if outletOnly */}
+        {isOutletOnlyUrl && <OrderTypeModal />}
       </div>
     </>
   );

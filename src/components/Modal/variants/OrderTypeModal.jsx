@@ -4,7 +4,7 @@ import { useCart } from '../../../contexts/CartContext';
 import { useModal } from '../../../contexts/ModalContext';
 
 export const OrderTypeModal = () => {
-  const { closeModal } = useModal();
+  const { closeModal, modals } = useModal();
   const { updateOrderSettings, orderSettings } = useCart();
 
   const orderTypes = [
@@ -32,13 +32,14 @@ export const OrderTypeModal = () => {
 
   const handleOrderTypeSelect = (type) => {
     updateOrderSettings({ order_type: type });
-    closeModal();
+    closeModal('orderType');
   };
 
   return (
     <BaseModal 
+      isOpen={modals.orderType}
       title="Select Order Type" 
-      onClose={closeModal}
+      onClose={() => closeModal('orderType')}
     >
       <div className="row g-3">
         {orderTypes.map((type) => (

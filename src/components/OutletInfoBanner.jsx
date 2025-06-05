@@ -32,7 +32,7 @@ function OutletInfoBanner() {
   };
 
   const handleOrderTypeClick = () => {
-    openModal('ORDER_TYPE');
+    openModal('orderType');
   };
 
   const handleOutletClick = () => {

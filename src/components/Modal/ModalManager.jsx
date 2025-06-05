@@ -4,9 +4,9 @@ import { AddToCartModal } from './variants/AddToCartModal';
 import { OrderTypeModal } from './variants/OrderTypeModal';
 
 const ModalManager = () => {
-  const { modalConfig } = useModal();
+  const { modals } = useModal();
 
-  if (!modalConfig.isOpen) return null;
+  if (!modals.orderType) return null;
 
   const MODAL_COMPONENTS = {
     ADD_TO_CART: AddToCartModal,
@@ -14,7 +14,7 @@ const ModalManager = () => {
     // Add more modal types here
   };
 
-  const SpecificModal = MODAL_COMPONENTS[modalConfig.type];
+  const SpecificModal = MODAL_COMPONENTS[modals.orderType];
 
   return SpecificModal ? <SpecificModal /> : null;
 };

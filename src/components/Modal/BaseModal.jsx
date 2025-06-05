@@ -2,12 +2,16 @@ import React, { useEffect } from 'react';
 import { useModal } from '../../contexts/ModalContext';
 
 const BaseModal = ({ 
+  id,
+  isOpen,
   title, 
   children, 
   footer,
   onClose,
   size = 'modal-dialog-centered' // default size
 }) => {
+  if (!isOpen) return null;
+
   // Add body class when modal opens
   useEffect(() => {
     document.body.classList.add('modal-open');

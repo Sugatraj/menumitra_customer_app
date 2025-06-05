@@ -11,11 +11,15 @@ export const useMenuItems = () => {
   const { outletId } = useOutlet();
 
   const fetchMenusByCategory = async () => {
-    console.log('🔄 Fetching menu items...');
+    if (!outletId) {
+      console.log('No outlet ID available, skipping menu fetch');
+      return;
+    }
+
+    console.log('🔄 Fetching menu items for outlet:', outletId);
     try {
       const authData = localStorage.getItem('auth');
       const userData = authData ? JSON.parse(authData) : null;
-      console.log('📦 Using outlet ID:', outletId);
 
       const response = await fetch(`${API_BASE_URL}/user/get_all_menu_list_by_category`, {
         method: 'POST',
@@ -74,9 +78,11 @@ export const useMenuItems = () => {
   };
 
   useEffect(() => {
-    console.log('🏁 useMenuItems mounted, fetching data...');
-    fetchMenusByCategory();
-  }, []); // Only run once on mount
+    if (outletId) {
+      console.log('🏁 OutletId changed, fetching menu data...');
+      fetchMenusByCategory();
+    }
+  }, [outletId]); // Depend on outletId
 
   return {
     menuCategories,

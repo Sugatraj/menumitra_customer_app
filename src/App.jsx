@@ -37,13 +37,13 @@ function App() {
   console.log("Router basename:", import.meta.env.BASE_URL);
 
   return (
-    <Router basename={import.meta.env.BASE_URL}>
-      <OutletProvider>
-        <ThemeColorProvider>
-          <ThemeProvider>
-            <AuthProvider>
-              <CartProvider onLogout={handleLogout}>
-                <ModalProvider>
+    <ModalProvider>
+      <Router basename={import.meta.env.BASE_URL}>
+        <OutletProvider>
+          <ThemeColorProvider>
+            <ThemeProvider>
+              <AuthProvider>
+                <CartProvider onLogout={handleLogout}>
                   <AuthOffcanvas />
                   <SidebarProvider>
                     <Routes>
@@ -77,13 +77,13 @@ function App() {
                     <Sidebar />
                   </SidebarProvider>
                   <ModalManager />
-                </ModalProvider>
-              </CartProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </ThemeColorProvider>
-      </OutletProvider>
-    </Router>
+                </CartProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </ThemeColorProvider>
+        </OutletProvider>
+      </Router>
+    </ModalProvider>
   );
 }
 

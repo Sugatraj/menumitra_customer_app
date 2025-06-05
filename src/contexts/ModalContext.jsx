@@ -1,6 +1,36 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const ModalContext = createContext();
+
+export const ModalProvider = ({ children }) => {
+  const [modals, setModals] = useState({
+    orderType: false
+  });
+
+  const openModal = (modalId) => {
+    setModals(prev => ({
+      ...prev,
+      [modalId]: true
+    }));
+  };
+
+  const closeModal = (modalId) => {
+    setModals(prev => ({
+      ...prev,
+      [modalId]: false
+    }));
+  };
+
+  return (
+    <ModalContext.Provider value={{
+      modals,
+      openModal,
+      closeModal
+    }}>
+      {children}
+    </ModalContext.Provider>
+  );
+};
 
 export const useModal = () => {
   const context = useContext(ModalContext);
@@ -8,43 +38,4 @@ export const useModal = () => {
     throw new Error('useModal must be used within a ModalProvider');
   }
   return context;
-};
-
-export const ModalProvider = ({ children }) => {
-  const [modalConfig, setModalConfig] = useState({
-    isOpen: false,
-    type: null,
-    data: null
-  });
-
-  // Handle ESC key to close modal
-  useEffect(() => {
-    const handleEscKey = (event) => {
-      if (event.key === 'Escape' && modalConfig.isOpen) {
-        closeModal();
-      }
-    };
-
-    if (modalConfig.isOpen) {
-      window.addEventListener('keydown', handleEscKey);
-    }
-
-    return () => {
-      window.removeEventListener('keydown', handleEscKey);
-    };
-  }, [modalConfig.isOpen]);
-
-  const openModal = (type, data = null) => {
-    setModalConfig({ isOpen: true, type, data });
-  };
-
-  const closeModal = () => {
-    setModalConfig({ isOpen: false, type: null, data: null });
-  };
-
-  return (
-    <ModalContext.Provider value={{ modalConfig, openModal, closeModal }}>
-      {children}
-    </ModalContext.Provider>
-  );
 };
